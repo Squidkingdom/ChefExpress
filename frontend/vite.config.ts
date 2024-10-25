@@ -6,5 +6,10 @@ export default defineConfig({
   plugins: [react()],
   build: {
     outDir: '../server/static'
+  },
+  server: {
+    watch: {
+      usePolling: true
+    }
   }
 })
