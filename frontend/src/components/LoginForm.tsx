@@ -1,3 +1,20 @@
+/**
+ * LoginForm component for user authentication.
+ * Provides a form interface for user login by capturing
+ * username and password inputs, with an API call placeholder on submit.
+ * 
+ * @component
+ * @returns {React.JSX.Element} A login form component with input fields for username and password.
+ * 
+ * @example
+ * <LoginForm />
+ * 
+ * @interface FormData
+ * @property {string} username - Username input value.
+ * @property {string} password - Password input value.
+ */
+
+
 import React, { ChangeEvent } from "react";
 import FormText from "../subcomponents/FormText";
 

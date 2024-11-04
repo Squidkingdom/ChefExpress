@@ -1,3 +1,28 @@
+/**
+ * FormText component for rendering a labeled text input field.
+ *
+ * This component displays a text input with an associated label, and handles
+ * input changes via a callback function. It supports custom placeholder text
+ * and label display for a streamlined form experience.
+ *
+ * @param {FormTextProps} props - The properties required by the component.
+ * @param {string} props.name - Internal name attribute of the input field.
+ * @param {string} props.value - Current value of the input field.
+ * @param {string} props.label - Label text displayed above the input.
+ * @param {string} props.placeholder - Placeholder text for the input.
+ * @param {(e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void} props.onChange - Function called on input change.
+ * @returns {React.JSX.Element} The rendered input field with label.
+ *
+ * @example
+ * <FormText
+ *   name="username"
+ *   value={username}
+ *   label="Username"
+ *   placeholder="Enter your username"
+ *   onChange={handleInputChange}
+ * />
+ */
+
 import React, { ChangeEvent } from "react";
 
 /**

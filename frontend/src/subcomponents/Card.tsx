@@ -1,6 +1,3 @@
-import React from 'react';
-
-
 
 /**
  * Card component
@@ -9,6 +6,8 @@ import React from 'react';
  * @param {React.ReactNode} children - HTML to display within the card
  * @returns { React.JSX.Element}
  */
+import React from 'react';
+
 const Card: React.FC<{children: React.ReactNode}> = ({children}) => {
     return (
         <div className="max-w-4xl mx-auto pt-4 pb-20">

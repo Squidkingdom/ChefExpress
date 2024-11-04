@@ -1,3 +1,22 @@
+/**
+ * Header component for the ChefExpress application.
+ * 
+ * This component renders the site title and a set of navigation buttons.
+ * It utilizes React Router's Link component for client-side navigation.
+ * The NavButtons component contains multiple NavButton components,
+ * each directing to different routes within the application.
+ * 
+ * @module Header
+ * @requires react
+ * @requires react-router-dom
+ * @component
+ * @example
+ * return (
+ *   <Header />
+ * );
+ */
+
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
