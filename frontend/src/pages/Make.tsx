@@ -1,5 +1,11 @@
 import React from 'react';
 
+
+/**
+ * Making Page
+ * The Making page for the application
+ * @returns {React.JSX.Element} -  Making Page
+ */
 const Make: React.FC = () => {
     return (
         <div className=''>

@@ -1,8 +1,35 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 
+/**
+ * Interface for Navigation buttons.
+ *
+ * @interface NavButtonProps
+ */
+interface NavButtonProps {
+    /**
+     * The path to navigate to when the button is clicked.
+     * @type {string}
+     */
+    to: string;
 
-const NavButton: React.FC<{to: string; children: React.ReactNode}> = ({ to, children }) => {
+    /**
+     * The content to be displayed inside the button.
+     * Usually used for button text
+     * @type {React.ReactNode}
+     */
+    children: React.ReactNode;
+}
+
+/**
+ * A button component for navigation that renders a link styled as a button.
+ *
+ * @param {NavButtonProps} props - The properties for the NavButton component.
+ * @param {string} props.to - The path to navigate to.
+ * @param {React.ReactNode} props.children - The content of the button.
+ * @returns {JSX.Element} The rendered NavButton component.
+ */
+const NavButton: React.FC<NavButtonProps> = ({ to, children }) => {
     return (
         <Link
             to={to}
@@ -13,6 +40,10 @@ const NavButton: React.FC<{to: string; children: React.ReactNode}> = ({ to, chil
     );
 };
 
+/**
+ * A component that renders a set of navigation buttons.
+ * @returns {JSX.Element} The rendered NavButtons component containing multiple NavButton components.
+ */
 const NavButtons: React.FC = () => {
     return (
         <div className="flex flex-col md:flex-row lg:space-x-4 ">
@@ -21,10 +52,14 @@ const NavButtons: React.FC = () => {
             <NavButton to="/Order">Order</NavButton>
             <NavButton to="/Share">Share</NavButton>
             <NavButton to="/Login">Login</NavButton>
-
         </div>
     );
 };
+
+/**
+ * The header component that contains the site title and navigation links.
+ * @returns {JSX.Element} The rendered Header component containing the site title and navigation buttons.
+ */
 const Header: React.FC = () => {
     return (
         <header className='bg-gray-800 text-white p-5'>
@@ -35,7 +70,7 @@ const Header: React.FC = () => {
                 </nav>
             </div>
         </header>
-    )
+    );
 };
 
 export default Header;

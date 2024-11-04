@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * Order Page
+ * The Ordering page for the application
+ * @returns {React.JSX.Element} -  Order Page
+ */
 const Order: React.FC = () => {
     return (
         <div className=''>

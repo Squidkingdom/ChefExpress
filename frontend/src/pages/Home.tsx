@@ -1,5 +1,11 @@
 import React from 'react';
 
+
+/**
+ * Home Page
+ * The Home page for the application
+ * @returns {React.JSX.Element} - Home Page
+ */
 const Home: React.FC = () => {
     return (
         <div className=''>

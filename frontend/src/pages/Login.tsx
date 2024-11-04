@@ -1,6 +1,12 @@
 import React from 'react';
 import Card from '../subcomponents/Card';
 import LoginForm from '../components/LoginForm';
+
+/**
+ * Login Page
+ * The login page for the application
+ * @returns {React.JSX.Element} - Login Page
+ */
 const Login: React.FC = () => {
     return (
         <div>

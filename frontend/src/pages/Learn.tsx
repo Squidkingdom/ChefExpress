@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * Learn Page
+ * The Learning page for the application
+ * @returns {React.JSX.Element} - Learn Page
+ */
 const Learn: React.FC = () => {
     return (
         <div className=''>

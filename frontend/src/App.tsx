@@ -16,6 +16,7 @@ function App() {
     <Router>
       <Header/>
         <Routes>
+          {/** Display the correct page based on the URL path. */}
           <Route path="/" element={<Home/>}/>
           <Route path="/learn" element={<Learn/>} />
           <Route path="/make" element={<Make/>} />
@@ -23,9 +24,7 @@ function App() {
           <Route path="/share" element={<Share/>} />
           <Route path="/home" element={<Home/>} />
           <Route path="/login" element={<Login/>} />
-
         </Routes>
-      
     </Router>
   )
 }

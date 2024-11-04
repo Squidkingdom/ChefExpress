@@ -2,6 +2,13 @@ import React from 'react';
 
 
 
+/**
+ * Card component
+ * Displays its children visually higher than the its parent with a bit of drop shadow.
+ *
+ * @param {React.ReactNode} children - HTML to display within the card
+ * @returns { React.JSX.Element}
+ */
 const Card: React.FC<{children: React.ReactNode}> = ({children}) => {
     return (
         <div className="max-w-4xl mx-auto pt-4 pb-20">

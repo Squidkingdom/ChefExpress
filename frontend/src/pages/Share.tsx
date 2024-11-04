@@ -1,5 +1,10 @@
 import React from 'react';
 
+/**
+ * Share Page
+ * The Sharing page for the application
+ * @returns {React.JSX.Element} -  Sharing Page
+ */
 const Share: React.FC = () => {
     return (
         <div className=''>
