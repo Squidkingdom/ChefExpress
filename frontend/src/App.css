@@ -1,0 +1,57 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* Font Import */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
+
+/* Root color variables */
+:root {
+    --primary-color: #333333;
+    --secondary-color: #777777;
+    --background-color: #f9f9f9;
+}
+
+/* Base Body Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    color: var(--primary-color);
+    background-color: var(--background-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom Utility Classes */
+/* These add consistency and keep classes lightweight without extra custom CSS */
+
+.flex-center {
+    @apply flex items-center justify-center;
+}
+
+.text-primary {
+    color: var(--primary-color);
+}
+
+.text-secondary {
+    color: var(--secondary-color);
+}
+
+.bg-primary {
+    background-color: var(--primary-color);
+    color: #ffffff;
+}
+
+/* Card Component (if custom styling is needed beyond Tailwind) */
+.card {
+    @apply bg-white rounded-lg shadow-lg p-6 mb-4;
+}
+
+.btn-primary {
+    @apply bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90 transition duration-200;
+}
+
+
+img {
+    max-width: 100%;
+    height: auto;
+}
