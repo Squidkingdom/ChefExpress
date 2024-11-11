@@ -37,6 +37,7 @@ function App() {
           <Route path="/order" element={<Order/>} />
           <Route path="/share" element={<Share/>} />
           <Route path="/home" element={<Home/>} />
+          <Route path="/login" element={<Login/>} />
         {/* Optional route for /home to redirect to the main homepage */}
         <Route path="/home" element={<Home />} />
         
