@@ -1,21 +1,26 @@
+import React from 'react';
+
+interface CardProps {
+    children: React.ReactNode;
+    className?: string; // Optional additional styling classes for customization
+}
 
 /**
  * Card component
- * Displays its children visually higher than the its parent with a bit of drop shadow.
+ * Displays its children visually elevated with a drop shadow and padding.
  *
- * @param {React.ReactNode} children - HTML to display within the card
- * @returns { React.JSX.Element}
+ * @param {React.ReactNode} children - Content to display within the card.
+ * @param {string} [className] - Optional additional classes for custom styling.
+ * @returns { React.JSX.Element }
  */
-import React from 'react';
-
-const Card: React.FC<{children: React.ReactNode}> = ({children}) => {
+const Card: React.FC<CardProps> = ({ children, className }) => {
     return (
-        <div className="max-w-4xl mx-auto pt-4 pb-20">
-          <div className="sm:mx-8 sm:border sm:shadow-xl sm:px-8 pb-8">
-            {children} 
-          </div>
+        <div className={`max-w-4xl mx-auto p-4 ${className || ''}`}>
+            <div className="bg-white rounded-lg shadow-md p-6 transition duration-300 hover:shadow-lg">
+                {children}
+            </div>
         </div>
-      );
+    );
 };
 
 export default Card;

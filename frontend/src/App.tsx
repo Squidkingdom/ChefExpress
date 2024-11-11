@@ -37,10 +37,14 @@ function App() {
           <Route path="/order" element={<Order/>} />
           <Route path="/share" element={<Share/>} />
           <Route path="/home" element={<Home/>} />
-          <Route path="/login" element={<Login/>} />
+        {/* Optional route for /home to redirect to the main homepage */}
+        <Route path="/home" element={<Home />} />
+        
+        {/* 404 Fallback Route */}
+        <Route path="*" element={<div className="text-center py-10 text-2xl">Page Not Found</div>} />
         </Routes>
     </Router>
-  )
+  );
 }
 
 export default App
