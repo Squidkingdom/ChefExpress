@@ -1,65 +1,210 @@
-import React from 'react';
+// src/pages/Home.tsx
+
+import React from "react";
+import { FaUtensils, FaBookOpen, FaUsers } from "react-icons/fa";
+import { motion } from "framer-motion";
+
+/**
+ * Interface for Home component props.
+ */
+interface HomeProps {
+  setRunTour: (run: boolean) => void;
+}
 
 /**
  * Home Page
- * The Home page for the ChefExpress application.
- * @returns {React.JSX.Element} - Home Page
+ * Enhanced with interactive elements, animations, and a modern design.
+ * @returns {React.JSX.Element} - Enhanced Home Page
  */
-const Home: React.FC = () => {
-    return (
-        <div className="min-h-screen flex flex-col items-center bg-gray-50">
-            {/* Hero Section */}
-            <header className="text-center py-16 bg-blue-600 text-white w-full">
-                <h1 className="text-5xl font-extrabold">Welcome to ChefExpress!</h1>
-                <p className="text-xl mt-4">Start cooking delicious meals with our recipes.</p>
-            </header>
+const Home: React.FC<HomeProps> = ({ setRunTour }) => {
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans overflow-x-hidden">
+      {/* Hero Section */}
+      <header
+        className="hero-section relative flex flex-col justify-center items-center text-center py-32 bg-cover bg-center w-full"
+        style={{
+          backgroundImage: "url('/images/hero-background.jpg')",
+        }}
+        id="hero"
+      >
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-50"></div>
 
-            {/* Features Section */}
-            <section className="flex flex-col items-center w-full py-12 px-6 max-w-4xl">
-                <h2 className="text-3xl font-bold text-primary mb-4">Discover New Recipes Every Day</h2>
-                <p className="text-lg text-gray-700 text-center mb-8 max-w-xl">
-                    ChefExpress brings you a curated collection of recipes to satisfy your taste buds and inspire your culinary adventures. Whether you're a beginner or a seasoned chef, we have recipes for every skill level and taste!
-                </p>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                    <div className="bg-white p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg">
-                        <h3 className="text-2xl font-semibold mb-2">Variety of Recipes</h3>
-                        <p className="text-gray-600">Explore recipes for every cuisine and dietary need.</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg">
-                        <h3 className="text-2xl font-semibold mb-2">Easy Instructions</h3>
-                        <p className="text-gray-600">Simple, step-by-step guides to make cooking enjoyable.</p>
-                    </div>
-                    <div className="bg-white p-6 rounded-lg shadow-md text-center transition duration-300 hover:shadow-lg">
-                        <h3 className="text-2xl font-semibold mb-2">Community Tips</h3>
-                        <p className="text-gray-600">Connect with fellow chefs and share cooking secrets.</p>
-                    </div>
-                </div>
-            </section>
+        <motion.div
+          className="max-w-4xl px-4 relative z-10"
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+        >
+          <h1 className="text-5xl md:text-7xl font-extrabold text-teal-400 mb-6">
+            Welcome to{" "}
+            <span className="text-white">Chef</span>
+            <span className="text-teal-500">Express</span>!
+          </h1>
+          <p className="text-2xl md:text-3xl text-gray-200 mb-8">
+            Ready to cook something delicious today?
+          </p>
+          <button
+            className="px-8 py-4 bg-teal-500 text-gray-900 rounded-full font-semibold text-xl hover:bg-teal-400 transition duration-300"
+            onClick={() => setRunTour(true)}
+            id="cta-button"
+          >
+            Get Started
+          </button>
+        </motion.div>
+      </header>
 
-            {/* Testimonials Section */}
-            <section className="bg-white w-full max-w-4xl p-8 rounded-lg shadow-lg my-10 text-center">
-                <h3 className="text-3xl font-bold mb-6 text-primary">What Our Users Say</h3>
-                <div className="flex flex-col sm:flex-row justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                    <div className="bg-gray-100 p-4 rounded-lg max-w-xs mx-auto shadow">
-                        <p>"ChefExpress has changed the way I cook at home. The recipes are easy to follow and delicious!"</p>
-                        <p className="mt-2 font-semibold text-gray-600">- Alice</p>
-                    </div>
-                    <div className="bg-gray-100 p-4 rounded-lg max-w-xs mx-auto shadow">
-                        <p>"Perfect for quick meals. The variety is amazing!"</p>
-                        <p className="mt-2 font-semibold text-gray-600">- Bob</p>
-                    </div>
-                </div>
-            </section>
-
-            {/* CTA Button */}
-            <div className="py-8">
-                <button className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-600 transition duration-200">
-                    Get Started
-                </button>
-            </div>
+      {/* Features Section */}
+      <section className="features-section py-20 px-6 bg-gray-900">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-4xl font-bold text-white text-center mb-12">
+            What We Offer
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <motion.div
+              className="feature-card bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-8 text-center"
+              id="feature-variety"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaUtensils className="text-teal-500 text-6xl mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-teal-400 mb-4">
+                Variety of Recipes
+              </h3>
+              <p className="text-gray-300">
+                Explore recipes tailored to your taste. From quick snacks to
+                gourmet meals, find it all here.
+              </p>
+            </motion.div>
+            <motion.div
+              className="feature-card bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-8 text-center"
+              id="feature-instructions"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaBookOpen className="text-teal-500 text-6xl mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-teal-400 mb-4">
+                Step-by-Step Guides
+              </h3>
+              <p className="text-gray-300">
+                Easy instructions with visuals to make cooking enjoyable and
+                hassle-free.
+              </p>
+            </motion.div>
+            <motion.div
+              className="feature-card bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-8 text-center"
+              id="feature-community"
+              whileHover={{ scale: 1.05 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FaUsers className="text-teal-500 text-6xl mx-auto mb-6" />
+              <h3 className="text-2xl font-semibold text-teal-400 mb-4">
+                Community Engagement
+              </h3>
+              <p className="text-gray-300">
+                Share and discover tips with fellow chefs. Join our vibrant
+                community.
+              </p>
+            </motion.div>
+          </div>
         </div>
-    );
+      </section>
+
+      {/* Parallax Section */}
+      <section
+        className="parallax-section bg-fixed bg-center bg-cover py-32 text-center text-white"
+        style={{
+          backgroundImage: "url('/images/parallax-background.jpg')",
+        }}
+      >
+        <div className="bg-gray-900 bg-opacity-60 py-20 px-4">
+          <h2 className="text-4xl font-bold mb-6">
+            Cooking Made <span className="text-teal-500">Simple</span> and{" "}
+            <span className="text-teal-500">Fun</span>
+          </h2>
+          <p className="text-xl max-w-3xl mx-auto">
+            Whether you're a beginner or a seasoned chef, ChefExpress offers
+            tools and resources to enhance your culinary journey.
+          </p>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section
+        className="bg-gray-900 py-20 px-6"
+        id="testimonials-section"
+      >
+        <div className="max-w-6xl mx-auto">
+          <h3 className="text-4xl font-bold text-white text-center mb-12">
+            Hear from Our Community
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+            <motion.div
+              className="testimonial-card bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-8 text-center"
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-gray-300 italic mb-4">
+                "ChefExpress makes cooking fun and easy!"
+              </p>
+              <p className="text-teal-400 font-semibold">- Alex</p>
+            </motion.div>
+            <motion.div
+              className="testimonial-card bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-8 text-center"
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-gray-300 italic mb-4">
+                "A daily source of inspiration for my meals."
+              </p>
+              <p className="text-teal-400 font-semibold">- Jamie</p>
+            </motion.div>
+            <motion.div
+              className="testimonial-card bg-gray-800 border border-gray-700 rounded-lg shadow-lg p-8 text-center"
+              whileHover={{ scale: 1.03 }}
+              transition={{ duration: 0.3 }}
+            >
+              <p className="text-gray-300 italic mb-4">
+                "The community tips are a game-changer!"
+              </p>
+              <p className="text-teal-400 font-semibold">- Taylor</p>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Newsletter Section */}
+      <section className="bg-gray-800 py-20 px-6">
+        <div className="max-w-4xl mx-auto text-center">
+          <h2 className="text-3xl font-bold text-white mb-6">
+            Join Our Newsletter
+          </h2>
+          <p className="text-gray-300 mb-8">
+            Stay updated with the latest recipes and culinary news.
+          </p>
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="px-4 py-3 rounded-full w-full sm:w-auto flex-grow bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
+            />
+            <button className="px-6 py-3 bg-teal-500 text-gray-900 rounded-full font-medium hover:bg-teal-400 transition duration-300">
+              Subscribe
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-gray-900 py-8">
+        <div className="max-w-6xl mx-auto text-center">
+          <p className="text-gray-500">
+            &copy; {new Date().getFullYear()} ChefExpress. All rights reserved.
+          </p>
+        </div>
+      </footer>
+    </div>
+  );
 };
 
 export default Home;
