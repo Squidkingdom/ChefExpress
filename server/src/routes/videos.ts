@@ -1,6 +1,6 @@
 import express, {NextFunction, Request, Response } from "express";
 import log4js from "log4js";
-import { prisma } from '../db/client';
+import { prisma } from "../db/client";
 
 
 const router = express.Router();

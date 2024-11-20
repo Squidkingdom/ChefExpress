@@ -23,14 +23,14 @@ const Learn: React.FC = () => {
 
   // Function to extract video ID from the URL
   const getVideoId = (url: string) => {
-    const regex = /embed\/([^\?&"]+)/;
+    const regex = /watch\?v=([^&]+)/;
     const match = url.match(regex);
     return match ? match[1] : "";
   };
 
   // Fetch video data Using TanStack's useQuery hook
   const fetchVideos = async () => {
-    const response = await fetch("localhost:3000/api/videos", {
+    const response = await fetch("http://localhost:3000/api/videos", {
       method: "POST"
     });
 
