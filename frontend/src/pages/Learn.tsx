@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { FaSearch, FaPlayCircle } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useQuery } from "@tanstack/react-query";
 
 // Define the Video interface
 interface Video {
@@ -14,38 +15,6 @@ interface Video {
 }
 
 const Learn: React.FC = () => {
-  const videos: Video[] = [
-    {
-      length: "2:39",
-      title: "Focusing on Safety",
-      URL: "https://www.youtube.com/embed/VHGtPeH4tCg",
-      id: "1.1",
-      category: "Kitchen Safety",
-    },
-    {
-      length: "2:46",
-      title: "Preventing Burns and Scalds",
-      URL: "https://www.youtube.com/embed/05TlLLUWUG8",
-      id: "1.4",
-      category: "Kitchen Safety",
-    },
-    {
-      length: "2:03",
-      title: "Food Combinations",
-      URL: "https://www.youtube.com/embed/NMt3H2CbTg4",
-      id: "2.9",
-      category: "Food Science",
-    },
-    {
-      length: "30:13",
-      title: "Cuisinart Culinary School - Episode 6",
-      URL: "https://www.youtube.com/embed/ZDqrMDw6QRY",
-      id: "3.6",
-      category: "Culinary Arts",
-    },
-    // Add more videos as needed
-  ];
-
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -59,6 +28,23 @@ const Learn: React.FC = () => {
     return match ? match[1] : "";
   };
 
+  // Fetch video data Using TanStack's useQuery hook
+  const fetchVideos = async () => {
+    const response = await fetch("localhost:3000/api/videos", {
+      method: "POST"
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch videos");
+    }
+    return response.json();
+  }
+
+  const { data: videos = [], isLoading, isError, error } = useQuery<Video[], Error>({
+    queryKey: ["videos"],
+    queryFn: fetchVideos
+  })
+
   const filteredVideos = videos.filter((video) => {
     const matchesCategory = selectedCategory
       ? video.category === selectedCategory
@@ -68,6 +54,8 @@ const Learn: React.FC = () => {
       .includes(searchQuery.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+  
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100">
