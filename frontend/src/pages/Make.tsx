@@ -1,11 +1,15 @@
 // src/pages/Make.tsx
 
 import React, { useState, useEffect, ChangeEvent } from "react";
-import { FaPlus, FaTimes } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { 
+  FaPlus, FaTimes, FaUtensils, FaTrash, FaClock, 
+  FaCamera, FaListUl, FaPencilAlt, FaCalendarAlt, FaBook
+} from "react-icons/fa";
+import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
+// Interface Definitions
 interface Ingredient {
   name: string;
   quantity: string;
@@ -31,14 +35,9 @@ interface MealPlan {
   [date: string]: Meal;
 }
 
-/**
- * Make Page
- * Includes recipe maker, saved recipes, meal planner, and meal selector.
- * Updated to work with the guided tour.
- * @returns {React.JSX.Element} - Make Page with full functionality.
- */
+// Main Make Page Component
 const Make: React.FC = () => {
-  // Initialize recipes with example data
+  // State Variables
   const [recipes, setRecipes] = useState<Recipe[]>([
     {
       id: 1,
@@ -106,12 +105,16 @@ const Make: React.FC = () => {
   const [mealPlan, setMealPlan] = useState<MealPlan>({});
   const [currentWeek, setCurrentWeek] = useState<Date[]>([]);
 
+  const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner">("breakfast");
+  const [showMealSelector, setShowMealSelector] = useState(false);
+
+  const [currentView, setCurrentView] = useState<"select" | "create" | "planner" | "view">("select");
+
   // Initialize current week dates
   useEffect(() => {
     const today = new Date();
-    const firstDayOfWeek = new Date(
-      today.setDate(today.getDate() - today.getDay())
-    );
+    const firstDayOfWeek = new Date(today.setDate(today.getDate() - today.getDay()));
     const dates = Array.from({ length: 7 }, (_, i) => {
       const date = new Date(firstDayOfWeek);
       date.setDate(firstDayOfWeek.getDate() + i);
@@ -128,6 +131,12 @@ const Make: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
+  // Handle ingredient input changes
+  const handleIngredientChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setNewIngredient({ ...newIngredient, [name]: value });
+  };
+
   // Handle ingredient addition
   const handleAddIngredient = () => {
     if (newIngredient.name && newIngredient.quantity && newIngredient.unit) {
@@ -136,15 +145,18 @@ const Make: React.FC = () => {
         ingredients: [...formData.ingredients, newIngredient],
       });
       setNewIngredient({ name: "", quantity: "", unit: "" });
+      toast.success("Ingredient added");
     } else {
       toast.error("Please fill in all ingredient fields.");
     }
   };
 
-  // Handle ingredient input
-  const handleIngredientChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewIngredient({ ...newIngredient, [name]: value });
+  // Handle ingredient removal
+  const handleRemoveIngredient = (index: number) => {
+    const updatedIngredients = [...formData.ingredients];
+    updatedIngredients.splice(index, 1);
+    setFormData({ ...formData, ingredients: updatedIngredients });
+    toast.success("Ingredient removed");
   };
 
   // Handle image upload
@@ -175,13 +187,7 @@ const Make: React.FC = () => {
     }
   };
 
-  // Meal planner functions
-  const [selectedDate, setSelectedDate] = useState<string | null>(null);
-  const [mealType, setMealType] = useState<"breakfast" | "lunch" | "dinner">(
-    "breakfast"
-  );
-  const [showMealSelector, setShowMealSelector] = useState(false);
-
+  // Handle meal slot click
   const handleMealSlotClick = (
     date: string,
     meal: "breakfast" | "lunch" | "dinner"
@@ -191,6 +197,7 @@ const Make: React.FC = () => {
     setShowMealSelector(true);
   };
 
+  // Handle meal selection
   const handleSelectMeal = (recipe: Recipe) => {
     if (selectedDate) {
       setMealPlan({
@@ -209,343 +216,681 @@ const Make: React.FC = () => {
     }
   };
 
-  const renderMealPlanner = () => {
-    return (
-      <div className="overflow-x-auto">
-        <table className="w-full text-left table-auto">
-          <thead>
-            <tr>
-              <th className="py-4 px-6 bg-gray-800 text-teal-400 font-bold">Day</th>
-              <th className="py-4 px-6 bg-gray-800 text-teal-400 font-bold">
-                Breakfast
-              </th>
-              <th className="py-4 px-6 bg-gray-800 text-teal-400 font-bold">Lunch</th>
-              <th className="py-4 px-6 bg-gray-800 text-teal-400 font-bold">Dinner</th>
-            </tr>
-          </thead>
-          <tbody>
-            {currentWeek.map((date) => {
-              const dateString = date.toDateString();
-              const meals = mealPlan[dateString] || {
-                breakfast: null,
-                lunch: null,
-                dinner: null,
-              };
-              return (
-                <tr key={dateString} className="border-b border-gray-700">
-                  <td className="py-4 px-6 bg-gray-800 text-gray-200 font-semibold">
-                    {date.toLocaleDateString("en-US", {
-                      weekday: "long",
-                      month: "short",
-                      day: "numeric",
-                    })}
-                  </td>
-                  {(["breakfast", "lunch", "dinner"] as const).map((meal) => (
-                    <td
-                      key={meal}
-                      className="py-4 px-6 bg-gray-800 cursor-pointer hover:bg-gray-700"
-                      onClick={() => handleMealSlotClick(dateString, meal)}
-                    >
-                      {meals[meal] ? (
-                        <div className="flex items-center">
-                          {meals[meal]?.image && (
-                            <img
-                              src={meals[meal]?.image}
-                              alt={meals[meal]?.title}
-                              className="w-10 h-10 object-cover rounded-full mr-3"
-                            />
-                          )}
-                          <span className="text-teal-400">
-                            {meals[meal]?.title}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center text-gray-400">
-                          <FaPlus className="mr-2" /> Add
-                        </div>
-                      )}
-                    </td>
-                  ))}
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    );
+  // Animation Variants
+  const { scrollY } = useScroll();
+  const headerOpacity = useTransform(scrollY, [0, 200], [1, 0]);
+  const headerScale = useTransform(scrollY, [0, 200], [1, 0.95]);
+  const smoothY = useSpring(headerOpacity, { stiffness: 100, damping: 30 });
+
+  const containerVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: 0.6 }
+    }
   };
 
-  return (
-    <div className="make-recipe-builder min-h-screen bg-gray-900 text-gray-100 py-10">
-      {/* Toast Notifications */}
-      <ToastContainer position="top-right" autoClose={3000} />
+  const staggerContainer = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
 
-      {/* Hero Section */}
-      <header
-        className="text-center py-16 bg-cover bg-center relative"
-        style={{
-          backgroundImage: "url('/images/make-hero.jpg')",
-        }}
+  const fadeIn = {
+    hidden: { opacity: 0, y: 20 },
+    visible: { opacity: 1, y: 0 }
+  };
+
+  // Handle Week Navigation
+  const navigateWeek = (direction: "prev" | "next") => {
+    const newWeek = currentWeek.map(date => {
+      const newDate = new Date(date);
+      newDate.setDate(newDate.getDate() + (direction === "prev" ? -7 : 7));
+      return newDate;
+    });
+    setCurrentWeek(newWeek);
+  };
+
+  // Sub-Components
+
+  // Selection View
+  const SelectView = () => (
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className="grid grid-cols-1 md:grid-cols-3 gap-8"
+    >
+      {/* Create Recipe Card */}
+      <motion.div
+        variants={fadeIn}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setCurrentView("create")}
+        className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700/50 transition-colors duration-300"
       >
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-75"></div>
-        <motion.div
-          className="relative z-10 max-w-3xl mx-auto px-4"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-        >
-          <h1 className="text-5xl font-extrabold text-teal-400 mb-4">
-            Create and Share Your Recipes!
-          </h1>
-          <p className="text-xl text-gray-200">
-            Build your personalized meal plans and inspire others.
-          </p>
-        </motion.div>
-      </header>
+        <FaPencilAlt className="text-5xl text-teal-400 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-200">Create a Recipe</h3>
+        <p className="text-gray-400 mt-2 text-center">
+          Share your unique recipes with the community.
+        </p>
+      </motion.div>
 
-      <div className="container mx-auto px-4 py-12">
-        {/* Recipe Maker Section */}
-        <div
-          className="recipe-maker w-full max-w-6xl mx-auto bg-gray-800 p-8 rounded-lg shadow-lg mb-16"
-          id="make-recipe-maker" // Added ID for Guided Tour targeting
+      {/* Meal Planner Card */}
+      <motion.div
+        variants={fadeIn}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setCurrentView("planner")}
+        className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700/50 transition-colors duration-300"
+      >
+        <FaCalendarAlt className="text-5xl text-teal-400 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-200">Plan Meals</h3>
+        <p className="text-gray-400 mt-2 text-center">
+          Organize your weekly meals with our planner.
+        </p>
+      </motion.div>
+
+      {/* View Recipes Card */}
+      <motion.div
+        variants={fadeIn}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setCurrentView("view")}
+        className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-6 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-700/50 transition-colors duration-300"
+      >
+        <FaBook className="text-5xl text-teal-400 mb-4" />
+        <h3 className="text-xl font-semibold text-gray-200">View Recipes</h3>
+        <p className="text-gray-400 mt-2 text-center">
+          Browse and manage your saved culinary creations.
+        </p>
+      </motion.div>
+    </motion.div>
+  );
+
+  // Create Recipe View
+  const CreateRecipe = () => (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="relative backdrop-blur-lg bg-gray-800/50 p-8 rounded-2xl shadow-xl border border-gray-700/50 mb-16"
+    >
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/5 to-cyan-500/5 rounded-2xl blur-xl" />
+      
+      <div className="relative z-10">
+        <motion.h2 
+          className="text-3xl font-bold text-center mb-12"
+          variants={fadeIn}
         >
-          <h2 className="text-3xl font-bold text-center text-teal-400 mb-8">
-            New Recipe
-          </h2>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
-            {/* Grid Layout for Form */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column */}
-              <div className="space-y-6">
-                {/* Recipe Title */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Recipe Title</label>
+          <span className="bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
+            Create New Recipe
+          </span>
+        </motion.h2>
+
+        <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
+          <motion.div 
+            className="grid grid-cols-1 lg:grid-cols-2 gap-8"
+            variants={staggerContainer}
+            initial="hidden"
+            animate="visible"
+          >
+            {/* Left Column */}
+            <div className="space-y-6">
+              {/* Recipe Title */}
+              <motion.div variants={fadeIn} className="group">
+                <label className="block text-gray-300 mb-2">Recipe Title</label>
+                <div className="relative">
                   <input
                     type="text"
                     name="title"
                     value={formData.title}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-6 py-4 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl
+                      focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300
+                      group-hover:border-teal-500/50"
+                    placeholder="Enter recipe name..."
                     required
                   />
+                  <FaPencilAlt className="absolute right-4 top-1/2 transform -translate-y-1/2 text-gray-500 group-hover:text-teal-400 transition-colors duration-300" />
                 </div>
+              </motion.div>
 
-                {/* Description */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Description</label>
+              {/* Description */}
+              <motion.div variants={fadeIn} className="group">
+                <label className="block text-gray-300 mb-2">Description</label>
+                <div className="relative">
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
-                    rows={5}
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  ></textarea>
+                    rows={4}
+                    className="w-full px-6 py-4 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 rounded-xl
+                      focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300
+                      group-hover:border-teal-500/50"
+                    placeholder="Describe your recipe..."
+                  />
+                  <FaPencilAlt className="absolute right-4 top-6 text-gray-500 group-hover:text-teal-400 transition-colors duration-300" />
+                </div>
+              </motion.div>
+
+              {/* Ingredients */}
+              <motion.div variants={fadeIn} className="space-y-4">
+                <label className="block text-gray-300 mb-2">Ingredients</label>
+                <div className="flex flex-wrap gap-3 mb-4">
+                  <input
+                    type="text"
+                    name="name"
+                    value={newIngredient.name}
+                    onChange={handleIngredientChange}
+                    placeholder="Ingredient"
+                    className="flex-grow min-w-[150px] px-4 py-3 bg-gray-900/50 backdrop-blur-sm 
+                      border border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 
+                      focus:ring-teal-500/50 transition-all duration-300"
+                  />
+                  <input
+                    type="text"
+                    name="quantity"
+                    value={newIngredient.quantity}
+                    onChange={handleIngredientChange}
+                    placeholder="Amount"
+                    className="w-24 px-4 py-3 bg-gray-900/50 backdrop-blur-sm 
+                      border border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 
+                      focus:ring-teal-500/50 transition-all duration-300"
+                  />
+                  <input
+                    type="text"
+                    name="unit"
+                    value={newIngredient.unit}
+                    onChange={handleIngredientChange}
+                    placeholder="Unit"
+                    className="w-24 px-4 py-3 bg-gray-900/50 backdrop-blur-sm 
+                      border border-gray-700/50 rounded-xl focus:outline-none focus:ring-2 
+                      focus:ring-teal-500/50 transition-all duration-300"
+                  />
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="button"
+                    onClick={handleAddIngredient}
+                    className="px-6 py-3 bg-gradient-to-r from-teal-500 to-cyan-400 
+                      text-gray-900 rounded-xl font-semibold shadow-lg shadow-teal-500/25 
+                      hover:shadow-teal-500/40 transition-all duration-300 flex items-center gap-2"
+                  >
+                    <FaPlus /> Add
+                  </motion.button>
                 </div>
 
-                {/* Ingredients */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Ingredients</label>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <input
-                      type="text"
-                      name="name"
-                      value={newIngredient.name}
-                      onChange={handleIngredientChange}
-                      placeholder="Ingredient Name"
-                      className="flex-grow min-w-[150px] px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <input
-                      type="text"
-                      name="quantity"
-                      value={newIngredient.quantity}
-                      onChange={handleIngredientChange}
-                      placeholder="Quantity"
-                      className="w-24 px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <input
-                      type="text"
-                      name="unit"
-                      value={newIngredient.unit}
-                      onChange={handleIngredientChange}
-                      placeholder="Unit"
-                      className="w-24 px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddIngredient}
-                      className="bg-teal-500 text-gray-900 px-4 py-2 rounded-md hover:bg-teal-400 transition duration-200 flex items-center"
-                    >
-                      <FaPlus className="mr-2" /> Add
-                    </button>
-                  </div>
+                {/* Ingredients List */}
+                <AnimatePresence>
                   {formData.ingredients.length > 0 && (
-                    <ul className="list-disc list-inside text-gray-300 max-h-40 overflow-y-auto border border-gray-700 rounded-md p-4 bg-gray-900">
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 
+                        rounded-xl p-4 max-h-[300px] overflow-y-auto custom-scrollbar"
+                    >
                       {formData.ingredients.map((ingredient, idx) => (
-                        <li key={idx}>
-                          {ingredient.quantity} {ingredient.unit} of {ingredient.name}
-                        </li>
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          exit={{ opacity: 0, x: 20 }}
+                          className="flex items-center justify-between p-2 hover:bg-gray-800/50 
+                            rounded-lg transition-colors duration-200"
+                        >
+                          <span className="text-gray-300">
+                            {ingredient.quantity} {ingredient.unit} {ingredient.name}
+                          </span>
+                          <motion.button
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
+                            onClick={() => handleRemoveIngredient(idx)}
+                            className="text-red-400 hover:text-red-300 transition-colors duration-200"
+                            aria-label="Remove Ingredient"
+                          >
+                            <FaTrash />
+                          </motion.button>
+                        </motion.div>
                       ))}
-                    </ul>
+                    </motion.div>
                   )}
-                </div>
-              </div>
+                </AnimatePresence>
+              </motion.div>
+            </div>
 
-              {/* Right Column */}
-              <div className="space-y-6">
-                {/* Image Upload */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Recipe Image</label>
+            {/* Right Column */}
+            <div className="space-y-6">
+              {/* Image Upload */}
+              <motion.div variants={fadeIn} className="group">
+                <label className="block text-gray-300 mb-2">Recipe Image</label>
+                <div className="relative">
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageChange}
-                    className="w-full text-gray-300 px-4 py-2 border border-gray-700 bg-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    className="w-full px-6 py-4 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 
+                      rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300
+                      file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:bg-teal-500 
+                      file:text-gray-900 file:font-semibold hover:file:bg-teal-400 file:transition-colors"
                   />
-                  {formData.image && (
+                  <FaCamera className="absolute right-4 top-1/2 transform -translate-y-1/2 
+                    text-gray-500 group-hover:text-teal-400 transition-colors duration-300" />
+                </div>
+                {formData.image && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="mt-4 rounded-xl overflow-hidden shadow-lg"
+                  >
                     <img
                       src={formData.image}
-                      alt="Recipe"
-                      className="w-full h-64 object-cover rounded-md mt-4"
+                      alt="Recipe Preview"
+                      className="w-full h-64 object-cover"
                     />
-                  )}
-                </div>
+                  </motion.div>
+                )}
+              </motion.div>
 
-                {/* Instructions */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Instructions</label>
+              {/* Instructions */}
+              <motion.div variants={fadeIn} className="group">
+                <label className="block text-gray-300 mb-2">Instructions</label>
+                <div className="relative">
                   <textarea
                     name="instructions"
                     value={formData.instructions}
                     onChange={handleInputChange}
-                    rows={8}
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
+                    rows={12}
+                    className="w-full px-6 py-4 bg-gray-900/50 backdrop-blur-sm border border-gray-700/50 
+                      rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all 
+                      duration-300 group-hover:border-teal-500/50"
+                    placeholder="Enter step-by-step instructions..."
                     required
-                  ></textarea>
+                  />
+                  <FaListUl className="absolute right-4 top-6 text-gray-500 
+                    group-hover:text-teal-400 transition-colors duration-300" />
                 </div>
-              </div>
+              </motion.div>
             </div>
+          </motion.div>
 
-            {/* Save Button */}
-            <button
-              type="button"
-              onClick={handleSaveRecipe}
-              className="w-full bg-teal-500 text-gray-900 py-4 rounded-md font-semibold text-xl hover:bg-teal-400 transition duration-200 flex items-center justify-center"
-            >
-              <FaPlus className="mr-2" /> Save Recipe
-            </button>
-          </form>
-        </div>
+          {/* Save Button */}
+          <motion.button
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+            type="button"
+            onClick={handleSaveRecipe}
+            className="w-full py-4 bg-gradient-to-r from-teal-500 to-cyan-400 
+              text-gray-900 rounded-xl font-semibold text-xl shadow-lg 
+              shadow-teal-500/25 hover:shadow-teal-500/40 transition-all duration-300 
+              flex items-center justify-center gap-2"
+          >
+            <FaPlus className="text-xl" /> Save Recipe
+          </motion.button>
 
-        {/* Meal Planner Section */}
-        <div
-          className="meal-planner w-full max-w-7xl mx-auto mb-16"
-          id="make-meal-planner"
-        >
-          <h2 className="text-4xl font-bold text-center text-teal-400 mb-12">
+          {/* Back Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setCurrentView("select")}
+            className="mt-4 w-full py-3 bg-gray-700 text-gray-200 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-colors duration-300"
+          >
+            <FaTimes /> Back to Menu
+          </motion.button>
+        </form>
+      </div>
+    </motion.div>
+  );
+
+  // Meal Planner View
+  const MealPlanner = () => (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full max-w-7xl mx-auto mb-16 relative"
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-cyan-500/5 rounded-2xl blur-xl" />
+      
+      <div className="relative backdrop-blur-lg bg-gray-800/50 p-8 rounded-2xl border border-gray-700/50">
+        <h2 className="text-4xl font-bold text-center mb-8">
+          <span className="bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
             Weekly Meal Planner
-          </h2>
-          {renderMealPlanner()}
+          </span>
+        </h2>
+
+        {/* Week Navigation */}
+        <div className="flex justify-between items-center mb-6">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-4 py-2 bg-gray-700/50 rounded-xl hover:bg-gray-600/50 
+              transition-colors duration-300 flex items-center gap-2"
+            onClick={() => navigateWeek("prev")}
+            aria-label="Previous Week"
+          >
+            ← Previous Week
+          </motion.button>
+          <h3 className="text-xl text-gray-300">
+            {currentWeek[0]?.toLocaleDateString('en-US', { 
+              month: 'long',
+              day: 'numeric'
+            })} - {currentWeek[6]?.toLocaleDateString('en-US', {
+              month: 'long',
+              day: 'numeric'
+            })}
+          </h3>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-4 py-2 bg-gray-700/50 rounded-xl hover:bg-gray-600/50 
+              transition-colors duration-300 flex items-center gap-2"
+            onClick={() => navigateWeek("next")}
+            aria-label="Next Week"
+          >
+            Next Week →
+          </motion.button>
         </div>
 
-        {/* Meal Selector Modal */}
-        {showMealSelector && (
-          <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
-            <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full relative">
-              <h3 className="text-2xl font-bold text-teal-400 mb-6">
-                Select a Recipe for {mealType.charAt(0).toUpperCase() + mealType.slice(1)} on{" "}
-                {new Date(selectedDate!).toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </h3>
-              <button
-                onClick={() => setShowMealSelector(false)}
-                className="absolute top-4 right-4 text-gray-300 hover:text-gray-100 text-2xl"
-                aria-label="Close meal selector"
-              >
-                <FaTimes />
-              </button>
-              {recipes.length > 0 ? (
-                <ul className="space-y-4 max-h-80 overflow-y-auto">
-                  {recipes.map((recipe) => (
-                    <li key={recipe.id}>
-                      <button
-                        onClick={() => handleSelectMeal(recipe)}
-                        className="w-full text-left bg-gray-700 hover:bg-gray-600 p-4 rounded-md flex items-center"
-                      >
-                        {recipe.image && (
-                          <img
-                            src={recipe.image}
-                            alt={recipe.title}
-                            className="w-16 h-16 object-cover rounded-md mr-4"
-                          />
-                        )}
-                        <span className="text-teal-400 text-xl font-semibold">
-                          {recipe.title}
+        {/* Meal Planner Grid */}
+        <div className="overflow-x-auto custom-scrollbar">
+          <table className="w-full text-left">
+            <thead>
+              <tr className="border-b border-gray-700/50">
+                <th className="py-4 px-6 bg-gray-900/30 rounded-tl-xl text-teal-400 font-bold">
+                  Day
+                </th>
+                {['Breakfast', 'Lunch', 'Dinner'].map((meal) => (
+                  <th key={meal} className="py-4 px-6 bg-gray-900/30 text-teal-400 font-bold">
+                    {meal}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {currentWeek.map((date) => {
+                const dateString = date.toDateString();
+                const meals = mealPlan[dateString] || {
+                  breakfast: null,
+                  lunch: null,
+                  dinner: null,
+                };
+                
+                return (
+                  <motion.tr 
+                    key={dateString}
+                    className="border-b border-gray-700/50 last:border-none"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <td className="py-4 px-6 bg-gray-900/30 font-semibold">
+                      <div className="flex flex-col">
+                        <span className="text-teal-400">
+                          {date.toLocaleDateString('en-US', { weekday: 'long' })}
                         </span>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-300">
-                  No recipes available. Please add recipes first.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Displaying Saved Recipes */}
-        <div className="w-full max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold text-center text-teal-400 mb-12">
-            Your Recipes
-          </h2>
-          {recipes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {recipes.map((recipe) => (
-                <motion.div
-                  key={recipe.id}
-                  className="bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  {recipe.image && (
-                    <img
-                      src={recipe.image}
-                      alt={recipe.title}
-                      className="w-full h-64 object-cover rounded-md mb-4"
-                    />
-                  )}
-                  <h2 className="text-2xl font-bold text-teal-400 mb-2">
-                    {recipe.title}
-                  </h2>
-                  <p className="text-gray-300 mb-4">{recipe.description}</p>
-                  <h3 className="text-xl font-semibold text-gray-200 mb-2">
-                    Ingredients
-                  </h3>
-                  <ul className="list-disc list-inside mb-4 text-gray-300">
-                    {recipe.ingredients.map((ingredient, idx) => (
-                      <li key={idx}>
-                        {ingredient.quantity} {ingredient.unit} of {ingredient.name}
-                      </li>
+                        <span className="text-sm text-gray-400">
+                          {date.toLocaleDateString('en-US', { 
+                            month: 'short',
+                            day: 'numeric'
+                          })}
+                        </span>
+                      </div>
+                    </td>
+                    {(['breakfast', 'lunch', 'dinner'] as const).map((meal) => (
+                      <td
+                        key={meal}
+                        className="py-4 px-6 bg-gray-900/30"
+                      >
+                        <motion.div
+                          whileHover={{ scale: 1.02 }}
+                          className="cursor-pointer"
+                          onClick={() => handleMealSlotClick(dateString, meal)}
+                        >
+                          {meals[meal] ? (
+                            <div className="flex items-center gap-3 p-2 bg-gray-800/50 
+                              rounded-xl hover:bg-gray-700/50 transition-colors duration-300">
+                              {meals[meal]?.image && (
+                                <img
+                                  src={meals[meal]?.image!}
+                                  alt={meals[meal]?.title}
+                                  className="w-12 h-12 object-cover rounded-lg"
+                                />
+                              )}
+                              <div>
+                                <p className="text-teal-400 font-medium">
+                                  {meals[meal]?.title}
+                                </p>
+                                <p className="text-xs text-gray-400">
+                                  Click to change
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 p-4 bg-gray-800/50 
+                              rounded-xl hover:bg-gray-700/50 transition-colors duration-300">
+                              <FaPlus className="text-teal-400" />
+                              <span className="text-gray-400">Add {meal}</span>
+                            </div>
+                          )}
+                        </motion.div>
+                      </td>
                     ))}
-                  </ul>
-                  <h3 className="text-xl font-semibold text-gray-200 mb-2">
-                    Instructions
-                  </h3>
-                  <p className="text-gray-300 whitespace-pre-line">
-                    {recipe.instructions}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-gray-400 text-xl">
-              No recipes yet. Create one to get started!
-            </p>
-          )}
+                  </motion.tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
+      </div>
+
+      {/* Back Button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setCurrentView("select")}
+        className="mt-4 w-full py-3 bg-gray-700 text-gray-200 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-colors duration-300"
+      >
+        <FaTimes /> Back to Menu
+      </motion.button>
+    </motion.div>
+  );
+
+  // View Recipes Component
+  const ViewRecipes = () => (
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      animate="visible"
+      className="w-full max-w-6xl mx-auto mb-16 relative"
+    >
+      <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-cyan-500/5 rounded-2xl blur-xl" />
+      
+      <div className="relative backdrop-blur-lg bg-gray-800/50 p-8 rounded-2xl border border-gray-700/50">
+        <h2 className="text-4xl font-bold text-center mb-12">
+          <span className="bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
+            Your Recipe Collection
+          </span>
+        </h2>
+
+        {recipes.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {recipes.map((recipe) => (
+              <motion.div
+                key={recipe.id}
+                whileHover={{ y: -5 }}
+                className="group relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 
+                  rounded-2xl blur-xl transform group-hover:scale-105 transition-transform duration-300" />
+                
+                <div className="relative backdrop-blur-sm bg-gray-800/50 border border-gray-700/50 
+                  rounded-2xl overflow-hidden shadow-xl">
+                  {recipe.image && (
+                    <div className="relative h-64">
+                      <img
+                        src={recipe.image}
+                        alt={recipe.title}
+                        className="w-full h-full object-cover"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent" />
+                    </div>
+                  )}
+                  
+                  <div className="p-6">
+                    <h3 className="text-2xl font-bold text-teal-400 mb-2">
+                      {recipe.title}
+                    </h3>
+                    <p className="text-gray-300 mb-4">{recipe.description}</p>
+                    
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="text-xl font-semibold text-gray-200 mb-2 flex items-center gap-2">
+                          <FaListUl className="text-teal-400" /> Ingredients
+                        </h4>
+                        <ul className="list-disc list-inside text-gray-300 space-y-1">
+                          {recipe.ingredients.map((ingredient, idx) => (
+                            <li key={idx}>
+                              {ingredient.quantity} {ingredient.unit} {ingredient.name}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                      
+                      <div>
+                        <h4 className="text-xl font-semibold text-gray-200 mb-2 flex items-center gap-2">
+                          <FaUtensils className="text-teal-400" /> Instructions
+                        </h4>
+                        <p className="text-gray-300 whitespace-pre-line">
+                          {recipe.instructions}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center bg-gray-800/50 backdrop-blur-sm rounded-2xl p-8 border border-gray-700/50"
+          >
+            <FaUtensils className="text-5xl text-teal-400 mx-auto mb-4" />
+            <p className="text-xl text-gray-300 mb-6">
+              Your recipe collection is empty. Start creating your culinary masterpieces!
+            </p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCurrentView("create")}
+              className="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-400 
+                text-gray-900 rounded-xl font-semibold shadow-lg 
+                shadow-teal-500/25 hover:shadow-teal-500/40 transition-all duration-300"
+            >
+              Create Your First Recipe
+            </motion.button>
+          </motion.div>
+        )}
+      </div>
+
+      {/* Back Button */}
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={() => setCurrentView("select")}
+        className="mt-4 w-full py-3 bg-gray-700 text-gray-200 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-600 transition-colors duration-300"
+      >
+        <FaTimes /> Back to Menu
+      </motion.button>
+    </motion.div>
+  );
+
+  // Floating Elements for Background
+  const FloatingElements = () => (
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      {Array.from({ length: 15 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-3 h-3 bg-teal-500/10 rounded-full"
+          initial={{
+            x: Math.random() * window.innerWidth,
+            y: Math.random() * window.innerHeight,
+          }}
+          animate={{
+            y: [0, -20, 0],
+            opacity: [0.5, 1, 0.5],
+          }}
+          transition={{
+            duration: 4 + Math.random() * 2,
+            repeat: Infinity,
+            delay: Math.random() * 2,
+          }}
+        />
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans overflow-x-hidden relative">
+      {/* Animated Background Gradient */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900" />
+        <div className="absolute inset-0 opacity-30">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(45,212,191,0.1),transparent_50%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_rgba(56,189,248,0.1),transparent_50%)]" />
+        </div>
+      </div>
+
+      {/* Floating Elements */}
+      <FloatingElements />
+
+      {/* Toast Notifications */}
+      <ToastContainer 
+        position="top-right" 
+        autoClose={3000}
+        theme="dark"
+        toastClassName="bg-gray-800 text-gray-100"
+      />
+
+      {/* Hero Section */}
+      <motion.header
+        style={{ opacity: headerOpacity, scale: headerScale }}
+        className="relative h-[40vh] flex items-center justify-center overflow-hidden"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 backdrop-blur-sm" />
+        
+        <motion.div
+          className="relative z-10 max-w-4xl mx-auto px-6 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="text-6xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
+              Recipe Studio
+            </span>
+          </h1>
+          <p className="text-xl text-gray-300 mb-8">
+            Create, plan, and share your culinary masterpieces
+          </p>
+        </motion.div>
+      </motion.header>
+
+      <div className="container mx-auto px-4 py-12 relative z-10">
+        <AnimatePresence mode="wait">
+          {currentView === "select" && <SelectView key="select" />}
+          {currentView === "create" && <CreateRecipe key="create" />}
+          {currentView === "planner" && <MealPlanner key="planner" />}
+          {currentView === "view" && <ViewRecipes key="view" />}
+        </AnimatePresence>
       </div>
     </div>
   );

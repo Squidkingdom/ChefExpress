@@ -52,25 +52,25 @@ const GuidedTour: React.FC<GuidedTourProps> = ({
       title: "Learn Section",
     },
     {
-      target: "#make-recipe-maker",
+      target: "#make-recipe-maker", // Ensure this ID is present in Make.tsx
       content: "Create and customize your own recipes with our Recipe Maker.",
       placement: "top",
       title: "Recipe Maker",
     },
     {
-      target: "#make-meal-planner",
+      target: "#make-meal-planner", // Ensure this ID is present in Make.tsx
       content: "Plan your meals for the week with our intuitive meal planner.",
       placement: "top",
       title: "Meal Planner",
     },
     {
-      target: "#order-hero", // Updated target ID for Order Hero Section
+      target: "#order-hero", // Ensure this ID is present in Order.tsx
       content: "Order your favorite kitchen tools from our selection.",
       placement: "top",
       title: "Order Section",
     },
     {
-      target: "#share-upload",
+      target: "#share-upload", // Ensure this ID is present in Share.tsx
       content: "Share your culinary creations with the community.",
       placement: "top",
       title: "Share Section",
@@ -178,7 +178,7 @@ const GuidedTour: React.FC<GuidedTourProps> = ({
 
   return (
     <Joyride
-      debug={true} // Enable debug mode for detailed logs
+      debug={false} // Set to true for debugging
       steps={steps}
       run={runTour}
       stepIndex={stepIndex}

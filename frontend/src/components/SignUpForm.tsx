@@ -2,6 +2,7 @@
 
 import React, { ChangeEvent, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 
 /**
  * Interface for the form data
@@ -45,6 +46,7 @@ const SignUpForm: React.FC = () => {
     e.preventDefault();
     const { username, email, password, confirmPassword } = formData;
 
+    // Validate form fields
     if (!username || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
@@ -53,7 +55,12 @@ const SignUpForm: React.FC = () => {
       setError("Passwords do not match.");
       return;
     }
-    // Additional validation can be added here (e.g., password strength)
+    // Additional validation for password strength
+    const passwordScore = zxcvbn(password).score;
+    if (passwordScore < 2) {
+      setError("Password is too weak. Please use a stronger password.");
+      return;
+    }
 
     setError("");
     // Handle sign-up logic
@@ -67,44 +74,56 @@ const SignUpForm: React.FC = () => {
     >
       {/* Username Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Username</label>
+        <label className="block text-gray-300 mb-2" htmlFor="username">
+          Username
+        </label>
         <input
           type="text"
+          id="username"
           name="username"
           value={formData.username}
           placeholder="Choose a username"
           onChange={handleInputChange}
           className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
           required
+          aria-label="Username"
         />
       </div>
 
       {/* Email Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Email</label>
+        <label className="block text-gray-300 mb-2" htmlFor="email">
+          Email
+        </label>
         <input
           type="email"
+          id="email"
           name="email"
           value={formData.email}
           placeholder="Enter your email"
           onChange={handleInputChange}
           className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
           required
+          aria-label="Email"
         />
       </div>
 
       {/* Password Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Password</label>
+        <label className="block text-gray-300 mb-2" htmlFor="password">
+          Password
+        </label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
+            id="password"
             name="password"
             value={formData.password}
             placeholder="Create a password"
             onChange={handleInputChange}
             className="w-full px-4 py-2 pr-10 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
             required
+            aria-label="Password"
           />
           <button
             type="button"
@@ -119,20 +138,25 @@ const SignUpForm: React.FC = () => {
             )}
           </button>
         </div>
+        <PasswordStrengthMeter password={formData.password} />
       </div>
 
       {/* Confirm Password Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Confirm Password</label>
+        <label className="block text-gray-300 mb-2" htmlFor="confirmPassword">
+          Confirm Password
+        </label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
+            id="confirmPassword"
             name="confirmPassword"
             value={formData.confirmPassword}
             placeholder="Confirm your password"
             onChange={handleInputChange}
             className="w-full px-4 py-2 pr-10 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
             required
+            aria-label="Confirm Password"
           />
           <button
             type="button"
@@ -156,6 +180,7 @@ const SignUpForm: React.FC = () => {
       <button
         type="submit"
         className="w-full bg-teal-500 text-gray-900 py-3 rounded-md font-semibold hover:bg-teal-400 transition duration-200"
+        aria-label="Sign Up"
       >
         Sign Up
       </button>

@@ -46,6 +46,7 @@ const LoginForm: React.FC = () => {
     setError("");
     // Handle login logic
     console.log("Logging in with:", formData);
+    // Provide feedback to the user or redirect them to the appropriate page
   };
 
   return (
@@ -55,30 +56,38 @@ const LoginForm: React.FC = () => {
     >
       {/* Username Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Username</label>
+        <label className="block text-gray-300 mb-2" htmlFor="username">
+          Username
+        </label>
         <input
           type="text"
+          id="username"
           name="username"
           value={formData.username}
           placeholder="Enter your username"
           onChange={handleInputChange}
           className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
           required
+          aria-label="Username"
         />
       </div>
 
       {/* Password Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Password</label>
+        <label className="block text-gray-300 mb-2" htmlFor="password">
+          Password
+        </label>
         <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
+            id="password"
             name="password"
             value={formData.password}
             placeholder="Enter your password"
             onChange={handleInputChange}
             className="w-full px-4 py-2 pr-10 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
             required
+            aria-label="Password"
           />
           <button
             type="button"
@@ -102,6 +111,7 @@ const LoginForm: React.FC = () => {
       <button
         type="submit"
         className="w-full bg-teal-500 text-gray-900 py-3 rounded-md font-semibold hover:bg-teal-400 transition duration-200"
+        aria-label="Login"
       >
         Login
       </button>
