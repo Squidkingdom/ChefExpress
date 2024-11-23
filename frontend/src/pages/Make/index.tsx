@@ -1,5 +1,3 @@
-// src/pages/make/index.tsx
-
 import React, { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import {
   motion,
@@ -20,22 +18,19 @@ import Explore from "./components/Explore";
 import { Recipe, ViewType } from "./types";
 
 import {
-  FaSearch,
   FaUtensils,
   FaCalendarAlt,
   FaHeart,
   FaArrowRight,
-  FaArrowLeft,
 } from "react-icons/fa";
 
 const Make: React.FC = () => {
   // State Management
-  const [currentView, setCurrentView] = useState<ViewType>("hero"); // Start with 'hero' view
+  const [currentView, setCurrentView] = useState<ViewType>("hero");
   const [recipes, setRecipes] = useState<Recipe[]>(() => {
     try {
       const saved = localStorage.getItem("recipes");
       const parsed = saved ? JSON.parse(saved) : [];
-      // Validate and sanitize parsed data
       if (Array.isArray(parsed)) {
         return parsed.map((recipe: any) => ({
           id: recipe.id || Date.now(),
@@ -54,31 +49,11 @@ const Make: React.FC = () => {
       return [];
     }
   });
-  const [searchQuery, setSearchQuery] = useState("");
   const [recipeStats, setRecipeStats] = useState({
     totalRecipes: 0,
     plannedMeals: 0,
     favoriteRecipes: 0,
   });
-
-  // Keyboard Shortcuts
-  useEffect(() => {
-    const handleKeyPress = (e: KeyboardEvent) => {
-      if (e.key === "/" && currentView === "view") {
-        e.preventDefault();
-        const searchInput = document.querySelector<HTMLInputElement>(
-          'input[type="search"]'
-        );
-        searchInput?.focus();
-      }
-      if (e.key === "Escape" && currentView !== "select") {
-        setCurrentView("select");
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [currentView]);
 
   // Save recipes to localStorage
   useEffect(() => {
@@ -165,17 +140,6 @@ const Make: React.FC = () => {
     }
   }, []);
 
-  // Filtered Recipes
-  const filteredRecipes = useMemo(
-    () =>
-      recipes.filter(
-        (recipe) =>
-          recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
-      ),
-    [recipes, searchQuery]
-  );
-
   // Quick Stats Component
   const QuickStats = () => (
     <motion.div
@@ -208,10 +172,7 @@ const Make: React.FC = () => {
           whileHover={{ scale: 1.02 }}
           transition={{ duration: 0.3 }}
         >
-          {/* Animated background */}
-          <div
-            className={`absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform scale-110`}
-          />
+          <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform scale-110" />
           <div className="relative z-10 flex items-center gap-4">
             <stat.icon className="text-3xl text-teal-400" />
             <div>
@@ -222,34 +183,6 @@ const Make: React.FC = () => {
         </motion.div>
       ))}
     </motion.div>
-  );
-
-  // Search Component
-  const SearchBar = () => (
-    <div className="mb-12">
-      <div className="relative group">
-        <FaSearch
-          className="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 
-                                group-hover:text-teal-400 transition-colors duration-300"
-        />
-        <input
-          type="search"
-          placeholder="Search recipes..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-14 pr-20 py-4 bg-gray-800/50 border border-gray-700/50 rounded-full
-                                focus:outline-none focus:ring-2 focus:ring-teal-500 transition-all duration-300
-                                backdrop-blur-sm text-gray-100 placeholder-gray-400
-                                group-hover:border-teal-500/50"
-        />
-        <kbd
-          className="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400
-                                bg-gray-700/50 px-2 py-0.5 rounded text-sm"
-        >
-          /
-        </kbd>
-      </div>
-    </div>
   );
 
   // Floating elements for background
@@ -276,30 +209,6 @@ const Make: React.FC = () => {
       ))}
     </div>
   );
-
-  // Container variants for animation
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-      },
-    },
-  };
-
-  // Item variants for animation
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-      },
-    },
-  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 font-sans overflow-x-hidden relative">
@@ -338,7 +247,6 @@ const Make: React.FC = () => {
                 transition={{ duration: 1, type: "spring" }}
                 className="relative"
               >
-                {/* Animated glow effect */}
                 <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 blur-3xl transform -translate-y-1/2" />
 
                 <h1 className="text-6xl md:text-8xl font-extrabold mb-8 relative">
@@ -378,16 +286,10 @@ const Make: React.FC = () => {
 
         {/* Content Container */}
         <div className="max-w-7xl mx-auto px-6 py-12">
-          {/* Add top margin when not on hero section */}
-          {currentView !== "hero" && <div className="mt-24" />} {/* Adjusted top margin */}
+          {currentView !== "hero" && <div className="mt-24" />}
 
           {/* Quick Stats */}
           {recipes.length > 0 && currentView !== "hero" && <QuickStats />}
-
-          {/* Search Bar */}
-          {(currentView === "view" || currentView === "explore") && (
-            <SearchBar />
-          )}
 
           {/* Page Content */}
           <AnimatePresence mode="wait">
@@ -409,7 +311,7 @@ const Make: React.FC = () => {
 
             {currentView === "planner" && (
               <MealPlanner
-                recipes={filteredRecipes}
+                recipes={recipes}
                 onBack={() => setCurrentView("select")}
                 key="planner"
               />
@@ -417,7 +319,7 @@ const Make: React.FC = () => {
 
             {currentView === "view" && (
               <RecipeViewer
-                recipes={filteredRecipes}
+                recipes={recipes}
                 onBack={() => setCurrentView("select")}
                 onDelete={handleDeleteRecipe}
                 onToggleFavorite={handleToggleFavorite}

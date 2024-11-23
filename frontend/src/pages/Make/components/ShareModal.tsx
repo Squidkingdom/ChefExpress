@@ -1,23 +1,21 @@
-// src/components/ShareModal.tsx
-
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  FaTimes, FaShare, FaGlobe,
-  FaCamera, FaHashtag, FaImage,
+import { 
+  FaTimes, FaShare, FaGlobe, FaLock, 
+  FaCamera, FaHashtag, FaImage 
 } from 'react-icons/fa';
-import type { ShareModalProps, Recipe } from '../types';
+import type { ShareModalProps } from '../types';
 import { toast } from 'react-toastify';
 
-const ShareModal: React.FC<ShareModalProps> = ({
+export const ShareModal: React.FC<ShareModalProps> = ({
   isOpen,
   onClose,
   recipe,
-  onShare,
+  onShare
 }) => {
-  const [description, setDescription] = useState(recipe.description || '');
+  const [description, setDescription] = useState(recipe.description);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [previewImage, setPreviewImage] = useState<string | null>(recipe.image || null);
+  const [previewImage, setPreviewImage] = useState<string | null>(recipe.image);
   const [tags, setTags] = useState<string[]>(recipe.tags || []);
   const [newTag, setNewTag] = useState('');
 
@@ -44,7 +42,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
+    setTags(tags.filter(tag => tag !== tagToRemove));
   };
 
   const handleShare = () => {
@@ -52,18 +50,18 @@ const ShareModal: React.FC<ShareModalProps> = ({
       toast.error('Please add a description');
       return;
     }
-
-    const updatedRecipe: Recipe = {
+    
+    const updatedRecipe = {
       ...recipe,
       description,
       tags,
       image: previewImage,
       isPublic: true,
       shares: (recipe.shares || 0) + 1,
-      created: new Date().toISOString(),
+      created: new Date().toISOString()
     };
 
-    onShare(updatedRecipe);
+    onShare(updatedRecipe, description);
     onClose();
   };
 
@@ -81,12 +79,12 @@ const ShareModal: React.FC<ShareModalProps> = ({
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
-            onClick={(e) => e.stopPropagation()}
+            onClick={e => e.stopPropagation()}
             className="relative w-full max-w-3xl bg-gray-800/90 backdrop-blur-sm rounded-2xl overflow-hidden"
           >
             {/* Gradient Background */}
             <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 pointer-events-none" />
-
+            
             {/* Header */}
             <div className="relative p-6 border-b border-gray-700/50">
               <div className="flex items-center justify-between">
@@ -114,8 +112,8 @@ const ShareModal: React.FC<ShareModalProps> = ({
                 <div className="relative group flex-shrink-0">
                   <div className="w-32 h-32 rounded-xl overflow-hidden">
                     {previewImage ? (
-                      <img
-                        src={previewImage}
+                      <img 
+                        src={previewImage} 
                         alt={recipe.title}
                         className="w-full h-full object-cover"
                       />
@@ -125,10 +123,8 @@ const ShareModal: React.FC<ShareModalProps> = ({
                       </div>
                     )}
                   </div>
-                  <label
-                    className="absolute inset-0 flex items-center justify-center bg-black/50 
-                      opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-                  >
+                  <label className="absolute inset-0 flex items-center justify-center bg-black/50 
+                    opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
                     <FaCamera className="text-white text-2xl" />
                     <input
                       type="file"
@@ -159,7 +155,7 @@ const ShareModal: React.FC<ShareModalProps> = ({
                   <FaHashtag className="text-teal-400" /> Add Tags
                 </label>
                 <div className="flex flex-wrap gap-2">
-                  {tags.map((tag) => (
+                  {tags.map(tag => (
                     <motion.span
                       key={tag}
                       initial={{ scale: 0 }}
@@ -192,7 +188,9 @@ const ShareModal: React.FC<ShareModalProps> = ({
               {/* Privacy Notice */}
               <div className="flex items-center gap-2 text-sm text-gray-400">
                 <FaGlobe className="text-teal-400" />
-                <span>This recipe will be shared publicly with the community</span>
+                <span>
+                  This recipe will be shared publicly with the community
+                </span>
               </div>
             </div>
 

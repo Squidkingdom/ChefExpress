@@ -1,21 +1,24 @@
-// src/components/SelectionCards.tsx
-
 import React from 'react';
 import { motion } from 'framer-motion';
 import {
   FaPencilAlt, FaCalendarAlt, FaBook, FaArrowRight,
   FaUtensils, FaClock, FaHeart, FaBookmark,
-  FaClipboardList, FaShareAlt, FaMagic, FaRegLightbulb,
-  FaGlobe, FaCompass
+  FaClipboardList, FaShare, FaMagic, FaRegLightbulb,
+  FaGlobe, FaCompass, FaFire, FaStar
 } from 'react-icons/fa';
 import type { SelectionOption } from '../types';
 
 interface SelectionCardsProps {
   onSelect: (view: string) => void;
   recipesCount: number;
+  publicRecipesCount?: number;
 }
 
-const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect, recipesCount }) => {
+const SelectionCards: React.FC<SelectionCardsProps> = ({ 
+  onSelect, 
+  recipesCount,
+  publicRecipesCount = 0 
+}) => {
   const options: SelectionOption[] = [
     {
       icon: FaPencilAlt,
@@ -31,6 +34,7 @@ const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect, recipesCount 
         "Privacy controls"
       ],
       color: "text-teal-400",
+      stats: null
     },
     {
       icon: FaCompass,
@@ -46,6 +50,10 @@ const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect, recipesCount 
         "Share discoveries"
       ],
       color: "text-violet-400",
+      stats: publicRecipesCount ? [
+        { icon: FaFire, label: "Trending", value: publicRecipesCount },
+        { icon: FaStar, label: "Most Liked", value: Math.floor(publicRecipesCount * 0.7) }
+      ] : null
     },
     {
       icon: FaCalendarAlt,
@@ -61,6 +69,7 @@ const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect, recipesCount 
         "Nutritional tracking"
       ],
       color: "text-cyan-400",
+      stats: null
     },
     {
       icon: FaBook,
@@ -76,68 +85,89 @@ const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect, recipesCount 
         "Share options"
       ],
       color: "text-pink-400",
+      stats: recipesCount > 0 ? [
+        { icon: FaUtensils, label: "Total", value: recipesCount },
+        { icon: FaShare, label: "Shared", value: Math.floor(recipesCount * 0.3) }
+      ] : null
     }
   ];
 
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
-  };
-
   return (
     <motion.div
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-6xl mx-auto px-6 mb-16"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-6xl mx-auto px-6 mb-16"
     >
       {options.map((option, index) => (
         <motion.button
           key={index}
-          variants={itemVariants}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: index * 0.1 }}
           whileHover={{ y: -5, scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={option.action}
-          className="group relative overflow-hidden rounded-2xl focus:outline-none"
-          aria-label={option.title}
+          className="group relative overflow-hidden rounded-2xl focus:outline-none text-left"
         >
-          {/* Background Gradient */}
-          <div
-            className={`absolute inset-0 bg-gradient-to-br ${option.gradient} opacity-20 group-hover:opacity-30 transition-opacity duration-300`}
-          />
+          {/* Background Effects */}
+          <div className={`absolute inset-0 bg-gradient-to-br ${option.gradient} 
+            opacity-20 group-hover:opacity-30 transition-opacity duration-300`} />
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm opacity-0 
+            group-hover:opacity-100 transition-opacity duration-300" />
 
           {/* Card Content */}
-          <div className="relative z-10 backdrop-blur-sm bg-gray-800/60 border border-gray-700/50 p-6 h-full rounded-2xl flex flex-col">
-            {/* Icon and Title */}
-            <div className="flex items-center mb-4">
-              <div className="relative mr-4">
-                <div
-                  className={`absolute inset-0 bg-gradient-to-br ${option.gradient} blur-xl opacity-50 rounded-full`}
-                />
-                <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-gray-800">
-                  <option.icon
-                    className={`text-2xl ${option.color}`}
-                  />
+          <div className="relative z-10 backdrop-blur-sm bg-gray-800/60 border 
+            border-gray-700/50 p-6 h-full rounded-2xl">
+            
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${option.gradient} 
+                    blur-xl opacity-50 rounded-full`} />
+                  <div className="relative p-3 bg-gray-800/80 rounded-full">
+                    <option.icon className={`text-2xl ${option.color}`} />
+                  </div>
                 </div>
+                {option.secondaryIcon && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="p-2 bg-gray-800/80 rounded-full"
+                  >
+                    <option.secondaryIcon className={`text-xl ${option.color}`} />
+                  </motion.div>
+                )}
               </div>
-              <h3
-                className={`text-xl font-bold ${option.color}`}
-              >
-                {option.title}
-              </h3>
+
+              {/* Stats Badge */}
+              {option.stats && (
+                <div className="flex gap-4">
+                  {option.stats.map((stat, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      className="flex items-center gap-2 bg-gray-800/80 px-3 py-1 
+                        rounded-full text-sm"
+                    >
+                      <stat.icon className={option.color} />
+                      <span className="text-gray-300">{stat.value}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
             </div>
 
-            {/* Description */}
-            <p className="text-gray-300 mb-4 flex-grow">{option.description}</p>
+            {/* Title & Description */}
+            <div className="mb-6">
+              <h3 className={`text-xl font-bold ${option.color} mb-2`}>
+                {option.title}
+              </h3>
+              <p className="text-gray-300">
+                {option.description}
+              </p>
+            </div>
 
             {/* Features */}
             <div className="space-y-2 mb-6">
@@ -149,36 +179,25 @@ const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect, recipesCount 
                   transition={{ delay: 0.05 * idx }}
                   className="flex items-center gap-2 text-gray-400"
                 >
-                  <FaRegLightbulb className="text-sm text-gray-300" />
+                  <FaRegLightbulb className={`text-sm ${option.color}`} />
                   <span className="text-sm">{feature}</span>
                 </motion.div>
               ))}
             </div>
 
             {/* Action Button */}
-            <div className="flex items-center justify-between">
-              {option.title === "Recipe Collection" && recipesCount > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="bg-gray-700/50 px-3 py-1 rounded-full text-sm text-gray-300"
-                >
-                  {recipesCount} recipes
-                </motion.div>
-              )}
+            <motion.div
+              className="flex items-center gap-2 text-gray-300"
+              whileHover={{ x: 5 }}
+            >
+              <span className="font-medium text-sm">Get Started</span>
               <motion.div
-                className="flex items-center gap-2 text-gray-300 ml-auto"
-                whileHover={{ x: 5 }}
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
               >
-                <span className="font-medium text-sm">Get Started</span>
-                <motion.div
-                  animate={{ x: [0, 5, 0] }}
-                  transition={{ repeat: Infinity, duration: 1.5 }}
-                >
-                  <FaArrowRight size={12} />
-                </motion.div>
+                <FaArrowRight size={12} />
               </motion.div>
-            </div>
+            </motion.div>
           </div>
         </motion.button>
       ))}
