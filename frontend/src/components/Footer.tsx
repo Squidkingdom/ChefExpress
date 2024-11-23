@@ -2,14 +2,25 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-
-// You can import social media icons as needed
-// import { FaFacebookF, FaTwitter, FaInstagram, FaYoutube } from "react-icons/fa";
+import {
+  FaFacebookF,
+  FaTwitter,
+  FaInstagram,
+  FaYoutube,
+} from "react-icons/fa"; // Importing the icons
 
 const Footer: React.FC = () => {
+  // Mapping social media names to their corresponding icons
+  const socialIcons: { [key: string]: JSX.Element } = {
+    facebook: <FaFacebookF />,
+    twitter: <FaTwitter />,
+    instagram: <FaInstagram />,
+    youtube: <FaYoutube />,
+  };
+
   return (
-    <footer className="py-12 px-6 relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 to-gray-900" />
+    <footer className="py-12 px-6 relative bg-gray-900 text-gray-100">
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/50 to-gray-900 pointer-events-none" />
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
@@ -35,12 +46,12 @@ const Footer: React.FC = () => {
                   whileHover={{ scale: 1.1, y: -2 }}
                   whileTap={{ scale: 0.9 }}
                   className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center group transition-colors duration-300 hover:bg-gradient-to-r hover:from-teal-500 hover:to-cyan-400"
+                  aria-label={social}
+                  target="_blank"
+                  rel="noopener noreferrer"
                 >
-                  <span className="text-gray-400 group-hover:text-gray-900">
-                    {/* Add your social media icons here */}
-                    {/* For example:
-                    {social === "facebook" && <FaFacebookF />}
-                    */}
+                  <span className="text-gray-300 group-hover:text-white"> {/* Adjusted color */}
+                    {socialIcons[social]}
                   </span>
                 </motion.a>
               ))}
@@ -54,7 +65,7 @@ const Footer: React.FC = () => {
               {["About Us", "Recipes", "Premium", "Blog"].map((link) => (
                 <motion.li key={link}>
                   <a
-                    href={`#${link.toLowerCase()}`}
+                    href={`#${link.toLowerCase().replace(/\s+/g, "")}`} // Removing spaces for href
                     className="text-gray-400 hover:text-teal-400 transition-colors duration-300"
                   >
                     {link}
@@ -71,7 +82,7 @@ const Footer: React.FC = () => {
               {["Help Center", "Community", "Contact Us", "Privacy Policy"].map((link) => (
                 <motion.li key={link}>
                   <a
-                    href={`#${link.toLowerCase()}`}
+                    href={`#${link.toLowerCase().replace(/\s+/g, "")}`} // Removing spaces for href
                     className="text-gray-400 hover:text-teal-400 transition-colors duration-300"
                   >
                     {link}
@@ -85,22 +96,24 @@ const Footer: React.FC = () => {
           <div className="space-y-4">
             <h4 className="text-lg font-semibold text-white">Get the App</h4>
             <div className="space-y-3">
-              <motion.button
+              <motion.a
+                href="#app-store" // Update with actual App Store link
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full px-6 py-3 bg-gray-800 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-700 transition-colors duration-300"
               >
-                {/* Add App Store icon */}
+                {/* Add App Store icon if available */}
                 <span className="text-white">App Store</span>
-              </motion.button>
-              <motion.button
+              </motion.a>
+              <motion.a
+                href="#play-store" // Update with actual Play Store link
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 className="w-full px-6 py-3 bg-gray-800 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-700 transition-colors duration-300"
               >
-                {/* Add Play Store icon */}
+                {/* Add Play Store icon if available */}
                 <span className="text-white">Play Store</span>
-              </motion.button>
+              </motion.a>
             </div>
           </div>
         </div>

@@ -18,8 +18,11 @@ const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
   
-  // Ref for Mission Statement
+  // Refs for sections
   const missionRef = useRef<HTMLDivElement>(null);
+  // If you prefer scrolling to features:
+  // const featuresRef = useRef<HTMLDivElement>(null);
+  
   const isMissionInView = useInView(missionRef);
 
   // Parallax effect for hero section
@@ -65,6 +68,18 @@ const Home: React.FC<HomeProps> = () => {
     console.log("Subscribed with email:", email);
     setIsSubscribed(true);
     setEmail("");
+  };
+
+  // Custom scroll function with offset
+  const scrollToMission = () => {
+    if (missionRef.current) {
+      const top = missionRef.current.getBoundingClientRect().top + window.pageYOffset;
+      const offset = 48; // 48px offset (adjust based on your layout)
+      window.scrollTo({
+        top: top - offset,
+        behavior: "smooth",
+      });
+    }
   };
 
   return (
@@ -115,11 +130,7 @@ const Home: React.FC<HomeProps> = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full font-semibold text-xl text-gray-900 shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 transition-all duration-300"
-              onClick={() => {
-                if (missionRef.current) {
-                  missionRef.current.scrollIntoView({ behavior: "smooth" });
-                }
-              }}
+              onClick={scrollToMission} // Updated onClick handler
               aria-label="Start Exploring Our Mission"
             >
               <span className="relative z-10 flex items-center gap-2">
@@ -163,7 +174,7 @@ const Home: React.FC<HomeProps> = () => {
       {/* Mission Statement */}
       <motion.section
         ref={missionRef}
-        className="py-16 px-6 relative" // Reduced padding
+        className="py-20 px-6 relative" // Increased padding from py-16 to py-20
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
