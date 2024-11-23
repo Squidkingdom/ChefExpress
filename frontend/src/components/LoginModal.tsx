@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { AiOutlineClose } from "react-icons/ai";
 import LoginForm from "./LoginForm";
 import SignUpForm from "./SignUpForm";
 
@@ -35,7 +34,19 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 focus:outline-none"
               aria-label="Close modal"
             >
-              <AiOutlineClose size={24} />
+              <svg 
+                viewBox="0 0 24 24" 
+                fill="none" 
+                stroke="currentColor" 
+                className="w-6 h-6"
+              >
+                <path 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round" 
+                  strokeWidth={2} 
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
             </button>
 
             {/* Modal Content */}

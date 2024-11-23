@@ -1,12 +1,31 @@
 // src/pages/Learn.tsx
 
-import React, { useState, useEffect, ChangeEvent, KeyboardEvent } from "react";
-import { 
-  FaSearch, FaPlayCircle, FaTimes, FaPlus, FaMinus, FaTrash 
+import React, {
+  useState,
+  useEffect,
+  KeyboardEvent,
+  useMemo,
+} from "react";
+import {
+  FaSearch,
+  FaPlayCircle,
+  FaArrowRight,
+  FaUtensils,
+  FaShieldAlt,
+  FaFlask,
+  FaBookOpen,
+  FaLightbulb,
+  FaFireAlt,
 } from "react-icons/fa";
-import { motion, AnimatePresence, useScroll, useTransform, useSpring } from "framer-motion";
-import { toast, ToastContainer } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  useSpring,
+} from "framer-motion";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { useQuery } from "@tanstack/react-query";
 
 /**
@@ -21,23 +40,31 @@ interface Video {
 }
 
 /**
+ * View Types
+ */
+type ViewType = "hero" | "select" | "view";
+
+/**
  * Learn Page Component
- * Enhanced with framer-motion animations and updated to align with Make.tsx design.
- * @returns {React.JSX.Element} - Enhanced Learn Page with modern design and features.
  */
 const Learn: React.FC = () => {
   // State Variables
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    null
+  );
   const [searchQuery, setSearchQuery] = useState<string>("");
+  const [currentView, setCurrentView] = useState<ViewType>("hero");
 
   // Debounced Search Query
-  const [debouncedSearch, setDebouncedSearch] = useState<string>(searchQuery);
+  const [debouncedSearch, setDebouncedSearch] = useState<string>(
+    searchQuery
+  );
 
   useEffect(() => {
     const handler = setTimeout(() => {
       setDebouncedSearch(searchQuery);
-    }, 300); // 300ms debounce
+    }, 300);
 
     return () => {
       clearTimeout(handler);
@@ -51,85 +78,138 @@ const Learn: React.FC = () => {
     return match ? match[1] : "";
   };
 
-  // Fetch video data Using TanStack's useQuery hook
+  // Fetch video data using useQuery
   const fetchVideos = async () => {
     const response = await fetch("http://localhost:3000/api/videos", {
-      method: "POST"
+      method: "POST",
     });
 
     if (!response.ok) {
       throw new Error("Failed to fetch videos");
     }
     return response.json();
-  }
+  };
 
-  const { data: videos = [], isLoading, isError, error } = useQuery<Video[], Error>({
+  const {
+    data: videos = [],
+    isLoading,
+    isError,
+    error,
+  } = useQuery<Video[], Error>({
     queryKey: ["videos"],
-    queryFn: fetchVideos
-  })
-
-  // Filtered videos based on category and search query
-  const filteredVideos = videos.filter((video) => {
-    const matchesCategory = selectedCategory
-      ? video.category === selectedCategory
-      : true;
-    const matchesSearch = video.title
-      .toLowerCase()
-      .includes(debouncedSearch.toLowerCase());
-    return matchesCategory && matchesSearch;
+    queryFn: fetchVideos,
+    enabled: currentView === "view",
   });
+
+  // Filtered videos based on selected category and search query
+  const filteredVideos = useMemo(
+    () =>
+      videos.filter((video) => {
+        const matchesCategory = selectedCategory
+          ? video.category.trim().toLowerCase() ===
+            selectedCategory!.trim().toLowerCase()
+          : true;
+        const matchesSearch = video.title
+          .toLowerCase()
+          .includes(debouncedSearch.toLowerCase());
+        return matchesCategory && matchesSearch;
+      }),
+    [videos, selectedCategory, debouncedSearch]
+  );
 
   /**
    * Animation Variants
    */
   const { scrollY } = useScroll();
-  const headerOpacity = useTransform(scrollY, [0, 200], [1, 0]);
-  const headerScale = useTransform(scrollY, [0, 200], [1, 0.95]);
-  const smoothY = useSpring(headerOpacity, { stiffness: 100, damping: 30 });
+  const y = useTransform(scrollY, [0, 500], [0, 150]);
+  const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+  const scale = useTransform(scrollY, [0, 300], [1, 0.8]);
+  const smoothY = useSpring(y, { stiffness: 100, damping: 30 });
 
   const containerVariants = {
-    hidden: { opacity: 0, y: 20 },
+    hidden: {},
     visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.6 }
-    }
-  };
-
-  const staggerContainer = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   };
 
-  const fadeIn = {
+  const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
+
+  /**
+   * Categories
+   */
+  const categories = [
+    {
+      title: "Culinary Arts",
+      value: "culinary arts", // Ensure this matches video.category values
+      description: "Master the art of cooking and culinary techniques.",
+      icon: FaUtensils,
+      secondaryIcon: FaFireAlt,
+      gradient: "from-red-500 to-orange-400",
+      features: [
+        "Professional cooking techniques",
+        "Recipe development",
+        "Plating and presentation",
+        "Global cuisines",
+      ],
+      color: "text-red-400",
+    },
+    {
+      title: "Kitchen Safety",
+      value: "kitchen safety", // Ensure this matches video.category values
+      description: "Learn essential safety practices in the kitchen.",
+      icon: FaShieldAlt,
+      secondaryIcon: FaBookOpen,
+      gradient: "from-green-500 to-emerald-400",
+      features: [
+        "Food handling and hygiene",
+        "Equipment safety",
+        "Emergency procedures",
+        "Safe storage practices",
+      ],
+      color: "text-green-400",
+    },
+    {
+      title: "Food Science",
+      value: "food science", // Ensure this matches video.category values
+      description: "Explore the science behind cooking and food.",
+      icon: FaFlask,
+      secondaryIcon: FaLightbulb,
+      gradient: "from-blue-500 to-indigo-400",
+      features: [
+        "Chemical reactions",
+        "Nutrition and health",
+        "Flavor development",
+        "Food technology",
+      ],
+      color: "text-blue-400",
+    },
+  ];
 
   /**
    * Floating Elements for Background
    */
   const FloatingElements = () => (
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {Array.from({ length: 15 }).map((_, i) => (
+      {Array.from({ length: 20 }).map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-3 h-3 bg-teal-500/10 rounded-full"
+          className="absolute w-4 h-4 bg-teal-500/10 rounded-full"
           initial={{
             x: Math.random() * window.innerWidth,
             y: Math.random() * window.innerHeight,
           }}
           animate={{
             y: [0, -20, 0],
-            opacity: [0.5, 1, 0.5],
+            scale: [1, 1.2, 1],
           }}
           transition={{
-            duration: 4 + Math.random() * 2,
+            duration: 3 + Math.random() * 2,
             repeat: Infinity,
             delay: Math.random() * 2,
           }}
@@ -143,33 +223,36 @@ const Learn: React.FC = () => {
    */
   const VideoCard: React.FC<{ video: Video }> = ({ video }) => (
     <motion.div
-      className="bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer overflow-hidden"
+      className="bg-gray-800/50 border border-gray-700/50 rounded-2xl shadow-lg hover:shadow-xl transition duration-300 cursor-pointer overflow-hidden relative"
       onClick={() => setSelectedVideo(video)}
       whileHover={{ scale: 1.02 }}
       role="button"
       tabIndex={0}
       onKeyPress={(e: KeyboardEvent<HTMLDivElement>) => {
-        if (e.key === 'Enter') setSelectedVideo(video);
+        if (e.key === "Enter") setSelectedVideo(video);
       }}
       aria-label={`Play video: ${video.title}`}
     >
-      <div className="relative" style={{ paddingTop: "56.25%" }}>
-        <img
-          src={`https://img.youtube.com/vi/${getVideoId(video.URL)}/hqdefault.jpg`}
-          alt={video.title}
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="lazy"
-        />
-        <FaPlayCircle className="absolute inset-0 m-auto text-6xl text-white opacity-75" />
-        <span className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded">
-          {video.length}
-        </span>
-      </div>
-      <div className="p-4">
-        <h3 className="text-lg font-bold text-teal-400">
-          {video.title}
-        </h3>
-        <p className="text-sm text-gray-300 mt-1">{video.category}</p>
+      {/* Animated background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform scale-110" />
+      <div className="relative z-10">
+        <div className="relative" style={{ paddingTop: "56.25%" }}>
+          <img
+            src={`https://img.youtube.com/vi/${getVideoId(
+              video.URL
+            )}/hqdefault.jpg`}
+            alt={video.title}
+            className="absolute inset-0 w-full h-full object-cover rounded-t-2xl"
+            loading="lazy"
+          />
+          <FaPlayCircle className="absolute inset-0 m-auto text-6xl text-white opacity-75" />
+          <span className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded">
+            {video.length}
+          </span>
+        </div>
+        <div className="p-4">
+          <h3 className="text-lg font-bold text-teal-400">{video.title}</h3>
+        </div>
       </div>
     </motion.div>
   );
@@ -177,7 +260,7 @@ const Learn: React.FC = () => {
   /**
    * Video Modal Component
    */
-  const VideoModal: React.FC<{ video: Video }> = ({ video }) => (
+  const VideoModal: React.FC<{ video: Video | null }> = ({ video }) => (
     <AnimatePresence>
       {video && (
         <motion.div
@@ -224,105 +307,128 @@ const Learn: React.FC = () => {
   );
 
   /**
-   * Filters Component
+   * SelectionCards Component
    */
-  const Filters: React.FC = () => (
+  const handleSelectView = (view: ViewType, categoryValue?: string) => {
+    setCurrentView(view);
+    if (categoryValue) {
+      setSelectedCategory(categoryValue);
+    } else {
+      setSelectedCategory(null);
+    }
+    setSearchQuery("");
+  };
+
+  const SelectionCards: React.FC<{
+    onSelect: (view: ViewType, categoryValue?: string) => void;
+  }> = ({ onSelect }) => (
     <motion.div
-      className="flex flex-col lg:flex-row items-center justify-between gap-4 px-8 py-6 bg-gray-800 rounded-xl"
-      variants={staggerContainer}
+      variants={containerVariants}
       initial="hidden"
       animate="visible"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-6xl mx-auto px-6 mb-16"
     >
-      {/* Category Buttons */}
-      <motion.div
-        className="flex gap-4 flex-wrap justify-center"
-        variants={fadeIn}
-      >
-        {["Culinary Arts", "Kitchen Safety", "Food Science"].map(
-          (category) => (
-            <button
-              key={category}
-              className={`px-4 py-2 rounded-full font-medium transition duration-200 ${
-                selectedCategory === category
-                  ? "bg-teal-500 text-gray-900"
-                  : "bg-gray-700 text-gray-200 hover:bg-teal-600"
-              }`}
-              onClick={() =>
-                setSelectedCategory(
-                  selectedCategory === category ? null : category
-                )
-              }
-              aria-label={`Filter by ${category}`}
-            >
-              {category}
-            </button>
-          )
-        )}
-        <button
-          className="px-4 py-2 bg-gray-700 text-gray-200 rounded-full hover:bg-red-600 transition duration-200"
-          onClick={() => setSelectedCategory(null)}
-          aria-label="Clear all filters"
+      {categories.map((category, index) => (
+        <motion.button
+          key={index}
+          variants={itemVariants}
+          whileHover={{ y: -5, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onSelect("view", category.value)}
+          className="group relative overflow-hidden rounded-2xl focus:outline-none"
+          aria-label={category.title}
         >
-          Clear Filters
-        </button>
-      </motion.div>
-
-      {/* Search Input */}
-      <motion.div
-        className="flex items-center gap-2 w-full lg:w-1/3"
-        variants={fadeIn}
-      >
-        <div className="relative flex-grow">
-          <FaSearch className="absolute top-3 left-3 text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search for a video..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"
-            aria-label="Search for a video"
+          {/* Background Gradient */}
+          <div
+            className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-20 group-hover:opacity-30 transition-opacity duration-300`}
           />
-        </div>
-        <button
-          className="px-4 py-2 bg-teal-500 text-gray-900 rounded-full hover:bg-teal-600 transition duration-200"
-          onClick={() => setSearchQuery("")}
-          aria-label="Clear search"
-        >
-          Clear
-        </button>
-      </motion.div>
+          {/* Card Content */}
+          <div className="relative z-10 backdrop-blur-sm bg-gray-800/60 border border-gray-700/50 p-6 h-full rounded-2xl flex flex-col">
+            {/* Icon and Title */}
+            <div className="flex items-center mb-4">
+              <div className="relative mr-4">
+                <div
+                  className={`absolute inset-0 bg-gradient-to-br ${category.gradient} blur-xl opacity-50 rounded-full`}
+                />
+                <div className="relative flex items-center justify-center w-12 h-12 rounded-full bg-gray-800">
+                  <category.icon className={`text-2xl ${category.color}`} />
+                </div>
+              </div>
+              <h3 className={`text-xl font-bold ${category.color}`}>
+                {category.title}
+              </h3>
+            </div>
+            {/* Description */}
+            <p className="text-gray-300 mb-4 flex-grow">
+              {category.description}
+            </p>
+            {/* Features */}
+            <div className="space-y-2 mb-6">
+              {category.features?.map((feature, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 * idx }}
+                  className="flex items-center gap-2 text-gray-400"
+                >
+                  <FaLightbulb className="text-sm text-gray-300" />
+                  <span className="text-sm">{feature}</span>
+                </motion.div>
+              ))}
+            </div>
+            {/* Action Button */}
+            <div className="flex items-center justify-between">
+              <motion.div
+                className="flex items-center gap-2 text-gray-300 ml-auto"
+                whileHover={{ x: 5 }}
+              >
+                <span className="font-medium text-sm">Get Started</span>
+                <motion.div
+                  animate={{ x: [0, 5, 0] }}
+                  transition={{ repeat: Infinity, duration: 1.5 }}
+                >
+                  <FaArrowRight size={12} />
+                </motion.div>
+              </motion.div>
+            </div>
+          </div>
+        </motion.button>
+      ))}
     </motion.div>
   );
 
   /**
-   * Floating Elements for Background
+   * SearchBar Component
    */
-  const EnhancedFloatingElements = () => (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none">
-      {Array.from({ length: 20 }).map((_, i) => (
-        <motion.div
-          key={i}
-          className="absolute w-3 h-3 bg-teal-500/10 rounded-full"
-          initial={{
-            x: Math.random() * window.innerWidth,
-            y: Math.random() * window.innerHeight,
-          }}
-          animate={{
-            y: [0, -20, 0],
-            opacity: [0.5, 1, 0.5],
-          }}
-          transition={{
-            duration: 4 + Math.random() * 2,
-            repeat: Infinity,
-            delay: Math.random() * 2,
-          }}
+  const SearchBar: React.FC = () => (
+    <motion.div
+      className="flex items-center gap-2 w-full lg:w-1/3 mx-auto"
+      variants={itemVariants}
+    >
+      <div className="relative flex-grow">
+        <FaSearch className="absolute top-3 left-3 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search for a video..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 border border-gray-700/50 bg-gray-800/50 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300"
+          aria-label="Search for a video"
         />
-      ))}
-    </div>
+      </div>
+      <button
+        className="px-4 py-2 bg-teal-500 text-gray-900 rounded-full hover:bg-teal-600 transition duration-200"
+        onClick={() => setSearchQuery("")}
+        aria-label="Clear search"
+      >
+        Clear
+      </button>
+    </motion.div>
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans overflow-x-hidden relative">
+    <div className="min-h-screen bg-gray-900 text-gray-100 font-sans overflow-x-hidden flex flex-col">
       {/* Animated Background Gradient */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900" />
@@ -333,77 +439,128 @@ const Learn: React.FC = () => {
       </div>
 
       {/* Floating Elements */}
-      <EnhancedFloatingElements />
+      <FloatingElements />
 
       {/* Toast Notifications */}
-      <ToastContainer 
-        position="top-right" 
+      <ToastContainer
+        position="top-right"
         autoClose={3000}
         theme="dark"
         toastClassName="bg-gray-800 text-gray-100"
       />
 
-      {/* Hero Section */}
-      <motion.header
-        style={{ opacity: headerOpacity, scale: headerScale }}
-        className="relative h-[40vh] flex items-center justify-center overflow-hidden"
-      >
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 backdrop-blur-sm" />
-        
-        <motion.div
-          className="relative z-10 max-w-4xl mx-auto px-6 text-center"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          <h2 className="text-6xl font-bold mb-6">
-            <span className="bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
-              Discover Culinary Skills
-            </span>
-          </h2>
-          <p className="text-xl text-gray-300 mb-8">
-            Learn from curated tutorials tailored for you.
-          </p>
-        </motion.div>
-      </motion.header>
-
-      <div className="container mx-auto px-4 py-12 relative z-10">
-        {/* Filters */}
-        <Filters />
-
-        {/* Video Grid */}
-        <motion.section
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8"
-          variants={staggerContainer}
-          initial="hidden"
-          animate="visible"
-        >
-          {isLoading ? (
-            <p className="col-span-full text-center text-gray-400">Loading videos...</p>
-          ) : isError ? (
-            <p className="col-span-full text-center text-red-500">Error: {error?.message}</p>
-          ) : filteredVideos.length > 0 ? (
-            filteredVideos.map((video) => (
-              <VideoCard key={video.id} video={video} />
-            ))
-          ) : (
-            <motion.p
-              className="col-span-full text-center text-gray-400"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5 }}
+      {/* Main Content */}
+      <div className="relative z-10 flex-grow">
+        {/* Hero Section */}
+        {currentView === "hero" && (
+          <motion.header
+            style={{ y: smoothY, opacity, scale }}
+            className="relative min-h-screen flex items-center justify-center overflow-hidden"
+          >
+            <motion.div
+              className="relative z-10 max-w-6xl mx-auto px-6 text-center mt-24"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8 }}
             >
-              No videos match your filters.
-            </motion.p>
-          )}
-        </motion.section>
+              {/* Animated glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 blur-3xl transform -translate-y-1/2" />
+
+              <h2 className="text-6xl md:text-8xl font-extrabold mb-8 relative">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-300">
+                  Discover
+                </span>{" "}
+                <span className="text-white">Culinary Skills</span>
+              </h2>
+              <p className="text-2xl md:text-4xl text-gray-300 mb-12 leading-relaxed">
+                Learn from curated tutorials tailored for you.
+              </p>
+
+              <motion.button
+                onClick={() => setCurrentView("select")}
+                className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full font-semibold text-xl text-gray-900 shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 transition-all duration-300"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Start Learning
+                  <motion.span
+                    animate={{ x: [0, 5, 0] }}
+                    transition={{ repeat: Infinity, duration: 1.5 }}
+                  >
+                    <FaArrowRight />
+                  </motion.span>
+                </span>
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-400 to-cyan-300 opacity-0 group-hover:opacity-100 blur transition-opacity duration-300" />
+              </motion.button>
+            </motion.div>
+          </motion.header>
+        )}
+
+        {/* Content Container */}
+        <div className="max-w-7xl mx-auto px-6 py-12">
+          {/* Add top margin when not on hero section */}
+          {currentView !== "hero" && <div className="mt-24" />}
+
+          {/* Page Content */}
+          <AnimatePresence mode="wait">
+            {currentView === "select" && (
+              <SelectionCards onSelect={handleSelectView} />
+            )}
+
+            {currentView === "view" && (
+              <motion.div
+                key="view"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                {/* Category Header */}
+                <div className="text-center mb-8">
+                  <h2 className="text-4xl font-bold capitalize">{selectedCategory}</h2>
+                </div>
+                {/* Search Bar */}
+                <SearchBar />
+
+                {/* Video Grid */}
+                <motion.section
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-8"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
+                >
+                  {isLoading ? (
+                    <p className="col-span-full text-center text-gray-400">
+                      Loading videos...
+                    </p>
+                  ) : isError ? (
+                    <p className="col-span-full text-center text-red-500">
+                      Error: {error?.message}
+                    </p>
+                  ) : filteredVideos.length > 0 ? (
+                    filteredVideos.map((video) => (
+                      <VideoCard key={video.id} video={video} />
+                    ))
+                  ) : (
+                    <motion.p
+                      className="col-span-full text-center text-gray-400"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ duration: 0.5 }}
+                    >
+                      No videos match your search.
+                    </motion.p>
+                  )}
+                </motion.section>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Video Modal */}
+        <VideoModal video={selectedVideo} />
       </div>
 
-      {/* Video Modal */}
-      <VideoModal video={selectedVideo} />
-
-      {/* Hero and Filters IDs for Potential Guided Tours */}
-      {/* Ensure consistency in IDs and structure with other pages like Make.tsx */}
     </div>
   );
 };
