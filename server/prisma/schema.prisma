@@ -25,29 +25,30 @@ model Videos {
 }
 
 model Ingredient {
-  name          String    @id(map: "ingredient_pk") @db.VarChar
-  ingredient_id String?   @db.VarChar
-  Relation      Relation? @relation(fields: [ingredient_id], references: [ingredient_id], onDelete: NoAction, onUpdate: NoAction, map: "ingredient_relation_fk")
+  name          String              @id(map: "ingredient_pk") @db.VarChar
+  ingredient_id String?             @db.VarChar
+  Relation      ingrediantinrecipe? @relation(fields: [ingredient_id], references: [ingredient_id], onDelete: NoAction, onUpdate: NoAction, map: "ingredient_relation_fk")
 }
 
 model Recipe {
-  name         String?  @db.VarChar
-  instructions String?  @db.VarChar
-  recipe_id    String   @id(map: "recipe_pk") @db.VarChar
-  Relation     Relation @relation(fields: [recipe_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "recipe_relation_fk")
+  name         String?            @db.VarChar
+  instructions String?            @db.VarChar
+  recipe_id    String             @id(map: "recipe_pk") @db.VarChar
+  owner_id     String?            @db.Uuid
+  Relation     ingrediantinrecipe @relation(fields: [recipe_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "recipe_relation_fk")
 }
 
-model Relation {
+model saved_recipes {
+  recipe_id String             @id(map: "saved_recipes_pk") @db.VarChar
+  user_id   String?            @db.VarChar
+  Relation  ingrediantinrecipe @relation(fields: [recipe_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "saved_recipes_relation_fk")
+}
+
+model ingrediantinrecipe {
   quantity      String?        @db.VarChar
   recipe_id     String         @id(map: "relation_pk_rec") @db.VarChar
   ingredient_id String         @unique(map: "relation_unique") @db.VarChar
   Ingredient    Ingredient[]
   Recipe        Recipe?
   saved_recipes saved_recipes?
-}
-
-model saved_recipes {
-  recipe_id String   @id(map: "saved_recipes_pk") @db.VarChar
-  user_id   String?  @db.VarChar
-  Relation  Relation @relation(fields: [recipe_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "saved_recipes_relation_fk")
 }
