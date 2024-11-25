@@ -1,95 +1,120 @@
-/**
- * Header component for the ChefExpress application.
- * 
- * This component renders the site title and a set of navigation buttons.
- * It utilizes React Router's Link component for client-side navigation.
- * The NavButtons component contains multiple NavButton components,
- * each directing to different routes within the application.
- * 
- * @module Header
- * @requires react
- * @requires react-router-dom
- * @component
- * @example
- * return (
- *   <Header />
- * );
- */
+// src/components/Header.tsx
 
-
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 
 /**
  * Interface for Navigation buttons.
- *
- * @interface NavButtonProps
  */
 interface NavButtonProps {
-    /**
-     * The path to navigate to when the button is clicked.
-     * @type {string}
-     */
-    to: string;
-
-    /**
-     * The content to be displayed inside the button.
-     * Usually used for button text
-     * @type {React.ReactNode}
-     */
-    children: React.ReactNode;
+  to?: string;
+  onClick?: () => void;
+  className?: string;
+  children: React.ReactNode;
 }
 
 /**
- * A button component for navigation that renders a link styled as a button.
- *
- * @param {NavButtonProps} props - The properties for the NavButton component.
- * @param {string} props.to - The path to navigate to.
- * @param {React.ReactNode} props.children - The content of the button.
- * @returns {JSX.Element} The rendered NavButton component.
+ * A button component for navigation that renders a link or button.
  */
-const NavButton: React.FC<NavButtonProps> = ({ to, children }) => {
+const NavButton: React.FC<NavButtonProps> = ({ to, onClick, className = "", children }) => {
+  const location = useLocation();
+  const isActive = to ? location.pathname === to : false;
+
+  const commonClasses =
+    "text-lg font-medium px-4 py-2 rounded-lg transition duration-300";
+
+  if (to) {
     return (
-        <Link
-            to={to}
-            className="text-xl outline outline-1 outline-gray-600 block font-semibold px-4 py-2 rounded-xl hover:bg-gray-600 transition-colors duration-300"
-        >
-            {children}
-        </Link>
+      <Link
+        to={to}
+        className={`${commonClasses} ${className} ${
+          isActive
+            ? "bg-teal-500 text-gray-900"
+            : "text-gray-300 hover:text-white hover:bg-gray-700"
+        }`}
+      >
+        {children}
+      </Link>
     );
+  } else {
+    return (
+      <button
+        onClick={onClick}
+        className={`${commonClasses} ${className} text-gray-300 hover:text-white hover:bg-gray-700 focus:outline-none`}
+      >
+        {children}
+      </button>
+    );
+  }
 };
 
 /**
  * A component that renders a set of navigation buttons.
- * @returns {JSX.Element} The rendered NavButtons component containing multiple NavButton components.
  */
-const NavButtons: React.FC = () => {
-    return (
-        <div className="flex flex-col md:flex-row lg:space-x-4 ">
-            <NavButton to="/Learn">Learn</NavButton>
-            <NavButton to="/Make">Make</NavButton>
-            <NavButton to="/Order">Order</NavButton>
-            <NavButton to="/Share">Share</NavButton>
-            <NavButton to="/Login">Login</NavButton>
-        </div>
-    );
-};
+const NavButtons: React.FC<{ onLoginClick: () => void }> = ({
+  onLoginClick,
+}) => (
+  <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+    <NavButton to="/learn">Learn</NavButton>
+    <NavButton to="/make">Make</NavButton>
+    <NavButton to="/order">Order</NavButton>
+    <NavButton to="/share">Share</NavButton>
+    <NavButton onClick={onLoginClick} className="login-button">
+      Login
+    </NavButton>
+  </div>
+);
 
 /**
- * The header component that contains the site title and navigation links.
- * @returns {JSX.Element} The rendered Header component containing the site title and navigation buttons.
+ * Interface for Header props.
  */
-const Header: React.FC = () => {
-    return (
-        <header className='bg-gray-800 text-white p-5'>
-            <div className='container mx-auto flex justify-between items-center'>
-                <Link to='/' className='text-2xl font-bold'>ChefExpress</Link>
-                <nav className="hidden md:flex">
-                    <NavButtons />
-                </nav>
-            </div>
-        </header>
-    );
+interface HeaderProps {
+  setIsLoginOpen: (isOpen: boolean) => void;
+}
+
+/**
+ * The header component that contains the site title, navigation links, and responsive menu toggle.
+ */
+const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleLoginClick = () => {
+    setIsLoginOpen(true);
+    setMenuOpen(false); // Close mobile menu if open
+  };
+
+  return (
+    <header className="bg-gray-900 text-gray-100 shadow-md sticky top-0 z-50">
+      <div className="container mx-auto flex justify-between items-center px-6 py-4">
+        {/* Site Logo */}
+        <Link to="/" className="text-3xl font-extrabold text-teal-500">
+          ChefExpress
+        </Link>
+
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex navbar"> {/* Added 'navbar' class here */}
+          <NavButtons onLoginClick={handleLoginClick} />
+        </nav>
+
+        {/* Mobile Menu Icon */}
+        <button
+          className="md:hidden text-gray-100 focus:outline-none"
+          onClick={() => setMenuOpen(!menuOpen)}
+          aria-label="Toggle navigation menu"
+        >
+          {menuOpen ? <AiOutlineClose size={28} /> : <AiOutlineMenu size={28} />}
+        </button>
+      </div>
+
+      {/* Mobile Navigation */}
+      {menuOpen && (
+        <nav className="md:hidden bg-gray-800 border-t border-gray-700 py-4 navbar"> {/* Added 'navbar' class here */}
+          <NavButtons onLoginClick={handleLoginClick} />
+        </nav>
+      )}
+    </header>
+  );
 };
 
 export default Header;
