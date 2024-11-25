@@ -42,10 +42,11 @@ const Learn: React.FC = () => {
 
   const { data: videos = [], isLoading, isError, error } = useQuery<Video[], Error>({
     queryKey: ["videos"],
-    queryFn: fetchVideos
+    queryFn: fetchVideos,
+    initialData: []
   })
 
-  const filteredVideos = videos.filter((video) => {
+  const filteredVideos = (videos|| []).filter((video) => {
     const matchesCategory = selectedCategory
       ? video.category === selectedCategory
       : true;
@@ -143,7 +144,7 @@ const Learn: React.FC = () => {
         className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 py-8"
         id="learn-videos"
       >
-        {filteredVideos.length > 0 ? (
+        {((filteredVideos.length > 0) && !isLoading) ? (
           filteredVideos.map((video) => (
             <motion.div
               key={video.id}

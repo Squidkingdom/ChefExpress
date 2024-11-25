@@ -41,7 +41,7 @@ router.route("/")
   })
   .post(async (req: Request, res: Response) => {
     // Fetch all existing recipes using findMany() without including related models
-    const recipes = await prisma.recipe.findMany();
+    const recipes = await prisma.recipeview.findMany()
 
     // Return the list of recipes
     res.status(200).json(recipes);

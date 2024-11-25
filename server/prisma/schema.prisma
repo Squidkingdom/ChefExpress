@@ -1,10 +1,16 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["views"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Ingredient {
+  name          String @db.VarChar
+  ingredient_id String @id(map: "ingredient_pk") @db.VarChar
 }
 
 model Items {
@@ -13,7 +19,15 @@ model Items {
   URL      String? @db.VarChar
   quantity String? @db.VarChar
   category String? @db.VarChar
-  id       String  @id(map: "ordering_page_pk") @db.VarChar
+  id       String  @id(map: "items_pk") @db.VarChar
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+model Recipe {
+  name         String? @db.VarChar
+  instructions String? @db.VarChar
+  recipe_id    String  @id(map: "recipe_pk") @db.VarChar
+  owner_id     String? @db.Uuid
 }
 
 model Videos {
@@ -24,31 +38,27 @@ model Videos {
   category String? @db.VarChar
 }
 
-model Ingredient {
-  name          String              @id(map: "ingredient_pk") @db.VarChar
-  ingredient_id String?             @db.VarChar
-  Relation      ingrediantinrecipe? @relation(fields: [ingredient_id], references: [ingredient_id], onDelete: NoAction, onUpdate: NoAction, map: "ingredient_relation_fk")
-}
+model ingrediantinrecipe {
+  quantity      String? @db.VarChar
+  recipe_id     String  @db.VarChar
+  ingredient_id String  @db.VarChar
 
-model Recipe {
-  name         String?            @db.VarChar
-  instructions String?            @db.VarChar
-  recipe_id    String             @id(map: "recipe_pk") @db.VarChar
-  owner_id     String?            @db.Uuid
-  Relation     ingrediantinrecipe @relation(fields: [recipe_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "recipe_relation_fk")
+  @@id([recipe_id, ingredient_id], map: "ingrediantinrecipe_pk")
 }
 
 model saved_recipes {
-  recipe_id String             @id(map: "saved_recipes_pk") @db.VarChar
-  user_id   String?            @db.VarChar
-  Relation  ingrediantinrecipe @relation(fields: [recipe_id], references: [recipe_id], onDelete: NoAction, onUpdate: NoAction, map: "saved_recipes_relation_fk")
+  recipe_id String @db.VarChar
+  user_id   String @db.VarChar
+
+  @@id([recipe_id, user_id], map: "saved_recipes_pk")
 }
 
-model ingrediantinrecipe {
-  quantity      String?        @db.VarChar
-  recipe_id     String         @id(map: "relation_pk_rec") @db.VarChar
-  ingredient_id String         @unique(map: "relation_unique") @db.VarChar
-  Ingredient    Ingredient[]
-  Recipe        Recipe?
-  saved_recipes saved_recipes?
+view recipeview {
+  id          String @db.VarChar @unique
+  title       String? @db.VarChar
+  owner_id    String? @db.Uuid
+  description String? @db.VarChar
+  ingredients Json?   @db.Json
+  image       String?
+
 }

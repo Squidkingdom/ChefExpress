@@ -4,12 +4,14 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
+import RecipeCard from "../subcomponents/RecipeCard";
 import 'react-toastify/dist/ReactToastify.css';
+import { useQuery } from "@tanstack/react-query";
+import { Recipes } from "../components/Recipes";
 
 interface Ingredient {
   name: string;
   quantity: string;
-  unit: string;
 }
 
 interface Recipe {
@@ -38,55 +40,8 @@ interface MealPlan {
  * @returns {React.JSX.Element} - Make Page with full functionality.
  */
 const Make: React.FC = () => {
-  // Initialize recipes with example data
-  const [recipes, setRecipes] = useState<Recipe[]>([
-    {
-      id: 1,
-      title: "Spaghetti Bolognese",
-      description: "A classic Italian pasta dish with rich meat sauce.",
-      ingredients: [
-        { name: "Spaghetti", quantity: "200", unit: "g" },
-        { name: "Ground Beef", quantity: "250", unit: "g" },
-        { name: "Tomato Sauce", quantity: "1", unit: "cup" },
-        { name: "Onion", quantity: "1", unit: "medium" },
-        { name: "Garlic", quantity: "2", unit: "cloves" },
-        { name: "Olive Oil", quantity: "2", unit: "tbsp" },
-        { name: "Salt", quantity: "to taste", unit: "" },
-        { name: "Black Pepper", quantity: "to taste", unit: "" },
-      ],
-      instructions:
-        "1. Cook spaghetti according to package instructions.\n" +
-        "2. In a pan, heat olive oil over medium heat.\n" +
-        "3. Sauté chopped onion and garlic until translucent.\n" +
-        "4. Add ground beef and cook until browned.\n" +
-        "5. Pour in tomato sauce and simmer for 15 minutes.\n" +
-        "6. Season with salt and pepper.\n" +
-        "7. Serve sauce over spaghetti.",
-      image: "/images/spaghetti_bolognese.jpg",
-    },
-    {
-      id: 2,
-      title: "Chicken Caesar Salad",
-      description: "A fresh salad with grilled chicken and creamy dressing.",
-      ingredients: [
-        { name: "Romaine Lettuce", quantity: "1", unit: "head" },
-        { name: "Chicken Breast", quantity: "2", unit: "pieces" },
-        { name: "Parmesan Cheese", quantity: "1/4", unit: "cup" },
-        { name: "Croutons", quantity: "1", unit: "cup" },
-        { name: "Caesar Dressing", quantity: "1/2", unit: "cup" },
-        { name: "Olive Oil", quantity: "2", unit: "tbsp" },
-        { name: "Salt", quantity: "to taste", unit: "" },
-        { name: "Black Pepper", quantity: "to taste", unit: "" },
-      ],
-      instructions:
-        "1. Season chicken with salt and pepper.\n" +
-        "2. Grill chicken until cooked through and slice.\n" +
-        "3. Chop romaine lettuce and place in a bowl.\n" +
-        "4. Add sliced chicken, croutons, and Parmesan cheese.\n" +
-        "5. Drizzle with Caesar dressing and toss to combine.",
-      image: "/images/chicken_caesar_salad.jpg",
-    },
-  ]);
+  //Get Recipes from API
+
 
   const [formData, setFormData] = useState<Recipe>({
     id: 0,
@@ -100,7 +55,6 @@ const Make: React.FC = () => {
   const [newIngredient, setNewIngredient] = useState<Ingredient>({
     name: "",
     quantity: "",
-    unit: "",
   });
 
   const [mealPlan, setMealPlan] = useState<MealPlan>({});
@@ -120,6 +74,7 @@ const Make: React.FC = () => {
     setCurrentWeek(dates);
   }, []);
 
+
   // Handle input changes for text fields
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -127,20 +82,6 @@ const Make: React.FC = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  // Handle ingredient addition
-  const handleAddIngredient = () => {
-    if (newIngredient.name && newIngredient.quantity && newIngredient.unit) {
-      setFormData({
-        ...formData,
-        ingredients: [...formData.ingredients, newIngredient],
-      });
-      setNewIngredient({ name: "", quantity: "", unit: "" });
-    } else {
-      toast.error("Please fill in all ingredient fields.");
-    }
-  };
-
   // Handle ingredient input
   const handleIngredientChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -157,22 +98,25 @@ const Make: React.FC = () => {
     }
   };
 
+
+
+
   // Save recipe
   const handleSaveRecipe = () => {
-    if (formData.title && formData.instructions) {
-      setRecipes([{ ...formData, id: recipes.length + 1 }, ...recipes]);
-      setFormData({
-        id: 0,
-        title: "",
-        description: "",
-        ingredients: [],
-        instructions: "",
-        image: null,
-      });
-      toast.success("Recipe saved successfully!");
-    } else {
-      toast.error("Please fill in all required fields.");
-    }
+    // if (formData.title && formData.instructions) {
+    //   setRecipes([{ ...formData, id: recipes.length + 1 }, ...recipes]);
+    //   setFormData({
+    //     id: 0,
+    //     title: "",
+    //     description: "",
+    //     ingredients: [],
+    //     instructions: "",
+    //     image: null,
+    //   });
+    //   toast.success("Recipe saved successfully!");
+    // } else {
+    //   toast.error("Please fill in all required fields.");
+    // }
   };
 
   // Meal planner functions
@@ -362,27 +306,19 @@ const Make: React.FC = () => {
                       placeholder="Quantity"
                       className="w-24 px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
                     />
-                    <input
-                      type="text"
-                      name="unit"
-                      value={newIngredient.unit}
-                      onChange={handleIngredientChange}
-                      placeholder="Unit"
-                      className="w-24 px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <button
+                    {/* <button
                       type="button"
                       onClick={handleAddIngredient}
                       className="bg-teal-500 text-gray-900 px-4 py-2 rounded-md hover:bg-teal-400 transition duration-200 flex items-center"
                     >
                       <FaPlus className="mr-2" /> Add
-                    </button>
+                    </button> */}
                   </div>
                   {formData.ingredients.length > 0 && (
                     <ul className="list-disc list-inside text-gray-300 max-h-40 overflow-y-auto border border-gray-700 rounded-md p-4 bg-gray-900">
                       {formData.ingredients.map((ingredient, idx) => (
                         <li key={idx}>
-                          {ingredient.quantity} {ingredient.unit} of {ingredient.name}
+                          {ingredient.quantity} of {ingredient.name}
                         </li>
                       ))}
                     </ul>
@@ -502,49 +438,7 @@ const Make: React.FC = () => {
           <h2 className="text-4xl font-bold text-center text-teal-400 mb-12">
             Your Recipes
           </h2>
-          {recipes.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-              {recipes.map((recipe) => (
-                <motion.div
-                  key={recipe.id}
-                  className="bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300"
-                  whileHover={{ scale: 1.02 }}
-                >
-                  {recipe.image && (
-                    <img
-                      src={recipe.image}
-                      alt={recipe.title}
-                      className="w-full h-64 object-cover rounded-md mb-4"
-                    />
-                  )}
-                  <h2 className="text-2xl font-bold text-teal-400 mb-2">
-                    {recipe.title}
-                  </h2>
-                  <p className="text-gray-300 mb-4">{recipe.description}</p>
-                  <h3 className="text-xl font-semibold text-gray-200 mb-2">
-                    Ingredients
-                  </h3>
-                  <ul className="list-disc list-inside mb-4 text-gray-300">
-                    {recipe.ingredients.map((ingredient, idx) => (
-                      <li key={idx}>
-                        {ingredient.quantity} {ingredient.unit} of {ingredient.name}
-                      </li>
-                    ))}
-                  </ul>
-                  <h3 className="text-xl font-semibold text-gray-200 mb-2">
-                    Instructions
-                  </h3>
-                  <p className="text-gray-300 whitespace-pre-line">
-                    {recipe.instructions}
-                  </p>
-                </motion.div>
-              ))}
-            </div>
-          ) : (
-            <p className="text-center text-gray-400 text-xl">
-              No recipes yet. Create one to get started!
-            </p>
-          )}
+          <Recipes />
         </div>
       </div>
     </div>

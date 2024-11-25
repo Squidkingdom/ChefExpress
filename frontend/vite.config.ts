@@ -5,7 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   build: {
-    outDir: '../server/static'
+    outDir: '../server/static',
+    sourcemap: true
   },
   server: {
     watch: {
