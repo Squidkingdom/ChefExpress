@@ -1,3 +1,4 @@
+// src/pages/share.tsx
 import React, { useState, ChangeEvent } from "react";
 import { FaPlus } from "react-icons/fa";
 import { motion } from "framer-motion";
@@ -14,58 +15,60 @@ import { Recipes } from "../components/Recipes";
  * @returns {React.JSX.Element} - The Share page component.
  */
 const Share: React.FC = () => {
-
+  // Form state for a new recipe
   const [formData, setFormData] = useState<Recipe>({
     id: 0,
     title: "",
     description: "",
     ingredients: [],
     instructions: "",
-    image: null,
+    image: null, // Placeholder for the uploaded image
   });
 
+  // State for a new ingredient input
   const [newIngredient, setNewIngredient] = useState<Ingredient>({
     name: "",
     quantity: "",
   });
 
+  // State for the selected image file
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-  // Handle image upload
+  // Handle image upload and update state
   const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setSelectedImage(e.target.files[0]);
+      setSelectedImage(e.target.files[0]); // Save the uploaded file to state
     }
   };
 
-  // Handle input change for recipe details
+  // Handle input changes for recipe details
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+    setFormData({ ...formData, [name]: value }); // Update the form data dynamically
   };
 
-  // Handle adding an ingredient
+  // Add a new ingredient to the list
   const handleAddIngredient = () => {
     if (newIngredient.name && newIngredient.quantity) {
       setFormData({
         ...formData,
-        ingredients: [...formData.ingredients, newIngredient],
+        ingredients: [...formData.ingredients, newIngredient], // Append new ingredient
       });
-      setNewIngredient({ name: "", quantity: ""});
+      setNewIngredient({ name: "", quantity: "" }); // Reset ingredient input
     } else {
-      toast.error("Please complete all ingredient fields.");
+      toast.error("Please complete all ingredient fields."); // Display error if fields are incomplete
     }
   };
 
-  // Handle new ingredient input
+  // Handle input for the new ingredient fields
   const handleIngredientInput = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setNewIngredient({ ...newIngredient, [name]: value });
+    setNewIngredient({ ...newIngredient, [name]: value }); // Dynamically update new ingredient state
   };
 
-  // Handle sharing a recipe
+  // Function to handle sharing a recipe (placeholder)
   const handleShareRecipe = () => {
     // if (
     //   formData.title &&
@@ -102,9 +105,9 @@ const Share: React.FC = () => {
       {/* Hero Section */}
       <header
         className="text-center py-24 bg-cover bg-center relative"
-        style={{ backgroundImage: "url('/images/share-hero.jpg')" }}
+        style={{ backgroundImage: "url('/images/share-hero.jpg')" }} // Hero background image
       >
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-75"></div>
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-75"></div> {/* Dark overlay */}
         <motion.div
           className="relative z-10 max-w-3xl mx-auto px-4"
           initial={{ opacity: 0, y: -30 }}
@@ -127,6 +130,7 @@ const Share: React.FC = () => {
             Share a Recipe
           </h2>
           <div className="space-y-4">
+            {/* Recipe Title Input */}
             <input
               type="text"
               name="title"
@@ -135,6 +139,7 @@ const Share: React.FC = () => {
               placeholder="Recipe Title"
               className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
+            {/* Recipe Description Input */}
             <textarea
               name="description"
               value={formData.description}
@@ -143,6 +148,7 @@ const Share: React.FC = () => {
               className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               rows={3}
             ></textarea>
+            {/* Ingredients Input */}
             <div>
               <div className="flex flex-wrap gap-2">
                 <input
@@ -161,7 +167,6 @@ const Share: React.FC = () => {
                   placeholder="Quantity"
                   className="w-24 px-4 py-2 bg-gray-900 border border-gray-700 rounded-md"
                 />
-                
                 <button
                   type="button"
                   onClick={handleAddIngredient}
@@ -171,6 +176,7 @@ const Share: React.FC = () => {
                 </button>
               </div>
               <ul className="list-disc list-inside mt-2 text-gray-300">
+                {/* Display list of added ingredients */}
                 {formData.ingredients.map((ingredient, index) => (
                   <li key={index}>
                     {ingredient.quantity} {ingredient.name}
@@ -178,6 +184,7 @@ const Share: React.FC = () => {
                 ))}
               </ul>
             </div>
+            {/* Recipe Instructions Input */}
             <textarea
               name="instructions"
               value={formData.instructions}
@@ -186,6 +193,7 @@ const Share: React.FC = () => {
               className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
               rows={4}
             ></textarea>
+            {/* Image Upload */}
             <div className="flex items-center">
               <label className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center cursor-pointer hover:bg-teal-400">
                 <FaPlus className="text-2xl text-gray-900" />
@@ -200,6 +208,7 @@ const Share: React.FC = () => {
                 {selectedImage ? selectedImage.name : "Upload an image"}
               </p>
             </div>
+            {/* Share Button */}
             <button
               onClick={handleShareRecipe}
               className="w-full bg-teal-500 text-gray-900 py-3 rounded-full hover:bg-teal-400"
@@ -214,7 +223,7 @@ const Share: React.FC = () => {
           <h2 className="text-4xl font-bold text-center text-teal-400 mb-12">
             Community Recipes
           </h2>
-          <Recipes/>
+          <Recipes />
         </section>
       </div>
     </div>

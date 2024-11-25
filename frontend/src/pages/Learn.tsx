@@ -7,56 +7,57 @@ import { useQuery } from "@tanstack/react-query";
 
 // Define the Video interface
 interface Video {
-  length: string;
-  title: string;
-  URL: string;
-  id: string;
-  category: string;
+  length: string; // Video duration
+  title: string; // Video title
+  URL: string;   // Video URL
+  id: string;    // Unique identifier for the video
+  category: string; // Video category
 }
 
 const Learn: React.FC = () => {
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null); // State for the currently selected video
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // State for the selected category filter
+  const [searchQuery, setSearchQuery] = useState<string>(""); // State for the search input value
 
-  const closeModal = () => setSelectedVideo(null);
+  const closeModal = () => setSelectedVideo(null); // Close the video modal
 
-  // Function to extract video ID from the URL
+  // Function to extract video ID from the URL (specific to YouTube links)
   const getVideoId = (url: string) => {
-    const regex = /watch\?v=([^&]+)/;
+    const regex = /watch\?v=([^&]+)/; // Regex to find the video ID in the query string
     const match = url.match(regex);
-    return match ? match[1] : "";
+    return match ? match[1] : ""; // Return the ID or an empty string if no match
   };
 
-  // Fetch video data Using TanStack's useQuery hook
+  // Fetch video data using TanStack's useQuery hook
   const fetchVideos = async () => {
     const response = await fetch("http://localhost:3000/api/videos", {
-      method: "POST"
+      method: "POST" // Use POST method to fetch videos from the API
     });
 
     if (!response.ok) {
+      // Throw an error if the request fails
       throw new Error("Failed to fetch videos");
     }
-    return response.json();
-  }
+    return response.json(); // Parse and return the JSON response
+  };
 
+  // React Query hook to manage video fetching and caching
   const { data: videos = [], isLoading, isError, error } = useQuery<Video[], Error>({
-    queryKey: ["videos"],
-    queryFn: fetchVideos,
-    initialData: []
-  })
+    queryKey: ["videos"], // Unique query key for caching and identification
+    queryFn: fetchVideos, // Function to fetch video data
+    initialData: [] // Initial value for videos to avoid undefined states
+  });
 
-  const filteredVideos = (videos|| []).filter((video) => {
+  // Filter videos based on the selected category and search query
+  const filteredVideos = (videos || []).filter((video) => {
     const matchesCategory = selectedCategory
-      ? video.category === selectedCategory
+      ? video.category === selectedCategory // Match the category if one is selected
       : true;
     const matchesSearch = video.title
       .toLowerCase()
-      .includes(searchQuery.toLowerCase());
+      .includes(searchQuery.toLowerCase()); // Match the title with the search query
     return matchesCategory && matchesSearch;
   });
-
-  
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100">
@@ -64,11 +65,11 @@ const Learn: React.FC = () => {
       <header
         className="text-center py-24 bg-cover bg-center relative"
         style={{
-          backgroundImage: "url('/images/learn-hero.jpg')",
+          backgroundImage: "url('/images/learn-hero.jpg')", // Background image for the hero section
         }}
         id="learn-hero"
       >
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-75"></div>
+        <div className="absolute inset-0 bg-gray-900 bg-opacity-75"></div> {/* Dark overlay */}
         <motion.div
           className="relative z-10 max-w-3xl mx-auto px-4"
           initial={{ opacity: 0, y: -30 }}
@@ -102,7 +103,7 @@ const Learn: React.FC = () => {
                 }`}
                 onClick={() =>
                   setSelectedCategory(
-                    selectedCategory === category ? null : category
+                    selectedCategory === category ? null : category // Toggle category selection
                   )
                 }
               >
@@ -112,7 +113,7 @@ const Learn: React.FC = () => {
           )}
           <button
             className="px-4 py-2 bg-gray-700 text-gray-200 rounded-full hover:bg-red-600 transition duration-200"
-            onClick={() => setSelectedCategory(null)}
+            onClick={() => setSelectedCategory(null)} // Clear the selected category
           >
             Clear Filters
           </button>
@@ -126,13 +127,13 @@ const Learn: React.FC = () => {
               type="text"
               placeholder="Search for a video..."
               value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              onChange={(e) => setSearchQuery(e.target.value)} // Update search query state
               className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"
             />
           </div>
           <button
             className="px-4 py-2 bg-teal-500 text-gray-900 rounded-full hover:bg-teal-600 transition duration-200"
-            onClick={() => setSearchQuery("")}
+            onClick={() => setSearchQuery("")} // Clear the search query
           >
             Clear
           </button>
@@ -149,14 +150,14 @@ const Learn: React.FC = () => {
             <motion.div
               key={video.id}
               className="bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer overflow-hidden"
-              onClick={() => setSelectedVideo(video)}
+              onClick={() => setSelectedVideo(video)} // Set the selected video for the modal
               whileHover={{ scale: 1.02 }}
             >
               <div className="relative" style={{ paddingTop: "56.25%" }}>
                 <img
                   src={`https://img.youtube.com/vi/${getVideoId(
                     video.URL
-                  )}/hqdefault.jpg`}
+                  )}/hqdefault.jpg`} // YouTube thumbnail
                   alt={video.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
@@ -192,7 +193,7 @@ const Learn: React.FC = () => {
               {/* Close Button */}
               <button
                 className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600 z-50"
-                onClick={closeModal}
+                onClick={closeModal} // Close the modal on click
               >
                 &times;
               </button>
@@ -200,8 +201,8 @@ const Learn: React.FC = () => {
               <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
                 <iframe
                   className="absolute inset-0 w-full h-full rounded-lg"
-                  src={selectedVideo.URL}
-                  title={selectedVideo.title}
+                  src={selectedVideo.URL} // Video URL for the iframe
+                  title={selectedVideo.title} // Accessible title for the iframe
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                 ></iframe>
