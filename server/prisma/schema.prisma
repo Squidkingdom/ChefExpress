@@ -28,6 +28,7 @@ model Recipe {
   instructions String? @db.VarChar
   recipe_id    String  @id(map: "recipe_pk") @db.VarChar
   owner_id     String? @db.Uuid
+  image        Bytes?
 }
 
 model Videos {
@@ -53,12 +54,20 @@ model saved_recipes {
   @@id([recipe_id, user_id], map: "saved_recipes_pk")
 }
 
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model users {
+  email     String @db.VarChar
+  name      String @db.VarChar
+  uuid      String @id(map: "users_pk") @db.Uuid
+  pass_hash String @db.VarChar
+}
+
 view recipeview {
-  id          String @db.VarChar @unique
+  id          String  @unique @db.VarChar
   title       String? @db.VarChar
   owner_id    String? @db.Uuid
   description String? @db.VarChar
+  owner_id    String? @db.Uuid
+  image       Bytes?
   ingredients Json?   @db.Json
-  image       String?
-
 }

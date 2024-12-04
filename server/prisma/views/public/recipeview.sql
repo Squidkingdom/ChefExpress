@@ -2,21 +2,11 @@ SELECT
   r.recipe_id AS id,
   r.name AS title,
   r.instructions AS description,
+  r.owner_id,
+  r.image,
   json_agg(
-    json_build_object(
-      'name',
-      i.name,
-      'quantity',
-      ir.quantity,
-      'unit',
-      ''
-    )
-  ) AS ingredients,
-  (
-    (
-      '/images/' :: text || REPLACE(lower((r.name) :: text), ' ' :: text, '_' :: text)
-    ) || '.jpg' :: text
-  ) AS image
+    json_build_object('name', i.name, 'quantity', ir.quantity)
+  ) AS ingredients
 FROM
   (
     (
