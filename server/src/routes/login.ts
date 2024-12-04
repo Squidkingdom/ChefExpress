@@ -34,7 +34,8 @@ router.post("/", async (req: Request, res: Response, next: NextFunction): Promis
 
     // If the credentials are correct, return the user's UUID
     logger.info("User logged in successfully with UUID: " + user.uuid);
-    res.status(200).json({ uuid: user.uuid });
+    res.status(200).json({ uuid: user.uuid, name: user.name });
+
   } catch (error) {
     // Log any errors and return a 500 internal server error
     console.error("Error during user login:", error);

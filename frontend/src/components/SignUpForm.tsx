@@ -1,6 +1,6 @@
 import React, { ChangeEvent, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { hash, decodeBase64, encodeBase64 } from "bcryptjs";
+import { hashPassword } from "../utils/LoginUtil.tsx";
 import { useMutation } from "@tanstack/react-query";
 
 interface FormData {
@@ -80,18 +80,8 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
     // Hash and send the password
     try {
       // Conver the Email into bcryptjs compatible b64
-      const b64 = btoa(email)
-        .replace(/[+/]/g, (match) => (match === "+" ? "." : "/")) //replace + with .
-        .replace(/=+$/, ""); //remove trailing equal signs
-
-      const salt = b64
-        .repeat(Math.ceil(22 / b64.length)) //repeat the b64 string to make it at least 22 characters long
-        .slice(0, 22); //make it max 22 characters long
-
-      const passwordHash = await hash(
-        password,
-        `$2a$10$${salt}` // bcryptjs requires the salt to be in the format $2a$10$salt
-      );
+      const passwordHash = await 
+      hashPassword(email, password)
 
       // Call the API
       registerMutation.mutate(
@@ -101,6 +91,7 @@ const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
             // Store login token
             localStorage.setItem("token", data.uuid);
             localStorage.setItem("name", data.name);
+            console.log(`User registered with UUID: ${data.uuid}, passwordHash: ${passwordHash}, password: ${password}`);
 
             // Close the modal
             onSuccess();

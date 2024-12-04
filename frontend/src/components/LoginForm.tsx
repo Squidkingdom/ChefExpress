@@ -2,12 +2,15 @@
 
 import React, { ChangeEvent, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { useMutation } from "@tanstack/react-query";
+import { hashPassword } from "../utils/LoginUtil";
+import { em } from "framer-motion/client";
 
 /**
  * Interface for the form data
  */
 interface FormData {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -16,7 +19,7 @@ interface FormData {
  */
 const LoginForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
-    username: "",
+    email: "",
     password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
@@ -36,31 +39,76 @@ const LoginForm: React.FC = () => {
     setShowPassword((prevState) => !prevState);
   };
 
+  //mutator for login
+  const useLoginMutation = () =>
+    useMutation({
+      mutationFn: async (loginData: { email: string; password: string }) => {
+        const passwordHash = await hashPassword(loginData.email, loginData.password);
+        console.log(`User logging in with passwordHash: ${passwordHash}, password: ${loginData.password}, email: ${loginData.email}`);
+        const response = await fetch("http://localhost:3000/api/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: loginData.email,
+            pass_hash: passwordHash,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error("Invalid credentials. Please try again.");
+        }
+
+        const json = await response.json();
+        console.log(json);
+        return json; // Assume the response includes a token
+      },
+    });
+
+  const loginMutation = useLoginMutation();
+
   // Handle form submission
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!formData.username || !formData.password) {
+
+    if (!formData.email || !formData.password) {
       setError("Please fill in both fields.");
       return;
     }
+
+
     setError("");
-    // Handle login logic
-    console.log("Logging in with:", formData);
-  };
+
+    loginMutation.mutate(
+      { email: formData.email, password: formData.password },
+      {
+        onSuccess: (data) => {
+          console.log("Login successful:", data);
+
+          // Example: Store the token and redirect
+          localStorage.setItem("token", data.uuid);
+          localStorage.setItem("name", data.name);
+        },
+        onError: (error) => {
+          console.error("Login error:", error);
+          setError(error.message || "Login failed.");
+        },
+      }
+    );
+  }
 
   return (
     <form
       onSubmit={handleSubmit}
       className="space-y-6 w-full max-w-md mx-auto"
     >
-      {/* Username Field */}
+      {/* email Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Username</label>
+        <label className="block text-gray-300 mb-2">Email</label>
         <input
           type="text"
-          name="username"
-          value={formData.username}
-          placeholder="Enter your username"
+          name="email"
+          value={formData.email}
+          placeholder="Enter your email"
           onChange={handleInputChange}
           className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
           required
