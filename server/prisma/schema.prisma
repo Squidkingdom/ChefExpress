@@ -65,7 +65,6 @@ model users {
 view recipeview {
   id          String  @unique @db.VarChar
   title       String? @db.VarChar
-  owner_id    String? @db.Uuid
   description String? @db.VarChar
   owner_id    String? @db.Uuid
   image       Bytes?
