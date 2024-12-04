@@ -1,24 +1,24 @@
-// src/components/SignUpForm.tsx
-
 import React, { ChangeEvent, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
+import { hash, decodeBase64, encodeBase64 } from "bcryptjs";
+import { useMutation } from "@tanstack/react-query";
 
-/**
- * Interface for the form data
- */
 interface FormData {
-  username: string;
+  name: string;
   email: string;
   password: string;
   confirmPassword: string;
 }
 
-/**
- * Component for the sign-up form
- */
-const SignUpForm: React.FC = () => {
+const saltRounds = 10;
+
+interface SignUpFormProps {
+  onSuccess: () => void;
+}
+
+const SignUpForm: React.FC<SignUpFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<FormData>({
-    username: "",
+    name: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -26,7 +26,24 @@ const SignUpForm: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  // Handle input changes for form fields
+  // anon function for registerAPI
+  const registerMutation = useMutation({
+    mutationFn: async (data: { name: string; email: string; passwordHash: string }) => {
+      const response = await fetch("http://localhost:3000/api/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          "email": data.email,
+          "name": data.name,
+          "pass_hash": data.passwordHash,
+        }),
+      });
+      if (!response.ok) throw new Error("Registration failed");
+      return response.json();
+    },
+  });
+
+  // visually track password as its typed
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prevData) => ({
@@ -35,29 +52,74 @@ const SignUpForm: React.FC = () => {
     }));
   };
 
-  // Toggle password visibility
+  // toggle function to show password
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-  // Handle form submission
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const { username, email, password, confirmPassword } = formData;
 
-    if (!username || !email || !password || !confirmPassword) {
+
+
+  // Do things on submit
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+
+    e.preventDefault();
+    const { name, email, password, confirmPassword } = formData;
+
+    // Check if all fields are filled
+    if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
     }
+    // Check if passwords match
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
       return;
     }
-    // Additional validation can be added here (e.g., password strength)
 
-    setError("");
-    // Handle sign-up logic
-    console.log("Signing up with:", formData);
+    // Hash and send the password
+    try {
+      // Conver the Email into bcryptjs compatible b64
+      const b64 = btoa(email)
+        .replace(/[+/]/g, (match) => (match === "+" ? "." : "/")) //replace + with .
+        .replace(/=+$/, ""); //remove trailing equal signs
+
+      const salt = b64
+        .repeat(Math.ceil(22 / b64.length)) //repeat the b64 string to make it at least 22 characters long
+        .slice(0, 22); //make it max 22 characters long
+
+      const passwordHash = await hash(
+        password,
+        `$2a$10$${salt}` // bcryptjs requires the salt to be in the format $2a$10$salt
+      );
+
+      // Call the API
+      registerMutation.mutate(
+        { name, email, passwordHash },
+        {
+          onSuccess: (data) => {
+            // Store login token
+            localStorage.setItem("token", data.uuid);
+            localStorage.setItem("name", data.name);
+
+            // Close the modal
+            onSuccess();
+            // console.log(passwordHash)
+            console.log("User registered successfully");
+          },
+          onError: (error) => {
+            console.log(passwordHash)
+            console.error(error);
+            setError("Registration failed. Please try again.");
+          },
+        }
+      );
+
+      setError("");
+    } catch (err) {
+      console.error("Error hashing password:", err);
+      setError("An error occurred. Please try again.");
+    }
   };
 
   return (
@@ -65,14 +127,14 @@ const SignUpForm: React.FC = () => {
       onSubmit={handleSubmit}
       className="space-y-6 w-full max-w-md mx-auto"
     >
-      {/* Username Field */}
+      {/* name Field */}
       <div>
-        <label className="block text-gray-300 mb-2">Username</label>
+        <label className="block text-gray-300 mb-2">Name</label>
         <input
           type="text"
-          name="username"
-          value={formData.username}
-          placeholder="Choose a username"
+          name="name"
+          value={formData.name}
+          placeholder="Enter your name"
           onChange={handleInputChange}
           className="w-full px-4 py-2 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
           required

@@ -39,7 +39,7 @@ router.post("/", async (req: Request, res: Response, next: NextFunction): Promis
     logger.info("Successfully created a new user with UUID: " + newUser.uuid);
 
     // Return the UUID of the new user
-    res.status(201).json({ uuid: newUser.uuid });
+    res.status(201).json({ uuid: newUser.uuid, name: newUser.name });
   } catch (error) {
     console.error("Error during user registration:", error);
     res.status(500).json({ error: "Internal server error" });

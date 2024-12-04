@@ -41,7 +41,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               : "Sign in to access delicious recipes and personalized recommendations."}
           </p>
           {/* Render the appropriate form */}
-          {isSignUp ? <SignUpForm /> : <LoginForm />}
+          {isSignUp ? <SignUpForm onSuccess={onClose}/> : <LoginForm />}
           {/* Toggle between Login and Sign Up */}
           <div className="text-center mt-6">
             {isSignUp ? (
