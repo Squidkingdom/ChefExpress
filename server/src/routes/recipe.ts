@@ -54,8 +54,15 @@ router.route("/")
           : undefined, // If owner_id_ref is not provided, fetch all recipes
       });
   
+      const newRecipes = recipes.map((recipe) => {
+        return {
+          ...recipe,
+          image: recipe.image? `data:image/jpeg;base64,${Buffer.from(recipe.image).toString('base64')}` : null
+        };
+      });
+
       // Return the list of recipes
-      res.status(200).json(recipes);
+      res.status(200).json(newRecipes);
     } catch (error) {
       console.error("Error fetching recipes:", error);
       res.status(500).json({ error: "Failed to fetch recipes" });

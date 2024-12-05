@@ -9,7 +9,7 @@ export const Recipes: React.FC = () => {
     // Fetches the list of recipes from the backend API
     const fetchRecipes = async () => {
         const response = await fetch("http://localhost:3000/api/recipe", {
-            method: "POST" // Use POST method to retrieve recipes
+            method: "GET" // Use POST method to retrieve recipes
         });
 
         if (!response.ok) {

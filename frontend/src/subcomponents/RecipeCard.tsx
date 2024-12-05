@@ -24,6 +24,15 @@ export interface RecipeCardProps {
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
+
+  const getImageSrc = (image: string | null) => {
+    // If the image is a byte array stored as a string in the database
+    if (image) {
+      return image; // Adjust image type as needed
+    }
+    return ""; // Return an empty string if no image is available
+  };
+
   return (
     <motion.div
       className="bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 cursor-pointer"
@@ -33,7 +42,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe, onClick }) => {
       {/* Display the recipe image if it exists */}
       {recipe.image && (
         <img
-          src={recipe.image}
+          src={getImageSrc(recipe.image)}
           alt={recipe.title}
           className="w-full h-64 object-cover rounded-md mb-4"
         />
