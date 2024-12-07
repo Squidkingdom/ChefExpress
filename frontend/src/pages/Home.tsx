@@ -49,7 +49,7 @@ const Home: React.FC<HomeProps> = ({ setRunTour }) => {
             onClick={() => setRunTour(true)}
             id="cta-button"
           >
-            Get Started
+            Take a Tour
           </button>
         </motion.div>
       </header>
@@ -112,7 +112,7 @@ const Home: React.FC<HomeProps> = ({ setRunTour }) => {
 
       {/* Parallax Section */}
       <section
-        className="parallax-section bg-fixed bg-center bg-cover py-32 text-center text-white"
+        className="parallax-section bg-fixed bg-center bg-cover text-center text-white"
         style={{
           backgroundImage: "url('/images/parallax-background.jpg')",
         }}
@@ -169,28 +169,6 @@ const Home: React.FC<HomeProps> = ({ setRunTour }) => {
               </p>
               <p className="text-teal-400 font-semibold">- Taylor</p>
             </motion.div>
-          </div>
-        </div>
-      </section>
-
-      {/* Newsletter Section */}
-      <section className="bg-gray-800 py-20 px-6">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Join Our Newsletter
-          </h2>
-          <p className="text-gray-300 mb-8">
-            Stay updated with the latest recipes and culinary news.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <input
-              type="email"
-              placeholder="Enter your email"
-              className="px-4 py-3 rounded-full w-full sm:w-auto flex-grow bg-gray-900 border border-gray-700 text-gray-200 focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-            <button className="px-6 py-3 bg-teal-500 text-gray-900 rounded-full font-medium hover:bg-teal-400 transition duration-300">
-              Subscribe
-            </button>
           </div>
         </div>
       </section>

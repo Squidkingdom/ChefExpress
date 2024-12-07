@@ -56,6 +56,7 @@ const NavButtons: React.FC<{ onLoginClick: () => void }> = ({
   onLoginClick,
 }) => (
   <div className="flex flex-col md:flex-row space-y-2 md:space-y-0 md:space-x-6">
+    <NavButton to="/">Home</NavButton>
     <NavButton to="/learn">Learn</NavButton>
     <NavButton to="/make">Make</NavButton>
     <NavButton to="/order">Order</NavButton>
