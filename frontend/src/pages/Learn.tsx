@@ -139,23 +139,34 @@ const Learn: React.FC = () => {
         </div>
       </div>
 
-      {/* Video Grid */}
-      <section
-        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 px-8 py-8"
-        id="learn-videos"
-      >
-        {((filteredVideos.length > 0) && !isLoading) ? (
-          filteredVideos.map((video) => (
-            <motion.div
-              key={video.id}
-              className="bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer overflow-hidden"
-              onClick={() => setSelectedVideo(video)} // Set the selected video for the modal
-              whileHover={{ scale: 1.02 }}
-            >
-              <div className="relative" style={{ paddingTop: "56.25%" }}>
-                <img
-                  src={`https://img.youtube.com/vi/${getVideoId(
-                    video.URL
+        {/* Video Grid */}
+        <section
+          className="
+          w-full 
+          grid 
+          grid-cols-1
+          gap-4
+          p-4
+          sm:grid-cols-1 sm:gap-10 sm:p-10
+          md:grid-cols-2 md:gap-8 md:p-8
+          lg:grid-cols-3 lg:gap-10 lg:p-10
+          xl:grid-cols-4 xl:gap-12 xl:p-12
+          2xl:grid-cols-5 2xl:gap-12 2xl:p-12
+        "
+          id="learn-videos"
+        >
+          {((filteredVideos.length > 0) && !isLoading) ? (
+            filteredVideos.map((video) => (
+              <motion.div
+                key={video.id}
+                className=" bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer overflow-hidden"
+                onClick={() => setSelectedVideo(video)} // Set the selected video for the modal
+                whileHover={{ scale: 1.02 }}
+              >
+                <div className="relative aspect-video">
+                  <img
+                    src={`https://img.youtube.com/vi/${getVideoId(
+                      video.URL
                   )}/hqdefault.jpg`} // YouTube thumbnail
                   alt={video.title}
                   className="absolute inset-0 w-full h-full object-cover"
@@ -191,7 +202,7 @@ const Learn: React.FC = () => {
             <div className="bg-gray-900 w-11/12 lg:w-3/4 xl:w-2/3 rounded-lg shadow-lg overflow-hidden relative">
               {/* Close Button */}
               <button
-                className="absolute top-4 right-4 bg-red-500 text-white p-2 rounded-full shadow-lg hover:bg-red-600 z-50"
+                className="absolute w-10 h-10 bottom-7 right-6 bg-red-500 text-white flex items-center justify-center p-2 rounded-full shadow-lg hover:bg-red-600 z-50"
                 onClick={closeModal} // Close the modal on click
               >
                 &times;
@@ -200,7 +211,7 @@ const Learn: React.FC = () => {
               <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
                 <iframe
                   className="absolute inset-0 w-full h-full rounded-lg"
-                  src={selectedVideo.URL} // Video URL for the iframe
+                  src={`https://www.youtube.com/embed/${getVideoId(selectedVideo.URL)}`} // Video URL for the iframe
                   title={selectedVideo.title} // Accessible title for the iframe
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
