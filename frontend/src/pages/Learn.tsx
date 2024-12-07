@@ -92,18 +92,17 @@ const Learn: React.FC = () => {
       >
         {/* Category Buttons */}
         <div className="flex gap-4 flex-wrap justify-center">
-          {["Culinary Arts", "Kitchen Safety", "Food Science"].map(
+          {["Kitchen Safety", "Food Safety", "Food Science", "Ramsay"].map(
             (category) => (
               <button
                 key={category}
-                className={`px-4 py-2 rounded-full font-medium transition duration-200 ${
-                  selectedCategory === category
+                className={`px-4 py-2 rounded-full font-medium transition duration-200 ${selectedCategory === category
                     ? "bg-teal-500 text-gray-900"
                     : "bg-gray-700 text-gray-200 hover:bg-teal-600"
-                }`}
+                  }`}
                 onClick={() =>
                   setSelectedCategory(
-                    selectedCategory === category ? null : category // Toggle category selection
+                    selectedCategory === category ? null : category
                   )
                 }
               >
@@ -113,7 +112,7 @@ const Learn: React.FC = () => {
           )}
           <button
             className="px-4 py-2 bg-gray-700 text-gray-200 rounded-full hover:bg-red-600 transition duration-200"
-            onClick={() => setSelectedCategory(null)} // Clear the selected category
+            onClick={() => setSelectedCategory(null)}
           >
             Clear Filters
           </button>
