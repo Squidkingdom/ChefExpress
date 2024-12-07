@@ -204,7 +204,7 @@ const Make: React.FC = () => {
 
       <div className="container mx-auto px-4 py-12">
         {/* Recipe Maker Section */}
-        <UploadRecipe />
+        {/* <UploadRecipe /> */}
 
         {/* Meal Planner Section */}
         <div
@@ -272,7 +272,7 @@ const Make: React.FC = () => {
           <h2 className="text-4xl font-bold text-center text-teal-400 mb-12">
             Your Recipes
           </h2>
-          <Recipes />
+          <Recipes isSavedRecipes={true} />
         </div>
       </div>
     </div>

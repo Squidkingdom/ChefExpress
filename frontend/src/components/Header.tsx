@@ -61,7 +61,7 @@ const NavButtons: React.FC<{ onLoginClick: () => void }> = ({
     <NavButton to="/order">Order</NavButton>
     <NavButton to="/share">Share</NavButton>
     <NavButton onClick={onLoginClick} className="login-button">
-      Login
+      {localStorage.getItem("name") ? localStorage.getItem("name") : "Login"}
     </NavButton>
   </div>
 );

@@ -14,10 +14,13 @@ interface FormData {
   password: string;
 }
 
+interface LoginFormProps {
+  onSuccess: () => void;
+}
 /**
  * Component for the login form
  */
-const LoginForm: React.FC = () => {
+const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     password: "",
@@ -87,6 +90,7 @@ const LoginForm: React.FC = () => {
           // Example: Store the token and redirect
           localStorage.setItem("token", data.uuid);
           localStorage.setItem("name", data.name);
+          onSuccess();
         },
         onError: (error) => {
           console.error("Login error:", error);
