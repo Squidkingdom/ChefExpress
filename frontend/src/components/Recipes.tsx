@@ -22,7 +22,7 @@ export const Recipes: React.FC = () => {
 
     // React Query hook to manage recipe fetching
     const { data: sharedRecipes = [], isLoading, isError, error } = useQuery<Recipe[], Error>({
-        queryKey: ["precipes"], // Unique key for caching and identifying this query
+        queryKey: ["recipes"], // Unique key for caching and identifying this query
         queryFn: fetchRecipes, // Function to fetch recipes
         initialData: [], // Initial data to populate the query state
     });

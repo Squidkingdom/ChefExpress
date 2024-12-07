@@ -10,8 +10,6 @@ interface FormData {
   confirmPassword: string;
 }
 
-const saltRounds = 10;
-
 interface SignUpFormProps {
   onSuccess: () => void;
 }

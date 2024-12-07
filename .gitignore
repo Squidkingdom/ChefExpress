@@ -130,3 +130,5 @@ dist
 .pnp.*
 
 frontend/log.txt
+
+frontend/src/components/OldUploadRecipe.tsx

@@ -4,10 +4,9 @@ import React, { useState, useEffect, ChangeEvent } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
-import RecipeCard from "../subcomponents/RecipeCard";
 import 'react-toastify/dist/ReactToastify.css';
-import { useQuery } from "@tanstack/react-query";
 import { Recipes } from "../components/Recipes";
+import { UploadRecipe } from "../components/UploadRecipe";
 
 interface Ingredient {
   name: string;
@@ -74,50 +73,6 @@ const Make: React.FC = () => {
     setCurrentWeek(dates);
   }, []);
 
-
-  // Handle input changes for text fields
-  const handleInputChange = (
-    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-  // Handle ingredient input
-  const handleIngredientChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setNewIngredient({ ...newIngredient, [name]: value });
-  };
-
-  // Handle image upload
-  const handleImageChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData({
-        ...formData,
-        image: URL.createObjectURL(e.target.files[0]),
-      });
-    }
-  };
-
-
-
-
-  // Save recipe
-  const handleSaveRecipe = () => {
-    // if (formData.title && formData.instructions) {
-    //   setRecipes([{ ...formData, id: recipes.length + 1 }, ...recipes]);
-    //   setFormData({
-    //     id: 0,
-    //     title: "",
-    //     description: "",
-    //     ingredients: [],
-    //     instructions: "",
-    //     image: null,
-    //   });
-    //   toast.success("Recipe saved successfully!");
-    // } else {
-    //   toast.error("Please fill in all required fields.");
-    // }
-  };
 
   // Meal planner functions
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
@@ -249,128 +204,7 @@ const Make: React.FC = () => {
 
       <div className="container mx-auto px-4 py-12">
         {/* Recipe Maker Section */}
-        <div
-          className="recipe-maker w-full max-w-6xl mx-auto bg-gray-800 p-8 rounded-lg shadow-lg mb-16"
-          id="make-recipe-maker" // Added ID for Guided Tour targeting
-        >
-          <h2 className="text-3xl font-bold text-center text-teal-400 mb-8">
-            New Recipe
-          </h2>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-8">
-            {/* Grid Layout for Form */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Left Column */}
-              <div className="space-y-6">
-                {/* Recipe Title */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Recipe Title</label>
-                  <input
-                    type="text"
-                    name="title"
-                    value={formData.title}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    required
-                  />
-                </div>
-
-                {/* Description */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Description</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    rows={5}
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  ></textarea>
-                </div>
-
-                {/* Ingredients */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Ingredients</label>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    <input
-                      type="text"
-                      name="name"
-                      value={newIngredient.name}
-                      onChange={handleIngredientChange}
-                      placeholder="Ingredient Name"
-                      className="flex-grow min-w-[150px] px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    <input
-                      type="text"
-                      name="quantity"
-                      value={newIngredient.quantity}
-                      onChange={handleIngredientChange}
-                      placeholder="Quantity"
-                      className="w-24 px-4 py-2 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    />
-                    {/* <button
-                      type="button"
-                      onClick={handleAddIngredient}
-                      className="bg-teal-500 text-gray-900 px-4 py-2 rounded-md hover:bg-teal-400 transition duration-200 flex items-center"
-                    >
-                      <FaPlus className="mr-2" /> Add
-                    </button> */}
-                  </div>
-                  {formData.ingredients.length > 0 && (
-                    <ul className="list-disc list-inside text-gray-300 max-h-40 overflow-y-auto border border-gray-700 rounded-md p-4 bg-gray-900">
-                      {formData.ingredients.map((ingredient, idx) => (
-                        <li key={idx}>
-                          {ingredient.quantity} of {ingredient.name}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Column */}
-              <div className="space-y-6">
-                {/* Image Upload */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Recipe Image</label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="w-full text-gray-300 px-4 py-2 border border-gray-700 bg-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                  />
-                  {formData.image && (
-                    <img
-                      src={formData.image}
-                      alt="Recipe"
-                      className="w-full h-64 object-cover rounded-md mt-4"
-                    />
-                  )}
-                </div>
-
-                {/* Instructions */}
-                <div>
-                  <label className="block text-gray-300 mb-2">Instructions</label>
-                  <textarea
-                    name="instructions"
-                    value={formData.instructions}
-                    onChange={handleInputChange}
-                    rows={8}
-                    className="w-full px-4 py-3 bg-gray-900 border border-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500"
-                    required
-                  ></textarea>
-                </div>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <button
-              type="button"
-              onClick={handleSaveRecipe}
-              className="w-full bg-teal-500 text-gray-900 py-4 rounded-md font-semibold text-xl hover:bg-teal-400 transition duration-200 flex items-center justify-center"
-            >
-              <FaPlus className="mr-2" /> Save Recipe
-            </button>
-          </form>
-        </div>
+        <UploadRecipe />
 
         {/* Meal Planner Section */}
         <div
@@ -384,7 +218,7 @@ const Make: React.FC = () => {
         </div>
 
         {/* Meal Selector Modal */}
-        {showMealSelector && (
+        {/*showMealSelector && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-70 z-50">
             <div className="bg-gray-800 p-8 rounded-lg shadow-lg max-w-lg w-full relative">
               <h3 className="text-2xl font-bold text-teal-400 mb-6">
@@ -431,7 +265,7 @@ const Make: React.FC = () => {
               )}
             </div>
           </div>
-        )}
+        )*/}
 
         {/* Displaying Saved Recipes */}
         <div className="w-full max-w-5xl mx-auto">
@@ -442,7 +276,7 @@ const Make: React.FC = () => {
         </div>
       </div>
     </div>
-  );
+   );
 };
 
 export default Make;

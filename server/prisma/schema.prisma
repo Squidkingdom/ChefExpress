@@ -10,7 +10,7 @@ datasource db {
 
 model Ingredient {
   name          String @db.VarChar
-  ingredient_id String @id(map: "ingredient_pk") @db.VarChar
+  ingredient_id Int    @id(map: "ingredient_pk") @default(autoincrement())
 }
 
 model Items {
@@ -26,9 +26,10 @@ model Items {
 model Recipe {
   name         String? @db.VarChar
   instructions String? @db.VarChar
-  recipe_id    String  @id(map: "recipe_pk") @db.VarChar
   owner_id     String? @db.Uuid
   image        Bytes?
+  id           Int     @id(map: "recipe_pk") @default(autoincrement())
+  description  String? @db.VarChar
 }
 
 model Videos {
@@ -41,8 +42,8 @@ model Videos {
 
 model ingrediantinrecipe {
   quantity      String? @db.VarChar
-  recipe_id     String  @db.VarChar
-  ingredient_id String  @db.VarChar
+  recipe_id     Int
+  ingredient_id Int
 
   @@id([recipe_id, ingredient_id], map: "ingrediantinrecipe_pk")
 }
@@ -62,11 +63,13 @@ model users {
   pass_hash String @db.VarChar
 }
 
+/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 view recipeview {
-  id          String  @unique @db.VarChar
-  title       String? @db.VarChar
-  description String? @db.VarChar
-  owner_id    String? @db.Uuid
-  image       Bytes?
-  ingredients Json?   @db.Json
+  id           Int     @unique
+  title        String? @db.VarChar
+  instructions String? @db.VarChar
+  description  String? @db.VarChar
+  owner_id     String? @db.Uuid
+  image        Bytes?
+  ingredients  Json?   @db.Json
 }

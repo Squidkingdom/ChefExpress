@@ -1,7 +1,8 @@
 SELECT
-  r.recipe_id AS id,
+  r.id,
   r.name AS title,
-  r.instructions AS description,
+  r.instructions,
+  r.description,
   r.owner_id,
   r.image,
   json_agg(
@@ -11,15 +12,12 @@ FROM
   (
     (
       "Recipe" r
-      LEFT JOIN ingrediantinrecipe ir ON (((r.recipe_id) :: text = (ir.recipe_id) :: text))
+      LEFT JOIN ingrediantinrecipe ir ON ((r.id = ir.recipe_id))
     )
-    LEFT JOIN "Ingredient" i ON (
-      (
-        (ir.ingredient_id) :: text = (i.ingredient_id) :: text
-      )
-    )
+    LEFT JOIN "Ingredient" i ON ((ir.ingredient_id = i.ingredient_id))
   )
 GROUP BY
-  r.recipe_id,
   r.name,
-  r.instructions;
+  r.id,
+  r.instructions,
+  r.description;

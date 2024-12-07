@@ -1,4 +1,5 @@
 import express, { NextFunction, Request, Response } from "express";
+import multer from "multer";
 import log4js from "log4js";
 import { prisma } from "../db/client";
 
@@ -8,7 +9,17 @@ const router = express.Router();
 // Create a logger for the file 'recipe.ts'
 const logger = log4js.getLogger("recipe.ts");
 
+// Configure Multer for in-memory storage
+const upload = multer({ storage: multer.memoryStorage() });
 
+// Extend Request type to include 'file' property for TypeScript
+interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
+
+// Handle POST request to /api/recipeImage for image upload
+// (From the first snippet; DO NOT remove or change comments)
+ 
 /**
  *                                     RECIPE  /api/recipe
  * 
@@ -30,6 +41,7 @@ const logger = log4js.getLogger("recipe.ts");
         GET, PUT, DELETE:  Not implemented
  * 
  */
+
 router.route("/")
   .all((req: Request, res: Response, next: NextFunction) => {
     // logging the request
@@ -57,7 +69,7 @@ router.route("/")
       const newRecipes = recipes.map((recipe) => {
         return {
           ...recipe,
-          image: recipe.image? `data:image/jpeg;base64,${Buffer.from(recipe.image).toString('base64')}` : null
+          image: recipe.image ? `data:image/jpeg;base64,${Buffer.from(recipe.image).toString('base64')}` : null
         };
       });
 
@@ -68,15 +80,19 @@ router.route("/")
       res.status(500).json({ error: "Failed to fetch recipes" });
     }
   })
-  .post(async (req: Request, res: Response) => {
+  .post(upload.single("image"), async (req: MulterRequest, res: Response) => {
+    // Below code merges logic from both endpoints:
+    // First, we create a recipe and its ingredients as from the second snippet.
+    // Then, if an image is provided, we handle it as in the first snippet.
+    
     try {
       // Parse data from the request body
-      const { ingredients, title, description, owner_id } = req.body;
-  
+      const { ingredients, title, instructions, description, owner_id } = req.body;
+
       // Step 1: Process the ingredients
-      const ingredientData: { ingredient_id: string; quantity: string }[] = [];
+      const ingredientData: { ingredient_id: number; quantity: string }[] = [];
   
-      for (const ingredient of ingredients) {
+      for (const ingredient of JSON.parse(ingredients)) {
         const { name, quantity } = ingredient;
   
         // Search for the ingredient in the Ingredient table
@@ -88,8 +104,7 @@ router.route("/")
           // Create new ingredient if not found
           const newIngredient = await prisma.ingredient.create({
             data: {
-              name,
-              ingredient_id: Math.random().toString(36).substring(2, 15), // Generate random ingredient_id
+              name: name,
             },
           });
           existingIngredient = newIngredient;
@@ -103,22 +118,22 @@ router.route("/")
       }
   
       // Step 2: Add entry to the Recipe table
-      const recipeId = Math.random().toString(36).substring(2, 15); // Generate random recipe_id
-  
-      const newRecipe = await prisma.recipe.create({
+      // We no longer manually generate a recipe_id. The DB will handle it and return `id`.
+      let newRecipe = await prisma.recipe.create({
         data: {
-          recipe_id: recipeId, // Random recipe_id
           name: title, // Name from POST request body
-          instructions: description, // Instructions from POST request body
-          owner_id, // owner_id from POST request body
+          instructions: instructions, // Instructions from POST request body
+          owner_id: owner_id, // owner_id from POST request body
+          description: description, // Description from POST request body
         },
       });
   
-      // Step 3: Add entries to the ingrediantinrecipe table
+      // Step 3: Add entries to the ingrediantinrecipe table using newRecipe.id
       const ingredientInRecipeEntries = ingredientData.map(async (ingredient) => {
+        console.log(`${newRecipe.id} ${ingredient.ingredient_id}`)
         return prisma.ingrediantinrecipe.create({
           data: {
-            recipe_id: recipeId,
+            recipe_id: newRecipe.id,
             ingredient_id: ingredient.ingredient_id,
             quantity: ingredient.quantity,
           },
@@ -127,16 +142,41 @@ router.route("/")
   
       // Wait for all the ingrediantinrecipe entries to be created
       await Promise.all(ingredientInRecipeEntries);
-  
-      // Send a response indicating success
-      res.status(200).json({
-        message: "Recipe and ingredient entries created successfully",
-        recipe: newRecipe,
-        ingredients: ingredientData,
-      });
+
+      // Now integrate image upload logic from the first snippet
+      const file = req.file;
+
+      // Check if a file was uploaded
+      if (!file) {
+        // If no image, just respond with the newly created recipe info
+        res.status(200).json({
+          message: "Recipe and ingredient entries created successfully",
+          recipe: newRecipe,
+          ingredients: ingredientData,
+        });
+        return;
+      }
+
+      // Try updating the recipe with the image (from first snippet)
+      try {
+        const updatedRecipe = await prisma.recipe.update({
+          where: { id: newRecipe.id },
+          data: {
+            image: file.buffer, // Save the image as binary data
+          },
+        });
+
+        // Return the updated recipe with the id (from first snippet)
+        res.sendStatus(200);
+      } catch (error) {
+        console.error("Error updating recipe image:", error);
+        res.status(500).json({ error: "Internal Server Error" });
+      }
+
     } catch (error) {
       console.error("Error creating recipe and ingredients:", error);
       res.status(500).json({ error: "Failed to create recipe and ingredients" });
     }
   });
+
 export default router;
