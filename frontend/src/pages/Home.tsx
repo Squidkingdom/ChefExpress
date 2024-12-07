@@ -28,11 +28,9 @@ const Home: React.FC<HomeProps> = () => {
   const smoothY = useSpring(y, { stiffness: 50, damping: 15 });
   const smoothRotate = useSpring(rotate, { stiffness: 50, damping: 15 });
 
-  // Enhanced animation variants
+  // Modified container variants to remove disappearing animation
   const containerVariants = {
-    hidden: { opacity: 0 },
     visible: {
-      opacity: 1,
       transition: {
         staggerChildren: 0.15,
         delayChildren: 0.2,
@@ -41,7 +39,6 @@ const Home: React.FC<HomeProps> = () => {
   };
 
   const itemVariants = {
-    hidden: { y: 30, opacity: 0 },
     visible: {
       y: 0,
       opacity: 1,
@@ -142,18 +139,13 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </div>
 
-      {/* Enhanced Hero Section */}
+      {/* Modified Hero Section with bottom-up animations */}
       <header className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <motion.div
           style={{ y: smoothY, opacity, scale, rotateX: smoothRotate }}
           className="relative z-10 max-w-6xl mx-auto px-4 text-center"
         >
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, type: "spring", damping: 20 }}
-            className="relative"
-          >
+          <div className="relative">
             {/* Enhanced glow effect */}
             <motion.div
               animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
@@ -161,19 +153,24 @@ const Home: React.FC<HomeProps> = () => {
               className="absolute inset-0 bg-gradient-to-r from-teal-500/30 to-cyan-500/30 blur-3xl transform -translate-y-1/2"
             />
 
-            <h1 className="text-6xl md:text-8xl font-extrabold mb-8 relative">
+            <motion.h1 
+              className="text-6xl md:text-8xl font-extrabold mb-8 relative"
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+            >
               <motion.span
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.5 }}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
                 className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-300"
               >
                 Welcome to{" "}
               </motion.span>
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.8 }}
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
                 className="inline-block"
               >
                 <span className="text-white">Chef</span>
@@ -181,14 +178,22 @@ const Home: React.FC<HomeProps> = () => {
                   Express
                 </span>
               </motion.div>
-            </h1>
+            </motion.h1>
 
-            <p className="text-2xl md:text-4xl text-gray-300 mb-8 leading-relaxed">
+            <motion.p
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.8 }}
+              className="text-2xl md:text-4xl text-gray-300 mb-8 leading-relaxed"
+            >
               Experience the future of cooking,{" "}
               <span className="text-teal-400">one recipe at a time</span>
-            </p>
+            </motion.p>
 
             <motion.button
+              initial={{ opacity: 0, y: 20 }} // Changed from y: 50 to y: 20 for less travel
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 1 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="group relative px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-400 rounded-full font-semibold text-xl text-gray-900 shadow-lg shadow-teal-500/25 hover:shadow-teal-500/40 transition-all duration-300"
@@ -206,7 +211,8 @@ const Home: React.FC<HomeProps> = () => {
               </span>
               <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-400 to-cyan-300 opacity-0 group-hover:opacity-100 blur transition-opacity duration-300" />
             </motion.button>
-          </motion.div>
+
+          </div>
         </motion.div>
 
         {/* Enhanced floating elements */}
@@ -234,7 +240,7 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </header>
 
-      {/* Enhanced Mission Statement */}
+      {/* Mission Statement */}
       <motion.section
         ref={missionRef}
         className="py-20 px-6 relative"
@@ -265,11 +271,10 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </motion.section>
 
-      {/* Enhanced Features Section */}
+      {/* Modified Features Section */}
       <motion.section
         variants={containerVariants}
-        initial="hidden"
-        animate={isMissionInView ? "visible" : "hidden"}
+        animate="visible"
         className="py-24 px-6 relative"
       >
         <div className="max-w-6xl mx-auto">
@@ -336,7 +341,7 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </motion.section>
 
-      {/* Enhanced Stats Section */}
+      {/* Stats Section */}
       <section className="py-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 blur-3xl pointer-events-none" />
         <div className="max-w-6xl mx-auto px-6 relative">
@@ -359,7 +364,6 @@ const Home: React.FC<HomeProps> = () => {
                   transition={{ type: "spring", stiffness: 200, damping: 10 }}
                   className="text-5xl font-bold mb-2 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent relative"
                 >
-                  {/* Enhanced glow effect for stats */}
                   <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   {stat.number}
                 </motion.h4>
@@ -372,7 +376,7 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </section>
 
-      {/* Enhanced Testimonials Section */}
+      {/* Testimonials Section */}
       <section className="py-32 px-6 relative">
         <motion.div
           initial={{ opacity: 0 }}
@@ -420,13 +424,11 @@ const Home: React.FC<HomeProps> = () => {
                 }}
                 className="group relative flex flex-col"
               >
-                {/* Enhanced card effects */}
                 <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform group-hover:scale-110 transition-transform duration-300 pointer-events-none" />
 
                 <div className="relative z-10 backdrop-blur-sm bg-gray-800/50 border border-gray-700/50 p-8 rounded-2xl shadow-lg flex flex-col justify-between h-full">
                   <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-cyan-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                  {/* Enhanced quote styling */}
                   <div className="relative">
                     <div className="absolute -top-4 -left-2 text-4xl text-teal-500/20">
                       "
@@ -439,7 +441,6 @@ const Home: React.FC<HomeProps> = () => {
                     </div>
                   </div>
 
-                  {/* Enhanced author info */}
                   <div className="relative z-10">
                     <motion.p
                       whileHover={{ x: 5 }}
@@ -456,7 +457,7 @@ const Home: React.FC<HomeProps> = () => {
         </motion.div>
       </section>
 
-      {/* Enhanced Newsletter Section */}
+      {/* Newsletter Section */}
       <section className="py-24 px-6 relative">
         <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 blur-3xl pointer-events-none" />
         <div className="max-w-4xl mx-auto relative">
@@ -466,7 +467,6 @@ const Home: React.FC<HomeProps> = () => {
             viewport={{ once: true }}
             className="backdrop-blur-md bg-gray-800/50 border border-gray-700/50 p-12 rounded-2xl text-center relative overflow-hidden"
           >
-            {/* Enhanced background effects */}
             <div className="absolute inset-0">
               <motion.div
                 animate={{

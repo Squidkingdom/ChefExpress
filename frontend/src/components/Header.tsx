@@ -216,7 +216,10 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
       setScrolled(currentScrollY > 20);
     };
 
-    window.addEventListener("scroll", handleScroll);
+    // Initial check
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
@@ -225,100 +228,97 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
     setMenuOpen(false);
   };
 
-  const headerVariants = {
-    initial: { y: -100 },
-    visible: { 
-      y: 0,
-      transition: {
-        type: "spring",
-        stiffness: 100,
-        damping: 20,
-      }
-    },
-  };
-
   return (
     <motion.header
-      className={`fixed w-full top-0 z-50 transition-all duration-500 ease-in-out
-        ${scrolled 
-          ? "bg-gray-900/80 backdrop-blur-lg shadow-lg shadow-gray-900/20 border-b border-gray-700/20 py-3" 
-          : "bg-transparent py-4 border-b border-transparent"}
-      `}
-      variants={headerVariants}
-      initial="initial"
-      animate="visible"
+      className="fixed w-full top-0 z-50"
+      initial={{ y: -100 }}
+      animate={{ y: 0 }}
+      transition={{
+        type: "spring",
+        stiffness: 260,
+        damping: 20
+      }}
     >
-      <motion.div 
-        className="container mx-auto flex justify-between items-center px-6"
+      <motion.div
+        className={`w-full transition-all duration-300 ease-in-out
+          ${scrolled 
+            ? "bg-gray-900/80 backdrop-blur-lg shadow-lg shadow-gray-900/20 border-b border-gray-700/20 py-3" 
+            : "bg-transparent py-4 border-b border-transparent"}`}
         layout
       >
-        {/* Logo */}
-        <Link to="/" className="group relative">
-          <motion.span
-            className="text-3xl font-extrabold bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400, damping: 10 }}
-          >
+        <motion.div 
+          className="container mx-auto flex justify-between items-center px-6"
+          layout
+        >
+          {/* Logo */}
+          <Link to="/" className="group relative">
             <motion.span
-              animate={{ 
-                backgroundPosition: ["0%", "100%", "0%"],
+              className="text-3xl font-extrabold bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: "spring", stiffness: 400, damping: 10 }}
+            >
+              <motion.span
+                animate={{ 
+                  backgroundPosition: ["0%", "100%", "0%"],
+                }}
+                transition={{ 
+                  duration: 5,
+                  repeat: Infinity,
+                  repeatType: "reverse",
+                }}
+                style={{
+                  backgroundSize: "200% auto",
+                  backgroundImage: "linear-gradient(to right, #2dd4bf, #22d3ee, #2dd4bf)",
+                }}
+                className="bg-clip-text text-transparent"
+              >
+                ChefExpress
+              </motion.span>
+            </motion.span>
+            <motion.div
+              className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-teal-500/20 to-cyan-400/20 blur-xl opacity-0 group-hover:opacity-100"
+              animate={{
+                scale: [1, 1.2, 1],
+                opacity: [0, 0.5, 0],
               }}
-              transition={{ 
-                duration: 5,
+              transition={{
+                duration: 2,
                 repeat: Infinity,
                 repeatType: "reverse",
               }}
-              style={{
-                backgroundSize: "200% auto",
-                backgroundImage: "linear-gradient(to right, #2dd4bf, #22d3ee, #2dd4bf)",
-              }}
-              className="bg-clip-text text-transparent"
-            >
-              ChefExpress
-            </motion.span>
-          </motion.span>
-          <motion.div
-            className="absolute -inset-x-4 -inset-y-2 bg-gradient-to-r from-teal-500/20 to-cyan-400/20 blur-xl opacity-0 group-hover:opacity-100"
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0, 0.5, 0],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              repeatType: "reverse",
-            }}
-          />
-        </Link>
+            />
+          </Link>
 
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex" role="navigation">
-          <NavButtons onLoginClick={handleLoginClick} />
-        </nav>
+          {/* Desktop Navigation */}
+          <nav className="hidden md:flex" role="navigation">
+            <NavButtons onLoginClick={handleLoginClick} />
+          </nav>
 
-        {/* Mobile Menu Button */}
-        <motion.button
-          className="md:hidden text-gray-100 focus:outline-none relative"
-          onClick={() => setMenuOpen(!menuOpen)}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          aria-label="Toggle menu"
-        >
-          <motion.div
-            animate={menuOpen ? "open" : "closed"}
-            variants={{
-              open: { rotate: 180 },
-              closed: { rotate: 0 },
-            }}
-            transition={{ duration: 0.3 }}
+          {/* Mobile Menu Button */}
+          <motion.button
+            className="md:hidden text-gray-100 focus:outline-none relative"
+            onClick={() => setMenuOpen(!menuOpen)}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            aria-label="Toggle menu"
           >
-            {menuOpen ? (
-              <AiOutlineClose size={28} />
-            ) : (
-              <AiOutlineMenu size={28} />
-            )}
-          </motion.div>
-        </motion.button>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={menuOpen ? 'close' : 'menu'}
+                initial={{ opacity: 0, rotate: -180 }}
+                animate={{ opacity: 1, rotate: 0 }}
+                exit={{ opacity: 0, rotate: 180 }}
+                transition={{ duration: 0.2 }}
+              >
+                {menuOpen ? (
+                  <AiOutlineClose size={28} />
+                ) : (
+                  <AiOutlineMenu size={28} />
+                )}
+              </motion.div>
+            </AnimatePresence>
+          </motion.button>
+        </motion.div>
       </motion.div>
 
       {/* Mobile Navigation */}
@@ -333,13 +333,13 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
               transition: {
                 height: {
                   type: "spring",
-                  stiffness: 100,
-                  damping: 20,
+                  stiffness: 300,
+                  damping: 30
                 },
                 opacity: {
-                  duration: 0.2,
-                },
-              },
+                  duration: 0.2
+                }
+              }
             }}
             exit={{ 
               height: 0, 
@@ -347,13 +347,13 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
               transition: {
                 height: {
                   type: "spring",
-                  stiffness: 100,
-                  damping: 20,
+                  stiffness: 300,
+                  damping: 30
                 },
                 opacity: {
-                  duration: 0.2,
-                },
-              },
+                  duration: 0.2
+                }
+              }
             }}
             role="navigation"
           >
