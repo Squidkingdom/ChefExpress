@@ -1,3 +1,4 @@
+// HeroSection.tsx
 import React from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
@@ -24,7 +25,6 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartPlanning }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, type: "spring", damping: 20 }}
       >
-        {/* Enhanced glow effect */}
         <motion.div
           animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
           transition={{ duration: 3, repeat: Infinity }}
@@ -38,10 +38,10 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartPlanning }) => {
           transition={{ delay: 0.3 }}
         >
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-300">
-          Plan Your{" "}
+            Plan Your
           </span>
           <br />
-          <span className="text-white">Perfect Week</span>
+          <span className="text-white">Culinary Week</span>
         </motion.h1>
 
         <motion.p
@@ -50,9 +50,9 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartPlanning }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          Create your personalized meal schedule
+          Create your personalized meal plans
           <br />
-          <span className="text-teal-400">one week at a time</span>
+          <span className="text-teal-400">and explore new recipes</span>
         </motion.p>
 
         <motion.button
@@ -84,5 +84,4 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartPlanning }) => {
 };
 
 export default HeroSection;
-
 

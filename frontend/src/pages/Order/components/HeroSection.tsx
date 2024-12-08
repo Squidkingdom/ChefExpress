@@ -1,6 +1,6 @@
 import React from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { FaArrowRight } from "react-icons/fa";
 
 interface HeroSectionProps {
   onStartShopping: () => void;
@@ -72,7 +72,7 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ onStartShopping }) => 
               animate={{ x: [0, 5, 0] }}
               transition={{ repeat: Infinity, duration: 1.5 }}
             >
-              <ArrowRight className="w-6 h-6" />
+              <FaArrowRight className="w-6 h-6" />
             </motion.span>
           </span>
           <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-400 to-cyan-300 

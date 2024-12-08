@@ -27,36 +27,32 @@ export const Recipes: React.FC<RecipesDisplayProps> = ({ isSavedRecipes = false 
         }
 
         const response = await fetch(`http://localhost:3000/api/recipe${ownerIdQuery}`, {
-            method: "GET" // Use POST method to retrieve recipes
+            method: "GET"
         });
 
         if (!response.ok) {
             // Throw an error if the fetch operation fails
-            throw new Error("Failed to fetch videos");
+            throw new Error("Failed to fetch recipes");
         }
         // Parse the response body as JSON
         return response.json();
     }
 
     // React Query hook to manage recipe fetching
-    const { data: sharedRecipes = [], isLoading, isError, error } = useQuery<Recipe[], Error>({
-        queryKey: [`${isSavedRecipes ? 'u_' : ``} recipes`], // Unique key for caching and identifying this query
-        queryFn: fetchRecipes, // Function to fetch recipes
-        initialData: [], // Initial data to populate the query state
+    const { data: sharedRecipes = [] } = useQuery<Recipe[], Error>({
+        queryKey: [`${isSavedRecipes ? 'u_' : ''}recipes`], 
+        queryFn: fetchRecipes, 
+        initialData: [], 
     });
-
-
 
     return (
         <>
-            {/* Conditional rendering based on whether recipes exist */}
             {sharedRecipes.length === 0 ? (
-                <p className="text-center text-gray-400">No recipes yet.</p> // Message for empty recipes
+                <p className="text-center text-gray-400">No recipes yet.</p>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    {/* Render a grid of RecipeCard components */}
                     {sharedRecipes.map((recipe) => (
-                        <RecipeCard key={recipe.id} recipe={recipe} /> // Unique key for each recipe
+                        <RecipeCard key={recipe.id} recipe={recipe} />
                     ))}
                 </div>
             )}

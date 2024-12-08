@@ -1,232 +1,624 @@
 // src/pages/Learn.tsx
 
-import React, { useState } from "react";
-import { FaSearch, FaPlayCircle } from "react-icons/fa";
-import { motion } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import React, { 
+  useState, 
+  useEffect, 
+  useMemo,
+} from 'react';
+import { 
+  FaSearch, 
+  FaPlayCircle, 
+  FaArrowRight, 
+  FaUtensils, 
+  FaShieldAlt,
+  FaFlask, 
+  FaBookOpen, 
+  FaLightbulb, 
+  FaFireAlt, 
+  FaRegLightbulb,
+  FaClock,
+} from 'react-icons/fa';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useQuery } from '@tanstack/react-query';
+import 'react-toastify/dist/ReactToastify.css';
+import { HeroSection } from '../components/LearnHeroSection';
 
-// Define the Video interface
+// Types & Interfaces
 interface Video {
-  length: string; // Video duration
-  title: string; // Video title
-  URL: string;   // Video URL
-  id: string;    // Unique identifier for the video
-  category: string; // Video category
+  id: string;
+  title: string;
+  URL: string;
+  length: string;
+  category: string;
 }
 
-const Learn: React.FC = () => {
-  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null); // State for the currently selected video
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null); // State for the selected category filter
-  const [searchQuery, setSearchQuery] = useState<string>(""); // State for the search input value
+type ViewType = 'hero' | 'select' | 'view';
 
-  const closeModal = () => setSelectedVideo(null); // Close the video modal
+interface VideoCardProps {
+  video: Video;
+  onSelect: (video: Video) => void;
+}
 
-  // Function to extract video ID from the URL (specific to YouTube links)
-  const getVideoId = (url: string) => {
-    const regex = /watch\?v=([^&]+)/; // Regex to find the video ID in the query string
-    const match = url.match(regex);
-    return match ? match[1] : ""; // Return the ID or an empty string if no match
+interface SearchBarProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}
+
+interface SelectionCardsProps {
+  onSelect: (view: ViewType, category?: string) => void;
+}
+
+interface VideoModalProps {
+  video: Video | null;
+  onClose: () => void;
+}
+
+// Categories Data
+const categories = [
+  {
+    title: 'Kitchen Safety',
+    value: 'kitchen safety',
+    icon: FaShieldAlt,
+    secondaryIcon: FaUtensils,
+    description: 'Master essential kitchen safety practices and protocols',
+    gradient: 'from-red-500 to-orange-400',
+    features: [
+      'Equipment handling',
+      'Fire safety protocols',
+      'First aid basics',
+      'Accident prevention'
+    ],
+    color: 'text-red-400',
+  },
+  {
+    title: 'Food Safety',
+    value: 'food safety',
+    icon: FaBookOpen,
+    secondaryIcon: FaShieldAlt,
+    description: 'Learn proper food handling and storage techniques',
+    gradient: 'from-green-500 to-emerald-400',
+    features: [
+      'Food storage guidelines',
+      'Cross-contamination prevention',
+      'Temperature control',
+      'Hygiene practices'
+    ],
+    color: 'text-green-400',
+  },
+  {
+    title: 'Food Science',
+    value: 'food science',
+    icon: FaFlask,
+    secondaryIcon: FaLightbulb,
+    description: 'Explore the chemistry and physics behind cooking',
+    gradient: 'from-blue-500 to-indigo-400',
+    features: [
+      'Chemical reactions',
+      'Heat transfer',
+      'Ingredient properties',
+      'Molecular gastronomy'
+    ],
+    color: 'text-blue-400',
+  },
+  {
+    title: 'Gordon Ramsay',
+    value: 'gordon ramsay',
+    icon: FaFireAlt,
+    secondaryIcon: FaUtensils,
+    description: 'Learn from the legendary Michelin-starred chef',
+    gradient: 'from-yellow-500 to-amber-400',
+    features: [
+      'Signature techniques',
+      'Restaurant secrets',
+      'Advanced recipes',
+      'Professional tips'
+    ],
+    color: 'text-yellow-400',
+  }
+];
+
+const getVideoId = (url: string): string => {
+  const regex = /(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : '';
+};
+
+// VideoCard Component
+const VideoCard: React.FC<VideoCardProps> = ({ video, onSelect }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [imgError, setImgError] = useState(false);
+
+  const containerVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.02 }
   };
 
-  // Fetch video data using TanStack's useQuery hook
-  const fetchVideos = async () => {
-    const response = await fetch("http://localhost:3000/api/videos", {
-      method: "POST" // Use POST method to fetch videos from the API
-    });
-
-    if (!response.ok) {
-      // Throw an error if the request fails
-      throw new Error("Failed to fetch videos");
-    }
-    return response.json(); // Parse and return the JSON response
+  const overlayVariants = {
+    rest: { opacity: 0 },
+    hover: { opacity: 1 }
   };
 
-  // React Query hook to manage video fetching and caching
-  const { data: videos = [], isLoading, isError, error } = useQuery<Video[], Error>({
-    queryKey: ["videos"], // Unique query key for caching and identification
-    queryFn: fetchVideos, // Function to fetch video data
-    initialData: [] // Initial value for videos to avoid undefined states
-  });
+  const iconVariants = {
+    rest: { scale: 1 },
+    hover: { scale: 1.1 }
+  };
 
-  // Filter videos based on the selected category and search query
-  const filteredVideos = (videos || []).filter((video) => {
-    const matchesCategory = selectedCategory
-      ? video.category === selectedCategory // Match the category if one is selected
-      : true;
-    const matchesSearch = video.title
-      .toLowerCase()
-      .includes(searchQuery.toLowerCase()); // Match the title with the search query
-    return matchesCategory && matchesSearch;
-  });
+  const thumbnailUrl = imgError 
+    ? "/api/placeholder/400/320"
+    : `https://img.youtube.com/vi/${getVideoId(video.URL)}/hqdefault.jpg`;
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-900 text-gray-100">
-      {/* Hero Section */}
-      <header
-        className="text-center py-24 bg-cover bg-center relative"
-        style={{
-          backgroundImage: "url('/images/learn-hero.jpg')", // Background image for the hero section
-        }}
-        id="learn-hero"
-      >
-        <div className="absolute inset-0 bg-gray-900 bg-opacity-75"></div> {/* Dark overlay */}
+    <motion.div
+      className="group relative bg-gray-900/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700/50"
+      variants={containerVariants}
+      initial="rest"
+      whileHover="hover"
+      animate={isHovered ? "hover" : "rest"}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      onClick={() => onSelect(video)}
+      role="button"
+      tabIndex={0}
+      onKeyPress={(e: React.KeyboardEvent) => e.key === "Enter" && onSelect(video)}
+    >
+      <div className="absolute inset-0 p-[1px] rounded-2xl bg-gradient-to-br from-teal-500/30 via-cyan-500/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      
+      <div className="relative aspect-video">
+        <img
+          src={thumbnailUrl}
+          alt={video.title}
+          className="w-full h-full object-cover rounded-t-2xl"
+          loading="lazy"
+          onError={() => setImgError(true)}
+        />
+        
         <motion.div
-          className="relative z-10 max-w-3xl mx-auto px-4"
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          variants={overlayVariants}
+          className="absolute inset-0 bg-gradient-to-t from-gray-900/95 via-gray-900/70 to-transparent"
         >
-          <h2 className="text-5xl font-extrabold text-teal-400">
-            Discover Culinary Skills
-          </h2>
-          <p className="text-xl mt-4 text-gray-200">
-            Learn from curated tutorials tailored for you.
-          </p>
+          <motion.div
+            variants={iconVariants}
+            className="absolute inset-0 flex items-center justify-center"
+          >
+            <FaPlayCircle className="text-6xl text-teal-400/90" />
+          </motion.div>
         </motion.div>
-      </header>
 
-      {/* Search and Categories */}
-      <div
-        className="flex flex-col lg:flex-row items-center justify-between gap-4 px-8 py-6 bg-gray-800"
-        id="learn-filters"
-      >
-        {/* Category Buttons */}
-        <div className="flex gap-4 flex-wrap justify-center">
-          {["Kitchen Safety", "Food Safety", "Food Science", "Ramsay"].map(
-            (category) => (
-              <button
-                key={category}
-                className={`px-4 py-2 rounded-full font-medium transition duration-200 ${selectedCategory === category
-                    ? "bg-teal-500 text-gray-900"
-                    : "bg-gray-700 text-gray-200 hover:bg-teal-600"
-                  }`}
-                onClick={() =>
-                  setSelectedCategory(
-                    selectedCategory === category ? null : category
-                  )
-                }
-              >
-                {category}
-              </button>
-            )
-          )}
-          <button
-            className="px-4 py-2 bg-gray-700 text-gray-200 rounded-full hover:bg-red-600 transition duration-200"
-            onClick={() => setSelectedCategory(null)}
-          >
-            Clear Filters
-          </button>
-        </div>
-
-        {/* Search Input */}
-        <div className="flex items-center gap-2 w-full lg:w-1/3 mt-4 lg:mt-0">
-          <div className="relative flex-grow">
-            <FaSearch className="absolute top-3 left-3 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search for a video..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)} // Update search query state
-              className="w-full pl-10 pr-4 py-2 border border-gray-600 bg-gray-700 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500"
-            />
-          </div>
-          <button
-            className="px-4 py-2 bg-teal-500 text-gray-900 rounded-full hover:bg-teal-600 transition duration-200"
-            onClick={() => setSearchQuery("")} // Clear the search query
-          >
-            Clear
-          </button>
+        <div className="absolute bottom-2 right-2 flex items-center gap-1 bg-gray-900/90 backdrop-blur-sm px-2 py-1 rounded-full">
+          <FaClock className="text-xs text-teal-400" />
+          <span className="text-sm text-gray-200">{video.length}</span>
         </div>
       </div>
 
-        {/* Video Grid */}
-        <section
-          className="
-          w-full 
-          grid 
-          grid-cols-1
-          gap-4
-          p-4
-          sm:grid-cols-1 sm:gap-10 sm:p-10
-          md:grid-cols-2 md:gap-8 md:p-8
-          lg:grid-cols-3 lg:gap-10 lg:p-10
-          xl:grid-cols-4 xl:gap-12 xl:p-12
-          2xl:grid-cols-5 2xl:gap-12 2xl:p-12
-        "
-          id="learn-videos"
-        >
-          {((filteredVideos.length > 0) && !isLoading) ? (
-            filteredVideos.map((video) => (
-              <motion.div
-                key={video.id}
-                className=" bg-gray-800 rounded-lg shadow-lg hover:shadow-xl transition duration-300 cursor-pointer overflow-hidden"
-                onClick={() => setSelectedVideo(video)} // Set the selected video for the modal
-                whileHover={{ scale: 1.02 }}
-              >
-                <div className="relative aspect-video">
-                  <img
-                    src={`https://img.youtube.com/vi/${getVideoId(
-                      video.URL
-                  )}/hqdefault.jpg`} // YouTube thumbnail
-                  alt={video.title}
-                  className="absolute inset-0 w-full h-full object-cover"
-                />
-                <FaPlayCircle className="absolute inset-0 m-auto text-6xl text-white opacity-75" />
-                <span className="absolute bottom-2 right-2 bg-black bg-opacity-75 text-white text-sm px-2 py-1 rounded">
-                  {video.length}
-                </span>
-              </div>
-              <div className="p-4">
-                <h3 className="text-lg font-bold text-teal-400">
-                  {video.title}
-                </h3>
-                <p className="text-sm text-gray-300 mt-1">{video.category}</p>
-              </div>
-            </motion.div>
-          ))
-        ) : (
-          <p className="text-center col-span-full text-gray-400">
-            No videos match your filters.
-          </p>
-        )}
-      </section>
+      <div className="p-4">
+        <div className="mt-3 flex items-center gap-2">
+          <span className="px-3 py-1 text-sm bg-gray-800/70 text-teal-300 rounded-full">
+            {video.category}
+          </span>
+        </div>
 
-      {/* Video Modal */}
-      {selectedVideo && (
-        <>
-          {/* Modal Overlay */}
-          <div
-            className="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50"
-            id="learn-video-modal"
+        <motion.div 
+          variants={overlayVariants}
+          className="mt-4 flex items-center justify-between"
+        >
+          <motion.button
+            onClick={(e: React.MouseEvent) => {
+              e.stopPropagation();
+              onSelect(video);
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-gray-900 rounded-full text-sm transition-colors duration-200 hover:bg-teal-400"
           >
-            <div className="bg-gray-900 w-11/12 lg:w-3/4 xl:w-2/3 rounded-lg shadow-lg overflow-hidden relative">
-              {/* Close Button */}
-              <button
-                className="absolute w-10 h-10 bottom-7 right-6 bg-red-500 text-white flex items-center justify-center p-2 rounded-full shadow-lg hover:bg-red-600 z-50"
-                onClick={closeModal} // Close the modal on click
-              >
-                &times;
-              </button>
-              {/* Video Player */}
-              <div className="relative w-full" style={{ paddingTop: "56.25%" }}>
-                <iframe
-                  className="absolute inset-0 w-full h-full rounded-lg"
-                  src={`https://www.youtube.com/embed/${getVideoId(selectedVideo.URL)}`} // Video URL for the iframe
-                  title={selectedVideo.title} // Accessible title for the iframe
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                ></iframe>
-              </div>
-              <div className="p-4">
-                <h3 className="text-2xl font-bold text-teal-400">
-                  {selectedVideo.title}
-                </h3>
-                <p className="text-gray-300 mt-2">{selectedVideo.category}</p>
+            Watch Now
+            <FaArrowRight />
+          </motion.button>
+        </motion.div>
+      </div>
+    </motion.div>
+  );
+};
+
+// SearchBar Component
+const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, setSearchQuery }) => {
+  const [inputValue, setInputValue] = useState(searchQuery);
+
+  useEffect(() => {
+    setInputValue(searchQuery);
+  }, [searchQuery]);
+
+  const handleSearch = () => {
+    setSearchQuery(inputValue.trim());
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleSearch();
+    }
+  };
+
+  const handleClear = () => {
+    setInputValue("");
+    setSearchQuery("");
+  };
+
+  return (
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="flex items-center gap-2 w-full lg:w-1/3 mx-auto"
+    >
+      <div className="relative flex-grow">
+        <FaSearch className="absolute top-3 left-3 text-gray-400" />
+        <input
+          type="text"
+          placeholder="Search for a video..."
+          value={inputValue}
+          onChange={handleInputChange}
+          onKeyPress={handleKeyPress}
+          className="w-full pl-10 pr-4 py-2 border border-gray-700/50 bg-gray-800/50 text-white rounded-full focus:outline-none focus:ring-2 focus:ring-teal-500/50 transition-all duration-300"
+        />
+      </div>
+      <motion.button
+        onClick={handleSearch}
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-gray-900 rounded-full hover:bg-teal-400 transition duration-200"
+      >
+        <FaSearch className="text-sm" />
+        Search
+      </motion.button>
+      <motion.button
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        className="px-4 py-2 bg-gray-700 text-white rounded-full hover:bg-gray-600 transition duration-200"
+        onClick={handleClear}
+      >
+        Clear
+      </motion.button>
+    </motion.div>
+  );
+};
+
+// SelectionCards Component
+const SelectionCards: React.FC<SelectionCardsProps> = ({ onSelect }) => {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y:20 }}
+      animate={{ opacity: 1, y:0 }}
+      className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-6xl mx-auto px-6 mb-16"
+    >
+      {categories.map((category, index) => (
+        <motion.button
+          key={index}
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: index * 0.1 }}
+          whileHover={{ y: -5, scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          onClick={() => onSelect("view", category.value)}
+          className="group relative overflow-hidden rounded-2xl focus:outline-none text-left"
+        >
+          <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} opacity-20 group-hover:opacity-30 transition-opacity duration-300`} />
+          <div className="absolute inset-0 bg-gray-900/50 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+          <div className="relative z-10 backdrop-blur-sm bg-gray-800/60 border border-gray-700/50 p-6 h-full rounded-2xl">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className={`absolute inset-0 bg-gradient-to-br ${category.gradient} blur-xl opacity-50 rounded-full`} />
+                  <div className="relative p-3 bg-gray-800/80 rounded-full">
+                    <category.icon className={`text-2xl ${category.color}`} />
+                  </div>
+                </div>
+                {category.secondaryIcon && (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    className="p-2 bg-gray-800/80 rounded-full"
+                  >
+                    <category.secondaryIcon className={`text-xl ${category.color}`} />
+                  </motion.div>
+                )}
               </div>
             </div>
+
+            <div className="mb-6">
+              <h3 className={`text-xl font-bold ${category.color} mb-2`}>
+                {category.title}
+              </h3>
+              <p className="text-gray-300">
+                {category.description}
+              </p>
+            </div>
+
+            <div className="space-y-2 mb-6">
+              {category.features?.map((feature, idx) => (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, x: -20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.05 * idx }}
+                  className="flex items-center gap-2 text-gray-400"
+                >
+                  <FaRegLightbulb className={`text-sm ${category.color}`} />
+                  <span className="text-sm">{feature}</span>
+                </motion.div>
+              ))}
+            </div>
+
+            <motion.div
+              className="flex items-center gap-2 text-gray-300"
+              whileHover={{ x: 5 }}
+            >
+              <span className="font-medium text-sm">Get Started</span>
+              <motion.span
+                animate={{ x: [0, 5, 0] }}
+                transition={{ repeat: Infinity, duration: 1.5 }}
+              >
+                <FaArrowRight className="relative top-[1px]" />
+              </motion.span>
+            </motion.div>
           </div>
-        </>
-      )}
+        </motion.button>
+      ))}
+    </motion.div>
+  );
+};
+
+// VideoModal Component
+const VideoModal: React.FC<VideoModalProps> = ({ video, onClose }) => (
+  <AnimatePresence>
+    {video && (
+      <motion.div
+        className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4 md:p-8"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        onClick={onClose}
+      >
+        <motion.div
+          className="bg-gray-900/90 backdrop-blur-xl max-w-6xl w-full relative rounded-2xl overflow-hidden border border-gray-700/50"
+          initial={{ scale: 0.95, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.95, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {/* Header Section */}
+          <div className="p-6 bg-gray-900/95 border-b border-gray-700/50">
+            <div className="flex justify-between items-start gap-4">
+              <div className="flex-1">
+                <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
+                  {video.title}
+                </h3>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="px-3 py-1 text-sm bg-gray-800 text-teal-300 rounded-full">
+                    {video.category}
+                  </span>
+                  <span className="px-3 py-1 text-sm bg-gray-800 text-gray-300 rounded-full flex items-center gap-1">
+                    <FaClock className="text-xs" />
+                    {video.length}
+                  </span>
+                </div>
+              </div>
+              <button
+                onClick={onClose}
+                className="bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white p-2 rounded-full transition-colors duration-200"
+                aria-label="Close modal"
+              >
+                <svg 
+                  className="w-6 h-6" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                    strokeLinecap="round" 
+                    strokeLinejoin="round" 
+                    strokeWidth={2} 
+                    d="M6 18L18 6M6 6l12 12" 
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Video Container */}
+          <div className="relative w-full bg-black" style={{ paddingTop: "56.25%" }}>
+            <iframe
+              className="absolute inset-0 w-full h-full"
+              src={`https://www.youtube.com/embed/${getVideoId(video.URL)}?autoplay=1`}
+              title={video.title}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          </div>
+        </motion.div>
+
+        {/* Background Close Button Area */}
+        <button
+          className="absolute inset-0 w-full h-full -z-10"
+          onClick={onClose}
+          aria-label="Close modal"
+        />
+      </motion.div>
+    )}
+  </AnimatePresence>
+);
+
+// Learn Page Component
+const Learn = () => {
+  const [currentView, setCurrentView] = useState<ViewType>('hero');
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  // Fetch videos when the view is 'view' and category is selected
+  const { data: videos = [], isLoading, isError, error } = useQuery<Video[], Error>({
+    queryKey: ['videos', selectedCategory],
+    queryFn: async () => {
+      const response = await fetch('http://localhost:3000/api/videos', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ category: selectedCategory })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch videos');
+      }
+      return response.json();
+    },
+    enabled: currentView === 'view' && !!selectedCategory
+  });
+
+  const filteredVideos = useMemo(() => {
+    return videos.filter(video => {
+      const matchesCategory = selectedCategory
+        ? video.category.toLowerCase() === selectedCategory.toLowerCase()
+        : true;
+      const matchesSearch = video.title
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase());
+      return matchesCategory && matchesSearch;
+    });
+  }, [videos, selectedCategory, searchQuery]);
+
+  const handleSelect = (view: ViewType, category?: string) => {
+    setCurrentView(view);
+    if (category) {
+      setSelectedCategory(category);
+    }
+    setSearchQuery('');
+  };
+
+  const VideoContent: React.FC = () => (
+    <motion.div
+      key="view"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="container mx-auto px-4"
+    >
+      <div className="flex items-center justify-between mb-8">
+        <motion.button
+          onClick={() => setCurrentView('select')}
+          className="flex items-center gap-2 text-gray-400 hover:text-teal-400 transition-colors duration-200"
+          whileHover={{ x: -5 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <FaArrowRight className="rotate-180 relative top-[1px]" />
+          <span>Back to Categories</span>
+        </motion.button>
+        <h2 className="text-3xl font-bold text-center bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
+          {selectedCategory && 
+            selectedCategory.charAt(0).toUpperCase() + selectedCategory.slice(1)}
+        </h2>
+        <div className="w-24" />
+      </div>
+
+      <SearchBar searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+
+      <motion.section
+        className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mt-8"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: { staggerChildren: 0.1 }
+          }
+        }}
+        initial="hidden"
+        animate="visible"
+      >
+        {isLoading ? (
+          <div className="col-span-full flex justify-center">
+            <motion.div
+              className="w-16 h-16 border-4 border-teal-400 border-t-transparent rounded-full"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            />
+          </div>
+        ) : isError ? (
+          <motion.div
+            className="col-span-full text-center text-red-500 bg-red-500/10 p-4 rounded-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <p>Error: {error?.message}</p>
+          </motion.div>
+        ) : filteredVideos.length > 0 ? (
+          filteredVideos.map((video) => (
+            <VideoCard
+              key={video.id}
+              video={video}
+              onSelect={setSelectedVideo}
+            />
+          ))
+        ) : (
+          <motion.div
+            className="col-span-full text-center text-gray-400 bg-gray-800/50 p-8 rounded-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <FaSearch className="text-4xl mb-4 mx-auto text-gray-500" />
+            <p className="text-lg">No videos match your search.</p>
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setSearchQuery('')}
+              className="mt-4 text-teal-400 hover:text-teal-300 transition-colors duration-200"
+            >
+              Clear search
+            </motion.button>
+          </motion.div>
+        )}
+      </motion.section>
+    </motion.div>
+  );
+
+  return (
+    <div className="min-h-screen font-sans overflow-x-hidden relative">
+
+      
+      {/* Adjust gradient overlay opacity */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900" />
+        <div className="absolute inset-0 opacity-40">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,_rgba(45,212,191,0.15),transparent_60%)]" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,_rgba(56,189,248,0.15),transparent_60%)]" />
+        </div>
+      </div>
+
+      {/* Content container with transparent background */}
+      <div className="relative z-10">
+        {currentView === 'hero' && (
+          <HeroSection onStartLearning={() => setCurrentView('select')} />
+        )}
+
+        <div className="max-w-7xl mx-auto py-12">
+          {currentView !== 'hero' && <div className="mt-24" />}
+          
+          <AnimatePresence mode="wait">
+            {currentView === 'select' && (
+              <SelectionCards onSelect={handleSelect} />
+            )}
+            {currentView === 'view' && <VideoContent />}
+          </AnimatePresence>
+        </div>
+
+        <VideoModal 
+          video={selectedVideo} 
+          onClose={() => setSelectedVideo(null)} 
+        />
+      </div>
     </div>
   );
 };

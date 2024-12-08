@@ -1,7 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Minus, Plus, Trash2, ChevronRight, X } from "lucide-react";
-import { toast } from "react-toastify";
 import type { CartItem } from "../types";
 
 interface CartItemProps {
@@ -94,7 +93,6 @@ export const Cart: React.FC<CartProps> = ({
         exit={{ opacity: 0, y: -50 }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="p-6 border-b border-gray-700/50 flex items-center justify-between">
           <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
                       bg-clip-text text-transparent">
@@ -123,7 +121,6 @@ export const Cart: React.FC<CartProps> = ({
           </div>
         ) : (
           <>
-            {/* Cart Items */}
             <div className="max-h-[60vh] overflow-y-auto p-6 space-y-4">
               <AnimatePresence mode="wait">
                 {cart.map((item) => (
@@ -137,7 +134,6 @@ export const Cart: React.FC<CartProps> = ({
               </AnimatePresence>
             </div>
 
-            {/* Footer */}
             <div className="p-6 border-t border-gray-700/50 bg-gray-800/50">
               <div className="flex justify-between items-center mb-6">
                 <span className="text-xl font-medium text-gray-300">Total</span>
