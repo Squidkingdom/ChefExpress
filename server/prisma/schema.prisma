@@ -9,27 +9,30 @@ datasource db {
 }
 
 model Ingredient {
-  name          String @db.VarChar
-  ingredient_id Int    @id(map: "ingredient_pk") @default(autoincrement())
+  name               String               @db.VarChar
+  ingredient_id      Int                  @id(map: "ingredient_pk") @default(autoincrement())
+  ingrediantinrecipe ingrediantinrecipe[]
 }
 
 model Items {
   name     String? @db.VarChar
   price    String? @db.VarChar
-  URL      String? @db.VarChar
+  URL      String  @db.VarChar
   quantity String? @db.VarChar
   category String? @db.VarChar
-  id       String  @id(map: "items_pk") @db.VarChar
+  id       Int     @id(map: "items_pk") @default(autoincrement())
 }
 
 /// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
 model Recipe {
-  name         String? @db.VarChar
-  instructions String? @db.VarChar
-  owner_id     String? @db.Uuid
-  image        Bytes?
-  id           Int     @id(map: "recipe_pk") @default(autoincrement())
-  description  String? @db.VarChar
+  name               String?              @db.VarChar
+  instructions       String?              @db.VarChar
+  owner_id           String?              @db.Uuid
+  image              Bytes?
+  id                 Int                  @id(map: "recipe_pk") @default(autoincrement())
+  description        String?              @db.VarChar
+  calendar           calendar[]
+  ingrediantinrecipe ingrediantinrecipe[]
 }
 
 model Videos {
@@ -41,9 +44,11 @@ model Videos {
 }
 
 model ingrediantinrecipe {
-  quantity      String? @db.VarChar
+  quantity      String?    @db.VarChar
   recipe_id     Int
   ingredient_id Int
+  Recipe        Recipe     @relation(fields: [recipe_id], references: [id], onDelete: Cascade, map: "ingrediantinrecipe___fk")
+  Ingredient    Ingredient @relation(fields: [ingredient_id], references: [ingredient_id], onDelete: Cascade, map: "ingrediantinrecipe_ingrediantinrecipe__fk")
 
   @@id([recipe_id, ingredient_id], map: "ingrediantinrecipe_pk")
 }
@@ -57,10 +62,22 @@ model saved_recipes {
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
 model users {
-  email     String @db.VarChar
-  name      String @db.VarChar
-  uuid      String @id(map: "users_pk") @db.Uuid
-  pass_hash String @db.VarChar
+  email     String     @db.VarChar
+  name      String     @db.VarChar
+  uuid      String     @id(map: "users_pk") @db.Uuid
+  pass_hash String     @db.VarChar
+  calendar  calendar[]
+}
+
+model calendar {
+  owner_id   String  @db.Uuid
+  date_saved String  @db.VarChar
+  meal       String  @db.VarChar
+  recipe_id  Int?
+  Recipe     Recipe? @relation(fields: [recipe_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "calendar_recipe_fk")
+  users      users   @relation(fields: [owner_id], references: [uuid], onDelete: NoAction, onUpdate: NoAction, map: "calendar_users_fk")
+
+  @@id([meal, date_saved, owner_id], map: "calendar_pk")
 }
 
 /// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
