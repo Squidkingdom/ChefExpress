@@ -5,22 +5,12 @@ import { FaShoppingCart, FaSearch, FaTrashAlt, FaTimes } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { toast, ToastContainer } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
+import { Shop, CartItem, Product } from "../components/Shop";
 
 /**
  * Interface definitions for Product and CartItem
  */
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  category: string;
-}
 
-interface CartItem extends Product {
-  quantity: number;
-}
 
 /**
  * Order Page
@@ -31,45 +21,23 @@ const Order: React.FC = () => {
   // Sample product data
   const [products] = useState<Product[]>([
     {
-      id: 1,
-      name: "Chef Knife",
-      description: "High-quality chef knife for all your cutting needs.",
-      price: 29.99,
-      image: "/images/knife.jpg",
-      category: "Tools",
-    },
-    {
-      id: 2,
-      name: "Mixing Bowl Set",
-      description: "Durable stainless steel bowls for mixing ingredients.",
-      price: 19.99,
-      image: "/images/bowls.jpg",
-      category: "Utensils",
-    },
-    {
-      id: 3,
-      name: "Cutting Board",
-      description: "Bamboo cutting board, gentle on your knives.",
-      price: 15.99,
-      image: "/images/board.jpg",
-      category: "Tools",
-    },
-    {
-      id: 4,
-      name: "Measuring Cups",
-      description: "Set of stainless steel measuring cups for precision.",
-      price: 12.99,
-      image: "/images/measuring_cups.jpg",
-      category: "Utensils",
-    },
-    {
-      id: 5,
-      name: "Non-Stick Frying Pan",
-      description: "12-inch non-stick frying pan for easy cooking.",
-      price: 39.99,
-      image: "/images/frying_pan.jpg",
-      category: "Cookware",
-    },
+      name: "Dawn Multi-Purpose Reusable Wipes, 6 Pack",
+      price: "$11.00",
+      URL: "https://www.amazon.com/Dawn-Multi-Purpose-Reusable-Wipes-Pack/dp/B081FJZ7HJ?ref_=ast_sto_dp",
+      quantity: 1,
+      category: "Health & Household",
+      id: 7,
+      img: "https://m.media-amazon.com/images/I/41G66bY0xzL._SY300_SX300_QL70_FMwebp_.jpg"
+  },
+  {
+      "name": "McCormick Basil Leaves, 1.25 oz",
+      "price": "$5.62",
+      "URL": "https://www.amazon.com/McCormick-Basil-Leaves-1-25-oz/dp/B0CX7NJPXJ?ref_=ast_sto_dp",
+      "quantity": "1",
+      "category": "Grocery & Gourmet Food",
+      "id": 42,
+      "img": "https://m.media-amazon.com/images/I/41WUAlFI01L._SX300_SY300_QL70_FMwebp_.jpg"
+  },
     // Add more products as needed
   ]);
 
@@ -200,50 +168,12 @@ const Order: React.FC = () => {
 
         <div className="flex flex-col lg:flex-row gap-10">
           {/* Product List */}
-          <section className="w-full lg:w-2/3" id="order-products">
-            {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
-                {filteredProducts.map((product) => (
-                  <motion.div
-                    key={product.id}
-                    className="bg-gray-800 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300 flex flex-col cursor-pointer"
-                    whileHover={{ scale: 1.02 }}
-                    onClick={() => setSelectedProduct(product)}
-                  >
-                    <div className="relative">
-                      <img
-                        src={product.image}
-                        alt={product.name}
-                        className="w-full h-48 object-cover rounded-md mb-4"
-                      />
-                      <span className="absolute top-2 left-2 bg-teal-500 text-gray-900 text-sm px-2 py-1 rounded-md">
-                        ${product.price.toFixed(2)}
-                      </span>
-                    </div>
-                    <h2 className="text-2xl font-bold text-teal-400 mb-2">
-                      {product.name}
-                    </h2>
-                    <p className="text-gray-300 flex-grow">
-                      {product.description.substring(0, 60)}...
-                    </p>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent triggering the parent onClick
-                        addToCart(product);
-                      }}
-                      className="mt-4 bg-teal-500 text-gray-900 px-4 py-2 rounded-full hover:bg-teal-400 transition duration-200 flex items-center justify-center"
-                    >
-                      <FaShoppingCart className="mr-2" /> Add to Cart
-                    </button>
-                  </motion.div>
-                ))}
-              </div>
-            ) : (
-              <p className="text-center text-gray-400">
-                No products found matching "{searchQuery}".
-              </p>
-            )}
-          </section>
+          <Shop 
+          addToCart={addToCart}
+          removeFromCart={removeFromCart}
+          setSelectedProduct={setSelectedProduct}
+          searchQuery={searchQuery}
+          selectedCategory={selectedCategory} />
 
           {/* Cart Summary */}
           <aside className="w-full lg:w-1/3">
