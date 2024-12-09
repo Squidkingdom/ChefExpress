@@ -34,6 +34,7 @@ model Recipe {
   description        String?              @db.VarChar
   calendar           calendar[]
   ingrediantinrecipe ingrediantinrecipe[]
+  saved_recipes      saved_recipes[]
 }
 
 model Videos {
@@ -55,10 +56,11 @@ model ingrediantinrecipe {
 }
 
 model saved_recipes {
-  recipe_id String @db.VarChar
-  user_id   String @db.VarChar
+  recipe_id Int
+  user_id   String @db.Uuid
+  Recipe    Recipe @relation(fields: [recipe_id], references: [id], onDelete: Cascade, map: "saved_recipes_recipe__fk")
 
-  @@id([recipe_id, user_id], map: "saved_recipes_pk")
+  @@unique([user_id, recipe_id], map: "saved_recipes_pk")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.

@@ -1,5 +1,5 @@
-import express, { NextFunction, Request, Response } from "express"; 
-import log4js from "log4js"; 
+import express, { NextFunction, Request, Response } from "express";
+import log4js from "log4js";
 import { prisma } from "../db/client";  // Import prisma client to interact with the database
 
 const router = express.Router();  // Create an express router for handling requests
@@ -8,7 +8,7 @@ const router = express.Router();  // Create an express router for handling reque
 const logger = log4js.getLogger("saveRecipe.ts");
 
 // Define the /saveRecipe route that listens for POST requests
-router.post("/", async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+router.route("/").post(async (req: Request, res: Response): Promise<void> => {
   const { user_id, recipe_id } = req.body;  // Extract user_id and recipe_id from the request body
 
   logger.info(`Attempting to save recipe with ID: ${recipe_id} for user: ${user_id}`);
@@ -17,9 +17,9 @@ router.post("/", async (req: Request, res: Response, next: NextFunction): Promis
     // Check if the user already saved the recipe (this prevents duplicates)
     const existingSave = await prisma.saved_recipes.findUnique({
       where: {
-        recipe_id_user_id: {
-          recipe_id: recipe_id,  // Check if this combination already exists
+        user_id_recipe_id: {
           user_id: user_id,
+          recipe_id: recipe_id,
         },
       },
     });
@@ -49,6 +49,40 @@ router.post("/", async (req: Request, res: Response, next: NextFunction): Promis
     console.error("Error saving recipe:", error);
     res.status(500).json({ error: "Internal server error" });
   }
-});
+})
+  .get(async (req: Request, res: Response) => {
+    try {
+      const { userId } = req.query;
+
+      if (!userId) {
+        res.status(400).json({ error: "User ID is required." });
+        return 
+      }
+
+      // Fetch all saved recipes for the user
+      const savedRecipes = await prisma.saved_recipes.findMany({
+        where: {
+          user_id: String(userId),
+        },
+        include: {
+          Recipe: true, // Fetch associated recipe details
+        },
+      });
+
+      // If no saved recipes are found
+      if (savedRecipes.length === 0) {
+        res.status(404).json({ message: "No saved recipes found for this user." });
+        return 
+      }
+
+      // Return saved recipes with associated recipe data
+      res.status(200).json(savedRecipes);
+      return
+    } catch (error) {
+      console.error("Error fetching saved recipes:", error);
+      res.status(500).json({ error: "An unexpected error occurred." });
+      return 
+    }
+  });
 
 export default router;  // Export the router to use in other parts of the application
