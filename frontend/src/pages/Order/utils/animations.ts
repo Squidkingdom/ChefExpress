@@ -4,11 +4,10 @@
  *   This file exports common framer-motion animation variants used throughout the application. 
  *   These animation variants can be applied to motion components to create smooth page transitions, 
  *   staggered child animations, and fade-in-up effects for UI elements.
- * Programmer’s name: Programmer 1
- * Date the code was created: Date 1
- * Dates the code was revised: Date 2
+ * Programmer’s name: Brady, Darshil
+ * Date the code was created: 11/24/24
+ * Dates the code was revised: 12/8/24
  * Brief description of each revision & author:
- *   Date 2 - Programmer 1: Refined durations, easings, and delays for smoother, more natural 
  *   entrance and exit animations.
  * Preconditions:
  *   - framer-motion must be installed.
@@ -78,46 +77,3 @@ export const fadeInUp = {
     },
   },
 };
-
-
-// export const pageTransition = {
-//     hidden: { opacity: 0, y: 20 },
-//     visible: {
-//       opacity: 1,
-//       y: 0,
-//       transition: {
-//         duration: 0.6,
-//         ease: "easeOut",
-//       },
-//     },
-//     exit: {
-//       opacity: 0,
-//       y: -20,
-//       transition: {
-//         duration: 0.3,
-//       },
-//     },
-//   };
-  
-//   export const staggerContainer = {
-//     hidden: { opacity: 0 },
-//     visible: {
-//       opacity: 1,
-//       transition: {
-//         staggerChildren: 0.1,
-//         delayChildren: 0.2,
-//       },
-//     },
-//   };
-  
-//   export const fadeInUp = {
-//     hidden: { opacity: 0, y: 20 },
-//     visible: {
-//       opacity: 1,
-//       y: 0,
-//       transition: {
-//         duration: 0.5,
-//         ease: "easeOut",
-//       },
-//     },
-//   };
