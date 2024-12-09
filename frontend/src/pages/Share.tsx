@@ -40,7 +40,7 @@ async function createRecipe(recipe: Recipe, image: File) {
     throw new Error("Error creating recipe");
   }
 
-  return response.json();
+  return;
 }
 
 interface ShareHeroSectionProps {
@@ -548,7 +548,7 @@ const Explore: React.FC<{ onBack: () => void }> = ({ onBack }) => {
             position="top-right"
             autoClose={3000}
             theme="dark"
-            toastClassName="my-20 bg-gray-800 text-gray-100"
+            toastClassName="my-20 bg-gray-800 text-gray-100 z-50"
           />
     <motion.div
       initial={{ opacity: 0, y: 20 }}
