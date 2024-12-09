@@ -43,11 +43,11 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartPlanning }) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1.2, type: "spring", damping: 20 }}
         >
-          <motion.div
+          {/* <motion.div
             animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
             transition={{ duration: 3, repeat: Infinity }}
             className="absolute inset-0 bg-gradient-to-r from-teal-500/25 to-cyan-500/25 blur-3xl transform -translate-y-1/2"
-          />
+          /> */}
 
           <div className="space-y-2">
             <motion.div
