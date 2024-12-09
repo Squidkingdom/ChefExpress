@@ -120,6 +120,26 @@ router
       logger.error("Error creating calendar entry:", error);
       res.status(500).json({ error: "Failed to create calendar entry" });
     }
-  });
+  })
+
+router
+  .route("/:owner_id/:date_saved/:meal")
+  .delete(async (req: Request, res: Response): Promise<void> => {
+    const { owner_id, date_saved, meal } = req.params;
+    const respond = await prisma.calendar.delete({
+      where: {
+        meal_date_saved_owner_id: {
+          meal: meal,
+          date_saved: date_saved,
+          owner_id: owner_id
+        }
+      }
+    });
+    res.status(200).json({message: "Deleted"});
+  })
+
+  
+  
+  ;
 
 export default router;

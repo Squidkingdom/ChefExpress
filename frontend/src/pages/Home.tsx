@@ -11,6 +11,7 @@ import {
   FaShareAlt,
 } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { Modal } from "../components/Modal"; // Make sure to create this file
 
 interface HomeProps {}
 
@@ -18,6 +19,7 @@ const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
   const missionRef = useRef<HTMLDivElement>(null);
+  const [selectedFeature, setSelectedFeature] = useState<number | null>(null);
 
   // Check if hero animation played this session
   const [showAnimation, setShowAnimation] = useState(true);
@@ -51,12 +53,13 @@ const Home: React.FC<HomeProps> = () => {
   };
 
   const itemVariants = {
+    hidden: { opacity: 0, y: -20 },
     visible: {
-      y: 0,
       opacity: 1,
+      y: 0,
       transition: {
         type: "spring",
-        stiffness: 100,
+        stiffness: 300,
         damping: 20,
       },
     },
@@ -66,28 +69,58 @@ const Home: React.FC<HomeProps> = () => {
     {
       icon: FaBookOpen,
       title: "Learn",
-      description:
-        "Discover a world of culinary knowledge and skills and become a better chef!",
+      description: "Discover a world of culinary knowledge and skills and become a better chef!",
       link: "/Learn",
+      modalDescription: [
+        "Access expert-curated courses and interactive tutorials designed for all skill levels",
+        "Master essential cooking techniques from basic to advanced",
+        "Learn professional kitchen tips and tricks",
+        "Learn about Food Science and Safety",
+        "Tutorials from Chef Gordon Ramsay",
+        "Watch step-by-step video demonstrations"
+      ]
     },
     {
       icon: FaUtensils,
       title: "Meal Planner",
       description: "Add your own or use our recipes to create a meal plan!",
       link: "/Make",
+      modalDescription: [
+        "Create customized weekly meal plans tailored to your preferences",
+        "Import your favorite recipes or choose from our collection",
+        "Export your meal plan with full recipe and instructions",
+        "Track nutritional information for balanced meals",
+        "Plan meals based on dietary requirements and restrictions"
+      ]
     },
     {
       icon: FaShareAlt,
       title: "Share",
       description: "Explore and share your favorite recipes with the community!",
       link: "/Share",
+      modalDescription: [
+        "Upload and share your original recipes with the community",
+        "Showcase your culinary creations with photos",
+        "Connect with fellow food enthusiasts",
+        "Explore recipes shared by others",
+        "Explore Recipes provided by us",
+        "Save and organize your favorite community recipes"
+      ]
     },
     {
       icon: FaShoppingCart,
       title: "Order",
       description: "Easily order tools and have them delivered to your door!",
       link: "/Order",
-    },
+      modalDescription: [
+        "Browse professional-grade kitchen tools and equipment",
+        "Get chef-recommended cookware and utensils",
+        "Direct acces to Amazon ensuring best prices and fast delivery",
+        "Professional products selected by our experts",
+        "Find specialty cooking ingredients",
+        "No need to wonder what to buy, our recipes will let you know"
+      ]
+    }
   ];
 
   const [email, setEmail] = useState("");
@@ -156,7 +189,6 @@ const Home: React.FC<HomeProps> = () => {
                   Express
                 </span>
               </motion.div>
-              
             </motion.h1>
 
             <motion.p
@@ -245,121 +277,51 @@ const Home: React.FC<HomeProps> = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
             {features.map((feature, index) => (
-              <motion.div
-                key={index}
-                variants={itemVariants}
-                whileHover={{ y: -10 }}
-                className="group relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform group-hover:scale-110 transition-transform duration-300 pointer-events-none" />
+              <React.Fragment key={index}>
+                <motion.div
+                  variants={itemVariants}
+                  whileHover={{ y: -10 }}
+                  className="group relative"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform group-hover:scale-110 transition-transform duration-300 pointer-events-none" />
 
-                <div className="relative z-10 h-full backdrop-blur-sm bg-gray-800/50 border border-gray-700/50 rounded-2xl p-8 shadow-lg flex flex-col justify-between">
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-cyan-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                  <div className="relative z-10 h-full backdrop-blur-sm bg-gray-800/50 border border-gray-700/50 rounded-2xl p-8 shadow-lg flex flex-col justify-between">
+                    <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-cyan-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                  <div>
-                    <feature.icon className="text-6xl mb-6 text-teal-400" />
-                    <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
-                      {feature.title}
-                    </h3>
-                    <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                    <div>
+                      <feature.icon className="text-6xl mb-6 text-teal-400" />
+                      <h3 className="text-2xl font-semibold mb-4 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-300 leading-relaxed">{feature.description}</p>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedFeature(index)}
+                      className="mt-6 bg-teal-500 text-gray-900 px-4 py-2 rounded-full hover:bg-teal-400 transition duration-200 flex items-center justify-center"
+                    >
+                      Learn More
+                      <FaArrowRight className="ml-2" />
+                    </button>
                   </div>
+                </motion.div>
 
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => navigate(feature.link)}
-                    className="mt-6 bg-teal-500 text-gray-900 px-4 py-2 rounded-full hover:bg-teal-400 transition duration-200 flex items-center"
-                  >
-                    Learn More
-                    <FaArrowRight className="ml-2" />
-                  </motion.button>
-                </div>
-              </motion.div>
+                <Modal
+                  isOpen={selectedFeature === index}
+                  onClose={() => setSelectedFeature(null)}
+                  title={feature.title}
+                  description={feature.modalDescription}
+                  onNavigate={() => {
+                    setSelectedFeature(null);
+                    navigate(feature.link);
+                  }}
+                />
+              </React.Fragment>
             ))}
           </div>
         </div>
       </motion.section>
-
-      {/* Testimonials Section */}
-      <section className="py-32 px-6 relative">
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          className="max-w-6xl mx-auto"
-        >
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="text-3xl md:text-4xl font-bold text-center mb-16 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent"
-          >
-            What Chefs Say
-          </motion.h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                text: "ChefExpress revolutionized my cooking journey!",
-                author: "Alex Chen",
-                role: "Home Chef",
-              },
-              {
-                text: "The recipes are delicious!",
-                author: "Sarah Johnson",
-                role: "Food Blogger",
-              },
-              {
-                text: "Best cooking platform I've ever used!",
-                author: "Mike Peterson",
-                role: "Professional Chef",
-              },
-            ].map((testimonial, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                whileHover={{
-                  scale: 1.05,
-                  rotateY: 5,
-                  rotateX: 5,
-                  transition: { type: "spring", stiffness: 400, damping: 30 },
-                }}
-                className="group relative flex flex-col"
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 rounded-2xl blur-xl transform group-hover:scale-110 transition-transform duration-300 pointer-events-none" />
-
-                <div className="relative z-10 backdrop-blur-sm bg-gray-800/50 border border-gray-700/50 p-8 rounded-2xl shadow-lg flex flex-col justify-between h-full">
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-500/5 to-cyan-500/5 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
-
-                  <div className="relative">
-                    <div className="absolute -top-4 -left-2 text-4xl text-teal-500/20">
-                      "
-                    </div>
-                    <p className="text-gray-300 italic mb-6 flex-grow relative z-10">
-                      {testimonial.text}
-                    </p>
-                    <div className="absolute -bottom-4 -right-2 text-4xl text-teal-500/20">
-                      "
-                    </div>
-                  </div>
-
-                  <div className="relative z-10">
-                    <motion.p
-                      whileHover={{ x: 5 }}
-                      className="font-semibold text-teal-400"
-                    >
-                      {testimonial.author}
-                    </motion.p>
-                    <p className="text-sm text-gray-400">{testimonial.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </motion.div>
-      </section>
 
       {/* Newsletter Section */}
       <section className="py-24 px-6 relative">

@@ -2,7 +2,7 @@
 
 import React, { ChangeEvent, useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, QueryClient} from "@tanstack/react-query";
 import { hashPassword } from "../utils/LoginUtil";
 import { em } from "framer-motion/client";
 
@@ -90,6 +90,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
           // Example: Store the token and redirect
           localStorage.setItem("token", data.uuid);
           localStorage.setItem("name", data.name);
+          const queryClient = new QueryClient();
+          queryClient.invalidateQueries({queryKey: ["savedRecipes", "u_recipes", "ownedRecipes"]});
+          window.location.reload();
           onSuccess();
         },
         onError: (error) => {
@@ -98,6 +101,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         },
       }
     );
+
+
   }
 
   return (

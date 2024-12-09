@@ -249,13 +249,20 @@ const MealPlanner: React.FC = () => {
     setShowRecipeModal(true);
   };
 
-  const handleRemoveMeal = (date: Date, type: "breakfast" | "lunch" | "dinner") => {
+  const handleRemoveMeal = async (date: Date, type: "breakfast" | "lunch" | "dinner") => {
     setMealPlan(prev => ({
       ...prev,
       meals: prev.meals.filter(
         meal => !(meal.date_saved === formatDate(date) && meal.type === type)
       ),
     }));
+
+    await fetch(`http://localhost:3000/api/calendar/${localStorage.getItem('token')}/${formatDate(date)}/${type}`,
+    {
+      method: 'DELETE',
+    })
+    toast.success('Meal removed successfully');
+    
   };
   
 
@@ -831,10 +838,10 @@ const MealPlanner: React.FC = () => {
         {showRecipeModal && <RecipeModal />}
       </AnimatePresence>
 
-      {/* Save Modal */}
+      {/* Save Modal
       <AnimatePresence>
         {showSaveModal && <SaveModal />}
-      </AnimatePresence>
+      </AnimatePresence> */}
     </div>
   );
 };
