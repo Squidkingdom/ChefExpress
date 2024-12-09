@@ -284,10 +284,10 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
 
           <div className="flex-1 p-6 min-w-0 relative">
             <h3 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
-                           bg-clip-text text-transparent mb-1 truncate">
+                           bg-clip-text text-transparent mb-1 ">
               {recipe.title}
             </h3>
-            <p className="text-gray-300 text-sm line-clamp-2 mb-3">
+            <p className="text-gray-300 text-sm line-clamp-4 mb-3">
               {recipe.description}
             </p>
 

@@ -9,7 +9,7 @@ import { jsPDF } from "jspdf";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 
 interface HeroSectionProps {
   onStartPlanning: () => void;
@@ -829,6 +829,12 @@ const MealPlanner: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100">
+      <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            theme="dark"
+            toastClassName="bg-gray-800 text-gray-100"
+          />
       {/* Conditional Rendering: HeroSection or Planner */}
       {currentPage === 'hero' && <HeroSection onStartPlanning={() => setCurrentPage('planner')} />}
       {currentPage === 'planner' && <Planner />}

@@ -50,7 +50,7 @@ export const Recipes: React.FC<RecipesDisplayProps> = ({ isSavedRecipes = false 
             {sharedRecipes.length === 0 ? (
                 <p className="text-center text-gray-400">No recipes yet.</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div className="grid sm:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-8">
                     {sharedRecipes.map((recipe) => (
                         <RecipeCard key={recipe.id} recipe={recipe} />
                     ))}

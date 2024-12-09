@@ -543,6 +543,13 @@ const ShareForm: React.FC<{ onBack: () => void }> = ({ onBack }) => {
 // Explore Component
 const Explore: React.FC<{ onBack: () => void }> = ({ onBack }) => {
   return (
+    <>
+    <ToastContainer
+            position="top-right"
+            autoClose={3000}
+            theme="dark"
+            toastClassName="my-20 bg-gray-800 text-gray-100"
+          />
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -569,7 +576,8 @@ const Explore: React.FC<{ onBack: () => void }> = ({ onBack }) => {
         </motion.h2>
       </div>
       <Recipes />
-    </motion.div>
+    </motion.div></>
+    
   );
 };
 
