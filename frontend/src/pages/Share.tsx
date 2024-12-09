@@ -67,12 +67,6 @@ const ShareHeroSection: React.FC<ShareHeroSectionProps> = ({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1.2, type: "spring", damping: 20 }}
       >
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-          transition={{ duration: 3, repeat: Infinity }}
-          className="absolute inset-0 bg-gradient-to-r from-teal-500/30 to-cyan-500/30 blur-3xl transform -translate-y-1/2"
-        />
-
         <motion.h1
           className="text-6xl md:text-8xl font-extrabold mb-8 relative"
           initial={{ opacity: 0, y: 20 }}
@@ -117,8 +111,6 @@ const ShareHeroSection: React.FC<ShareHeroSectionProps> = ({
               <FaArrowRight className="w-6 h-6" />
             </motion.span>
           </span>
-          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-teal-400 to-cyan-300 
-                        opacity-0 group-hover:opacity-100 blur transition-opacity duration-300" />
         </motion.button>
       </motion.div>
     </motion.div>
