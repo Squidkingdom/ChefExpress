@@ -4,11 +4,8 @@
  *   This component listens for route changes using React Router's `useLocation` hook and, upon 
  *   detecting a new pathname, automatically scrolls the browser window back up to the top. This 
  *   ensures that each new page/view starts at the top of the viewport.
- * Programmer’s name: Programmer 1
- * Date the code was created: Date 1
- * Dates the code was revised: Date 2
- * Brief description of each revision & author:
- *   Date 2 - Programmer 1: Added route-based scrolling behavior and integrated useLocation hook.
+ * Programmer’s name: Darshil Patel
+ * Date the code was created: 11/4/24
  * Preconditions:
  *   - Must be used within a React Router environment so `useLocation` can track route changes.
  * Acceptable and unacceptable input values or types, and their meanings:
@@ -52,22 +49,3 @@ const ScrollToTop = () => {
 };
 
 export default ScrollToTop;
-
-
-// import { useEffect } from "react";
-// import { useLocation } from "react-router-dom";
-
-// /**
-//  * ScrollToTop component to ensure the window scrolls to the top on route change.
-//  */
-// const ScrollToTop = () => {
-//   const { pathname } = useLocation();
-
-//   useEffect(() => {
-//     window.scrollTo(0, 0);
-//   }, [pathname]);
-
-//   return null;
-// };
-
-// export default ScrollToTop;

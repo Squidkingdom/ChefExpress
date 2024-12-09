@@ -5,11 +5,11 @@
  *   area with a heading, subtitle, and a call-to-action button. As the user scrolls, the hero section 
  *   smoothly scales, fades, and moves, giving a dynamic feel. The "Start Learning" button triggers 
  *   a callback to begin the learning process.
- * Programmer’s name: Programmer 1
- * Date the code was created: Date 1
- * Dates the code was revised: Date 2
+ * Programmer’s name: Brady Holland
+ * Date the code was created: 11/2/24
+ * Dates the code was revised: 11/9/24
  * Brief description of each revision & author:
- *   Date 2 - Programmer 1: Improved animations, added a glowing gradient effect, and refined the 
+ *   11/9/24 - Brady Holland: Improved animations, added a glowing gradient effect, and refined the 
  *   scaling and opacity transitions tied to scroll.
  * Preconditions:
  *   - React environment must be set up.
