@@ -75,8 +75,8 @@ const Home: React.FC<HomeProps> = () => {
         "Access expert-curated courses and interactive tutorials designed for all skill levels",
         "Master essential cooking techniques from basic to advanced",
         "Learn professional kitchen tips and tricks",
-        "Explore global cuisines and traditional cooking methods",
-        "Practice knife skills and advanced plating techniques",
+        "Learn about Food Science and Safety",
+        "Tutorials from Chef Gordon Ramsay",
         "Watch step-by-step video demonstrations"
       ]
     },
@@ -88,9 +88,8 @@ const Home: React.FC<HomeProps> = () => {
       modalDescription: [
         "Create customized weekly meal plans tailored to your preferences",
         "Import your favorite recipes or choose from our collection",
-        "Generate smart shopping lists automatically",
+        "Export your meal plan with full recipe and instructions",
         "Track nutritional information for balanced meals",
-        "Get personalized recipe recommendations",
         "Plan meals based on dietary requirements and restrictions"
       ]
     },
@@ -103,8 +102,8 @@ const Home: React.FC<HomeProps> = () => {
         "Upload and share your original recipes with the community",
         "Showcase your culinary creations with photos",
         "Connect with fellow food enthusiasts",
-        "Participate in cooking challenges and competitions",
-        "Get feedback from other passionate cooks",
+        "Explore recipes shared by others",
+        "Explore Recipes provided by us",
         "Save and organize your favorite community recipes"
       ]
     },
@@ -116,10 +115,10 @@ const Home: React.FC<HomeProps> = () => {
       modalDescription: [
         "Browse professional-grade kitchen tools and equipment",
         "Get chef-recommended cookware and utensils",
-        "Access exclusive deals on premium kitchen items",
-        "Enjoy convenient doorstep delivery",
-        "Find specialty cooking tools and gadgets",
-        "Get expert advice on kitchen equipment selection"
+        "Direct acces to Amazon ensuring best prices and fast delivery",
+        "Professional products selected by our experts",
+        "Find specialty cooking ingredients",
+        "No need to wonder what to buy, our recipes will let you know"
       ]
     }
   ];
