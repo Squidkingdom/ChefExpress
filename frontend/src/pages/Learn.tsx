@@ -71,8 +71,8 @@ const categories = [
     color: 'text-red-400',
   },
   {
-    title: 'Food Safety',
-    value: 'food safety',
+    title: 'Culinary Arts',
+    value: 'Culinary Arts',
     icon: FaBookOpen,
     secondaryIcon: FaShieldAlt,
     description: 'Learn proper food handling and storage techniques',
