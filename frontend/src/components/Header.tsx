@@ -1,9 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 import { RiLoginBoxLine } from "react-icons/ri";
 import { HeaderFloatingElements, HeaderShapeBackground } from "./HeaderFloatingElements";
+
+const NAV_ITEMS = [
+  { path: "/", label: "Home" },
+  { path: "/learn", label: "Learn" },
+  { path: "/make", label: "Plan" },
+  { path: "/share", label: "Share" },
+  { path: "/order", label: "Order" },
+];
 
 interface NavButtonProps {
   to?: string;
@@ -18,17 +26,12 @@ const NavButton: React.FC<NavButtonProps> = ({
   className = "",
   children,
 }) => {
-  const location = useLocation();
-  const isActive = to ? location.pathname === to : false;
-
   const combinedClasses = `
     relative transition-transform duration-300 
-    px-4 py-2 rounded-full overflow-hidden
-    ${className} 
-    ${isActive 
-      ? "bg-gradient-to-r from-teal-500 to-cyan-400 text-gray-900 shadow-lg" 
-      : "text-gray-200 hover:text-white hover:bg-gray-800/50"
-    }`;
+    px-6 py-2 rounded-full overflow-hidden
+    inline-flex items-center justify-center
+    min-w-[100px] mx-2
+    ${className}`;
 
   const content = (
     <motion.div
@@ -40,16 +43,29 @@ const NavButton: React.FC<NavButtonProps> = ({
         hover: { scale: 1.05 },
         tap: { scale: 0.95 },
       }}
-      className={combinedClasses}
+      className="w-full text-center"
     >
       {children}
     </motion.div>
   );
 
   return to ? (
-    <Link to={to}>{content}</Link>
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `${combinedClasses} ${
+          isActive
+            ? "bg-gradient-to-r from-teal-500 to-cyan-400 text-gray-900 shadow-lg"
+            : "text-gray-200 hover:text-white hover:bg-gray-800/50"
+        }`
+      }
+    >
+      {content}
+    </NavLink>
   ) : (
-    <button onClick={onClick} className="focus:outline-none">{content}</button>
+    <button onClick={onClick} className={`focus:outline-none ${combinedClasses}`}>
+      {content}
+    </button>
   );
 };
 
@@ -84,34 +100,35 @@ const NavButtons: React.FC<NavButtonsProps> = ({ onLoginClick, isMobile }) => {
     },
   };
 
+  const mobileClasses = "flex-col space-y-6 w-full items-center py-4";
+  const desktopClasses = "items-center";
+
   return (
     <motion.div
-      className={`flex items-center ${isMobile ? "flex-col space-y-4" : "space-x-6"}`}
+      className={`flex ${isMobile ? mobileClasses : desktopClasses}`}
       variants={containerVariants}
       initial="hidden"
       animate="visible"
     >
-      <motion.div variants={itemVariants}>
-        <NavButton to="/">Home</NavButton>
-      </motion.div>
-      <motion.div variants={itemVariants}>
-        <NavButton to="/learn">Learn</NavButton>
-      </motion.div>
-      <motion.div variants={itemVariants}>
-        <NavButton to="/make">Plan</NavButton>
-      </motion.div>
-      <motion.div variants={itemVariants}>
-        <NavButton to="/share">Share</NavButton>
-      </motion.div>
-      <motion.div variants={itemVariants}>
-        <NavButton to="/order">Order</NavButton>
-      </motion.div>
-      <motion.div variants={itemVariants}>
+      {NAV_ITEMS.map((item) => (
+        <motion.div 
+          key={item.path} 
+          variants={itemVariants}
+          className={isMobile ? "w-full flex justify-center" : ""}
+        >
+          <NavButton to={item.path}>{item.label}</NavButton>
+        </motion.div>
+      ))}
+      <motion.div 
+        variants={itemVariants}
+        className={isMobile ? "w-full flex justify-center mt-4" : "ml-4"}
+      >
         <motion.button
           onClick={onLoginClick}
-          className="bg-gradient-to-r from-teal-500 to-cyan-400 p-2 rounded-full text-gray-900 
+          className="bg-gradient-to-r from-teal-500 to-cyan-400 p-3 rounded-full text-gray-900 
                    focus:outline-none focus:ring-2 focus:ring-teal-500/50
-                   hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300"
+                   hover:shadow-lg hover:shadow-teal-500/30 transition-all duration-300
+                   min-w-[48px] flex items-center justify-center"
           whileHover={{
             scale: 1.1,
             rotate: [0, -10, 10, 0],
@@ -175,10 +192,10 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
         layout
       >
         <motion.div
-          className="container mx-auto flex justify-between items-center px-6"
+          className="container mx-auto flex justify-between items-center px-6 lg:px-8"
           layout
         >
-          <Link to="/" className="group relative">
+          <NavLink to="/" className="group relative">
             <motion.span
               className="text-3xl font-extrabold bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent"
               whileHover={{ scale: 1.05 }}
@@ -186,14 +203,14 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
             >
               ChefExpress
             </motion.span>
-          </Link>
+          </NavLink>
 
-          <nav className="hidden md:flex" role="navigation">
+          <nav className="hidden md:flex justify-end" role="navigation">
             <NavButtons onLoginClick={handleLoginClick} />
           </nav>
 
           <motion.button
-            className="md:hidden text-gray-100 focus:outline-none relative"
+            className="md:hidden text-gray-100 focus:outline-none relative p-2"
             onClick={() => setMenuOpen(!menuOpen)}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
@@ -249,7 +266,7 @@ const Header: React.FC<HeaderProps> = ({ setIsLoginOpen }) => {
             }}
             role="navigation"
           >
-            <div className="container mx-auto py-4 px-6">
+            <div className="container mx-auto px-6">
               <NavButtons onLoginClick={handleLoginClick} isMobile />
             </div>
           </motion.nav>

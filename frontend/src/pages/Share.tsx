@@ -131,10 +131,10 @@ const SelectionView: React.FC<SelectionViewProps> = ({ onSelect }) => {
       color: "text-violet-400",
       bgColor: "bg-violet-400",
       features: [
-        "Browse community recipes",
+        "Browse recipes by us",
+        "Browse recipes shared by others",
+        "Browse your own shared recipes",
         "Save your favorites",
-        "Leave comments and ratings",
-        "Share with friends",
       ],
       view: "explore" as const,
     },

@@ -54,9 +54,12 @@ async function toggleFavorite(recipeId: number) {
     return;
   }
 
-  const response = await fetch(`http://localhost:3000/api/recipe/toggleFavorite?recipe_id=${recipeId}&owner_id_ref=${token}`, {
-    method: "POST",
-  });
+  const response = await fetch(
+    `http://localhost:3000/api/recipe/toggleFavorite?recipe_id=${recipeId}&owner_id_ref=${token}`, 
+    {
+      method: "POST",
+    }
+  );
 
   if (!response.ok) {
     throw new Error("Failed to toggle favorite");
@@ -69,10 +72,7 @@ async function toggleFavorite(recipeId: number) {
 const RecipeModal: React.FC<{
   recipe: Recipe;
   onClose: () => void;
-}> = ({
-  recipe,
-  onClose,
-}) => {
+}> = ({ recipe, onClose }) => {
   const queryClient = useQueryClient();
 
   const handleToggleFavorite = async () => {
@@ -118,26 +118,26 @@ const RecipeModal: React.FC<{
         {/* Right Side - Content */}
         <div className="flex-1 flex flex-col h-[80vh] overflow-hidden">
           {/* Header Section */}
-          <div className="p-6 border-b border-gray-700/50">
+          <div className="p-6 border-b border-gray-700/50 relative">
             <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
                           bg-clip-text text-transparent mb-2">
               {recipe.title}
             </h2>
             <p className="text-gray-300">{recipe.description}</p>
-          </div>
 
-          {/* Close Button */}
-          <button 
-            onClick={onClose}
-            aria-label="Close"
-            className="absolute top-4 right-4 p-2 bg-red-600 rounded-full 
-                      text-white hover:bg-red-700 focus:outline-none focus:ring-2 
-                      focus:ring-red-500 transition-colors duration-200"
-          >
-            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-              <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
-            </svg>
-          </button>
+            {/* Close Button */}
+            <button 
+              onClick={onClose}
+              aria-label="Close"
+              className="absolute top-4 right-4 p-2 bg-red-600 rounded-full 
+                        text-white hover:bg-red-700 focus:outline-none focus:ring-2 
+                        focus:ring-red-500 transition-colors duration-200"
+            >
+              <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
+              </svg>
+            </button>
+          </div>
 
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6">
@@ -252,26 +252,25 @@ interface RecipeCardProps {
   recipe: Recipe;
 }
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ 
-  recipe,
-}) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ recipe }) => {
   const [isModalOpen, setIsModalOpen] = React.useState(false);
 
   return (
     <>
       <motion.div
-        className="group relative w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 
-                  rounded-2xl overflow-hidden cursor-pointer hover:bg-gray-800/70 transition-all duration-300"
+        className="group relative w-full border border-gray-700/50 rounded-2xl overflow-hidden 
+                   cursor-pointer bg-gray-800/40 backdrop-blur-sm transition-all duration-300"
         onClick={() => setIsModalOpen(true)}
-        whileHover={{ scale: 1.02 }}
+        whileHover={{ scale: 1.03 }}
         whileTap={{ scale: 0.98 }}
       >
-        {/* Gradient border effect */}
-        <div className="absolute inset-0 p-[1px] rounded-2xl bg-gradient-to-br from-teal-500/30 
-                      via-cyan-500/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Gradient border and hover effects */}
+        <div className="absolute inset-0 p-[1px] rounded-2xl 
+                        bg-gradient-to-br from-teal-500/30 via-cyan-500/30 to-purple-500/30 
+                        opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        <div className="flex items-stretch h-48">
-          {recipe.image && (
+        <div className="flex items-stretch h-48 relative">
+          {recipe.image ? (
             <div className="relative w-48 flex-shrink-0 overflow-hidden">
               <img
                 src={recipe.image}
@@ -280,38 +279,22 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/20" />
             </div>
+          ) : (
+            <div className="w-48 flex-shrink-0 bg-gray-800 flex items-center justify-center">
+              <span className="text-gray-500 text-sm">No Image</span>
+            </div>
           )}
 
-          <div className="flex-1 p-6 min-w-0">
-            <div className="flex items-start justify-between gap-4">
-              <div className="min-w-0">
-                <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
-                             bg-clip-text text-transparent mb-2 truncate">
-                  {recipe.title}
-                </h3>
-                <p className="text-gray-300 line-clamp-2">{recipe.description}</p>
-              </div>
-              
-              <div className="flex flex-col gap-2 flex-shrink-0">
-                {recipe.isPublic && (
-                  <div className="p-2 bg-teal-500/10 rounded-lg">
-                    <svg className="w-5 h-5 text-teal-400" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-                    </svg>
-                  </div>
-                )}
-                {recipe.favorite && (
-                  <div className="p-2 bg-teal-500/10 rounded-lg">
-                    <svg className="w-5 h-5 text-teal-400" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            </div>
+          <div className="flex-1 p-6 min-w-0 relative">
+            <h3 className="text-xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
+                           bg-clip-text text-transparent mb-1 truncate">
+              {recipe.title}
+            </h3>
+            <p className="text-gray-300 text-sm line-clamp-2 mb-3">
+              {recipe.description}
+            </p>
 
-            {/* Recipe Meta */}
-            <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
+            <div className="flex items-center gap-6 text-sm text-gray-400">
               {recipe.cookTime && (
                 <div className="flex items-center gap-2">
                   <div className="p-1 bg-teal-500/10 rounded-lg">
@@ -340,6 +323,24 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                     </svg>
                   </div>
                   <span>{recipe.servings} servings</span>
+                </div>
+              )}
+            </div>
+
+            {/* Badges (Favorite/Public) */}
+            <div className="absolute top-4 right-4 flex flex-col gap-2">
+              {recipe.isPublic && (
+                <div className="p-2 bg-teal-500/10 rounded-lg">
+                  <svg className="w-5 h-5 text-teal-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
+                  </svg>
+                </div>
+              )}
+              {recipe.favorite && (
+                <div className="p-2 bg-teal-500/10 rounded-lg">
+                  <svg className="w-5 h-5 text-teal-400" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+                  </svg>
                 </div>
               )}
             </div>
