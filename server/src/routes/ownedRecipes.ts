@@ -1,3 +1,25 @@
+/**
+ * Name: ownedRecipes.ts
+ * Description: This file defines the API route to fetch recipes owned by a specific user.
+ * Programmer's name: Brady
+ * Date the code was created: 12/7/24
+ * Date the code was revised: 12/8/24
+ * Preconditions: None
+ * Acceptable input values or types:
+ *   - `owner_id_ref` (string): A valid UUID representing the user’s ID.
+ *   - The `owner_id_ref` must be a query parameter in the GET request.
+ * Postconditions: Returns a JSON response with the list of owned recipes for the given user.
+ * Return values or types:
+ *   - On success: Returns an array of recipe objects, each with the recipe details and an image (if available).
+ *   - On error: Returns a JSON object with an error message and the appropriate status code.
+ * Error and exception condition values:
+ *   - Missing `owner_id_ref`: Returns status 400 with the message "owner_id_ref query parameter is required".
+ *   - Database errors or failures: Returns status 500 with the message "Failed to fetch owned recipes".
+ * Side effects: None
+ * Invariants: The response will always return a list of recipes (can be empty) if the input is valid.
+ * Known faults: None
+ */
+
 import express, { NextFunction, Request, Response } from "express";
 import log4js from "log4js";
 import { prisma } from "../db/client"; // Import prisma client to interact with the database

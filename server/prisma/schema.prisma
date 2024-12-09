@@ -1,19 +1,53 @@
+/*
+  Name: schema.prisma
+  Description: Database schema for the Chef Express project, defining models, relations, and configurations
+               using Prisma ORM.
+  Programmer: Blake, Ike, Brady, Kansas
+  Date Created: [11/1/24]
+  Revisions:
+  - Added views feature, revised models (e.g., `calendar`), by [Your Name].
+  Preconditions: 
+    - PostgreSQL database properly configured.
+    - DATABASE_URL environment variable set in .env.
+  Postconditions: 
+    - Models align with the database structure after Prisma migrations.
+  Notes:
+    - Views and models lacking unique identifiers may have limited functionality in Prisma Client.
+*/
+
+/* Generator for Prisma Client, with preview features enabled for views. */
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["views"]
 }
 
+/* Database connection details using PostgreSQL and an environment variable for the URL. */
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+/*
+  Ingredient Model:
+  Represents an ingredient used in recipes.
+  Fields:
+    - name: Name of the ingredient.
+    - ingredient_id: Primary key, auto-incremented.
+    - ingrediantinrecipe: Relation to `ingrediantinrecipe` for recipes using this ingredient.
+*/
 model Ingredient {
   name               String               @db.VarChar
   ingredient_id      Int                  @id(map: "ingredient_pk") @default(autoincrement())
   ingrediantinrecipe ingrediantinrecipe[]
 }
 
+/*
+  Items Model:
+  Represents items available for purchase on the site.
+  Fields:
+    - Various properties such as name, price, quantity, and category.
+    - id: Primary key, auto-incremented.
+*/
 model Items {
   name     String? @db.VarChar
   price    String? @db.VarChar
@@ -24,7 +58,14 @@ model Items {
   img      String? @db.VarChar
 }
 
-/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/*
+  Recipe Model:
+  Stores information about user-created recipes.
+  Fields:
+    - Various metadata such as name, instructions, and owner_id.
+    - id: Primary key, auto-incremented.
+    - Relations to other models for saved recipes, calendar entries, and ingredients.
+*/
 model Recipe {
   name               String?              @db.VarChar
   instructions       String?              @db.VarChar
@@ -37,6 +78,14 @@ model Recipe {
   saved_recipes      saved_recipes[]
 }
 
+/*
+  Videos Model:
+  Represents cooking-related videos on the learning page.
+  Fields:
+    - length: Video duration.
+    - title: Title of the video.
+    - id: Primary key (String).
+*/
 model Videos {
   length   String? @db.VarChar
   title    String? @db.VarChar
@@ -45,6 +94,13 @@ model Videos {
   category String? @db.VarChar
 }
 
+/*
+  IngrediantInRecipe Model:
+  Links recipes and their associated ingredients (many-to-many relationship).
+  Fields:
+    - Includes quantity of ingredients used.
+    - recipe_id and ingredient_id form a composite primary key.
+*/
 model ingrediantinrecipe {
   quantity      String?    @db.VarChar
   recipe_id     Int
@@ -55,6 +111,13 @@ model ingrediantinrecipe {
   @@id([recipe_id, ingredient_id], map: "ingrediantinrecipe_pk")
 }
 
+/*
+  SavedRecipes Model:
+  Tracks recipes saved by users.
+  Fields:
+    - recipe_id and user_id form a composite unique constraint.
+    - Links to the `Recipe` model.
+*/
 model saved_recipes {
   recipe_id Int
   user_id   String @db.Uuid
@@ -63,7 +126,14 @@ model saved_recipes {
   @@unique([user_id, recipe_id], map: "saved_recipes_pk")
 }
 
-/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/*
+  Users Model:
+  Stores user information.
+  Fields:
+    - uuid: Unique identifier.
+    - pass_hash: Hashed password.
+    - Links to calendar entries.
+*/
 model users {
   email     String     @db.VarChar
   name      String     @db.VarChar
@@ -72,6 +142,15 @@ model users {
   calendar  calendar[]
 }
 
+/*
+  Calendar Model:
+  Represents meal plans for users.
+  Fields:
+    - owner_id: User UUID.
+    - date_saved: Date for the meal plan.
+    - meal: Type of meal (e.g., breakfast, lunch, dinner).
+    - Composite primary key includes meal, date_saved, and owner_id.
+*/
 model calendar {
   owner_id   String  @db.Uuid
   date_saved String  @db.VarChar
@@ -83,7 +162,13 @@ model calendar {
   @@id([meal, date_saved, owner_id], map: "calendar_pk")
 }
 
-/// The underlying view does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+/*
+  Recipe View:
+  Database view providing a summary of recipes.
+  Fields:
+    - Includes title, instructions, description, and ingredients as JSON.
+    - id: Unique identifier.
+*/
 view recipeview {
   id           Int     @unique
   title        String? @db.VarChar
