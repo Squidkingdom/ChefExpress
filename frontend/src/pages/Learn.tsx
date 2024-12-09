@@ -22,6 +22,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useQuery } from '@tanstack/react-query';
 import 'react-toastify/dist/ReactToastify.css';
 import { HeroSection } from '../components/LearnHeroSection';
+import { title } from 'process';
+import { desc } from 'framer-motion/client';
 
 // Types & Interfaces
 interface Video {
@@ -55,20 +57,16 @@ interface VideoModalProps {
 
 // Categories Data
 const categories = [
+
   {
-    title: 'Kitchen Safety',
-    value: 'kitchen safety',
-    icon: FaShieldAlt,
-    secondaryIcon: FaUtensils,
-    description: 'Master essential kitchen safety practices and protocols',
-    gradient: 'from-red-500 to-orange-400',
-    features: [
-      'Equipment handling',
-      'Fire safety protocols',
-      'First aid basics',
-      'Accident prevention'
-    ],
-    color: 'text-red-400',
+    title: 'All Videos',
+    value: 'all',
+    icon: FaPlayCircle,
+    secondaryIcon: FaLightbulb,
+    description: 'Explore all available videos across categories',
+    gradient: 'from-gray-500 to-gray-400',
+    features: ['No filters applied', 'Browse every video'],
+    color: 'text-gray-400',
   },
   {
     title: 'Food Safety',
@@ -454,9 +452,8 @@ const Learn = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ category: selectedCategory })
-      });
+        }
+    });
 
       if (!response.ok) {
         throw new Error('Failed to fetch videos');
@@ -468,9 +465,10 @@ const Learn = () => {
 
   const filteredVideos = useMemo(() => {
     return videos.filter(video => {
-      const matchesCategory = selectedCategory
-        ? video.category.toLowerCase() === selectedCategory.toLowerCase()
-        : true;
+      const matchesCategory = selectedCategory === 'all' || 
+        (selectedCategory
+          ? video.category.toLowerCase() === selectedCategory.toLowerCase()
+          : true);
       const matchesSearch = video.title
         .toLowerCase()
         .includes(searchQuery.toLowerCase());
