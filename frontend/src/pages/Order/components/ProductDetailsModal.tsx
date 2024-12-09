@@ -1,7 +1,6 @@
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingCart } from "lucide-react";
-import { useStore } from "../store/useStore";
+import { X } from "lucide-react";
 import type { Product } from "../types";
 
 interface ProductDetailsModalProps {
@@ -15,11 +14,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
 }) => {
   if (!product) return null;
 
-  // The API returns a price as a string (e.g. "$19.99"). We can display it as-is.
-  // If needed, parse it for numeric operations.
   const displayPrice = product.price || "$0.00";
-
-  const { addToCart } = useStore();
 
   return (
     <AnimatePresence>
@@ -31,7 +26,7 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
         onClick={() => setSelectedProduct(null)}
       >
         <motion.div
-          className="bg-gray-900/90 backdrop-blur-md rounded-2xl w-full max-w-7xl relative
+          className="bg-gray-900/90 backdrop-blur-md rounded-xl w-full max-w-4xl relative
                      border border-gray-700/50 overflow-hidden"
           initial={{ scale: 0.9, opacity: 0, y: 20 }}
           animate={{ scale: 1, opacity: 1, y: 0 }}
@@ -39,18 +34,18 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
           onClick={(e) => e.stopPropagation()}
         >
           <motion.button
-            className="absolute top-4 right-4 text-gray-400 hover:text-gray-200 z-10"
+            className="absolute top-3 right-3 text-gray-400 hover:text-gray-200 z-10"
             onClick={() => setSelectedProduct(null)}
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </motion.button>
 
-          <div className="flex h-full">
+          <div className="flex flex-col md:flex-row">
             {/* Image Section */}
-            <div className="w-1/2 relative bg-white p-8">
-              <div className="aspect-square rounded-xl overflow-hidden">
+            <div className="w-full md:w-1/2 relative bg-white p-6">
+              <div className="aspect-square rounded-lg overflow-hidden">
                 {product.img ? (
                   <img
                     src={product.img}
@@ -63,65 +58,50 @@ export const ProductDetailsModal: React.FC<ProductDetailsModalProps> = ({
                   </div>
                 )}
               </div>
-              <div className="absolute top-4 left-4 bg-gradient-to-r from-teal-500 to-cyan-400 
-                              px-4 py-2 rounded-full text-gray-900 font-bold">
+              <div className="absolute top-3 left-3 bg-gradient-to-r from-teal-500 to-cyan-400 
+                             px-3 py-1.5 rounded-full text-gray-900 font-bold text-sm">
                 {displayPrice}
               </div>
             </div>
 
             {/* Content Section */}
-            <div className="w-1/2 p-8 flex flex-col justify-between">
+            <div className="w-full md:w-1/2 p-6 flex flex-col justify-between">
               <div>
-                <h2 className="text-3xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
-                               bg-clip-text text-transparent mb-4">
+                <h2 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
+                              bg-clip-text text-transparent mb-3">
                   {product.name}
                 </h2>
 
-                <p className="text-gray-300 text-lg leading-relaxed mb-4">
+                <p className="text-gray-300 text-base leading-relaxed mb-3">
                   Category: {product.category || "Unknown"}
                 </p>
 
-                <p className="text-gray-300 text-lg mb-4">
+                <p className="text-gray-300 text-base mb-3">
                   Quantity: {product.quantity || "N/A"}
                 </p>
 
-                <p className="text-gray-300 text-lg mb-8">
+                <p className="text-gray-300 text-base mb-6">
                   {product.description || "No description available."}
                 </p>
               </div>
 
-              <div className="flex gap-4 items-center">
+              <div className="flex justify-center">
                 {product.URL && (
                   <motion.a
                     href={product.URL}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-8 py-4 bg-[#FF9900] text-white rounded-xl 
-                               hover:bg-[#FF9900]/90 transition-colors duration-300
-                               shadow-lg shadow-[#FF9900]/20 hover:shadow-[#FF9900]/30
-                               flex items-center justify-center"
+                    className="px-6 py-3 bg-[#FF9900] text-white rounded-lg 
+                             hover:bg-[#FF9900]/90 transition-colors duration-300
+                             shadow-lg shadow-[#FF9900]/20 hover:shadow-[#FF9900]/30
+                             flex items-center justify-center w-full md:w-auto text-center
+                             text-sm font-medium"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                   >
                     View on Amazon
                   </motion.a>
                 )}
-
-                <motion.button
-                  onClick={() => {
-                    addToCart(product);
-                    setSelectedProduct(null);
-                  }}
-                  className="px-8 py-4 bg-gradient-to-r from-teal-500 to-cyan-400 text-gray-900 
-                            rounded-xl font-medium hover:from-teal-400 hover:to-cyan-300 
-                            transition-all duration-300 flex items-center justify-center gap-2
-                            shadow-lg shadow-teal-500/20 hover:shadow-teal-500/30"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <ShoppingCart className="w-5 h-5" />
-                  Add to Cart
-                </motion.button>
               </div>
             </div>
           </div>

@@ -123,7 +123,7 @@ const getVideoId = (url: string): string => {
   return match ? match[1] : '';
 };
 
-// VideoCard Component
+// VideoCard Component (Updated)
 const VideoCard: React.FC<VideoCardProps> = ({ video, onSelect }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [imgError, setImgError] = useState(false);
@@ -149,7 +149,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onSelect }) => {
 
   return (
     <motion.div
-      className="group relative bg-gray-900/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700/50"
+      className="group relative bg-gray-900/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700/50 cursor-pointer"
       variants={containerVariants}
       initial="rest"
       whileHover="hover"
@@ -191,33 +191,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onSelect }) => {
       </div>
 
       <div className="p-4">
-        <div className="mt-3 flex items-center gap-2">
+        <h4 className="text-lg font-medium text-gray-200 mb-2 break-words line-clamp-2">
+          {video.title}
+        </h4>
+        <div className="flex items-center gap-2">
           <span className="px-3 py-1 text-sm bg-gray-800/70 text-teal-300 rounded-full">
             {video.category}
           </span>
         </div>
-
-        <motion.div 
-          variants={overlayVariants}
-          className="mt-4 flex items-center justify-between"
-        >
-          <motion.button
-            onClick={(e: React.MouseEvent) => {
-              e.stopPropagation();
-              onSelect(video);
-            }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="flex items-center gap-2 px-4 py-2 bg-teal-500 text-gray-900 rounded-full text-sm transition-colors duration-200 hover:bg-teal-400"
-          >
-            Watch Now
-            <FaArrowRight />
-          </motion.button>
-        </motion.div>
       </div>
     </motion.div>
   );
 };
+
 
 // SearchBar Component
 const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, setSearchQuery }) => {

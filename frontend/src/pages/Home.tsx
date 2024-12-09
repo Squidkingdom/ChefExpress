@@ -1,6 +1,6 @@
 // src/pages/Home.tsx
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import {
   FaBookOpen,
@@ -18,6 +18,20 @@ const Home: React.FC<HomeProps> = () => {
   const navigate = useNavigate();
   const { scrollY } = useScroll();
   const missionRef = useRef<HTMLDivElement>(null);
+
+  // Check if hero animation played this session
+  const [showAnimation, setShowAnimation] = useState(true);
+
+  useEffect(() => {
+    const hasPlayed = sessionStorage.getItem("heroAnimationPlayed");
+    if (hasPlayed) {
+      // Skip animations this session
+      setShowAnimation(false);
+    } else {
+      // First time this session: run animations and set the flag
+      sessionStorage.setItem("heroAnimationPlayed", "true");
+    }
+  }, []);
 
   // Enhanced parallax effects
   const y = useTransform(scrollY, [0, 500], [0, 200]);
@@ -52,7 +66,8 @@ const Home: React.FC<HomeProps> = () => {
     {
       icon: FaBookOpen,
       title: "Learn",
-      description: "Discover a world of culinary knowledge and skills and become a better chef!",
+      description:
+        "Discover a world of culinary knowledge and skills and become a better chef!",
       link: "/Learn",
     },
     {
@@ -115,22 +130,15 @@ const Home: React.FC<HomeProps> = () => {
         <motion.div
           style={{ y: smoothY, opacity, scale }}
           className="relative z-10 max-w-6xl mx-auto px-6 text-center"
-          initial={{ opacity: 0, y: 50 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={showAnimation ? { opacity: 0, y: 50 } : false}
+          animate={showAnimation ? { opacity: 1, y: 0 } : false}
           transition={{ duration: 1.2, type: "spring", damping: 20 }}
         >
           <div className="relative">
-            {/* Enhanced glow effect */}
-            <motion.div
-              animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0.8, 0.5] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="absolute inset-0 bg-gradient-to-r from-teal-500/30 to-cyan-500/30 blur-3xl transform -translate-y-1/2"
-            />
-
             <motion.h1
               className="text-6xl md:text-8xl font-extrabold mb-8 relative"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={showAnimation ? { opacity: 0, y: 20 } : false}
+              animate={showAnimation ? { opacity: 1, y: 0 } : false}
               transition={{ delay: 0.3 }}
             >
               <span className="bg-clip-text text-transparent bg-gradient-to-r from-teal-400 to-cyan-300">
@@ -138,8 +146,8 @@ const Home: React.FC<HomeProps> = () => {
               </span>
               <br />
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={showAnimation ? { opacity: 0, y: 20 } : false}
+                animate={showAnimation ? { opacity: 1, y: 0 } : false}
                 transition={{ delay: 0.6 }}
                 className="inline-block"
               >
@@ -148,21 +156,23 @@ const Home: React.FC<HomeProps> = () => {
                   Express
                 </span>
               </motion.div>
+              
             </motion.h1>
 
             <motion.p
+              className="text-2xl md:text-4xl text-gray-300 mb-12 leading-relaxed"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.9 }}
-              className="text-2xl md:text-4xl text-gray-300 mb-12 leading-relaxed"
             >
-              Experience the future of cooking,{" "}
+              Experience the future of cooking
+              <br />
               <span className="text-teal-400">one recipe at a time</span>
             </motion.p>
 
             <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={showAnimation ? { opacity: 0, y: 20 } : false}
+              animate={showAnimation ? { opacity: 1, y: 0 } : false}
               transition={{ delay: 1.2 }}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -188,7 +198,6 @@ const Home: React.FC<HomeProps> = () => {
         </motion.div>
       </header>
 
-      {/* Rest of the components remain the same */}
       {/* Mission Statement */}
       <motion.section
         ref={missionRef}
@@ -271,41 +280,6 @@ const Home: React.FC<HomeProps> = () => {
         </div>
       </motion.section>
 
-      {/* Stats Section */}
-      <section className="py-24 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 blur-3xl pointer-events-none" />
-        <div className="max-w-6xl mx-auto px-6 relative">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              { number: "10k+", label: "Recipes" },
-              { number: "50k+", label: "Active Chefs" },
-              { number: "100k+", label: "Monthly Users" },
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.2 }}
-                className="text-center group"
-              >
-                <motion.h4
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ type: "spring", stiffness: 200, damping: 10 }}
-                  className="text-5xl font-bold mb-2 bg-gradient-to-r from-teal-400 to-cyan-300 bg-clip-text text-transparent relative"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-teal-500/20 to-cyan-500/20 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  {stat.number}
-                </motion.h4>
-                <p className="text-gray-400 transform group-hover:scale-105 transition-transform duration-300">
-                  {stat.label}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* Testimonials Section */}
       <section className="py-32 px-6 relative">
         <motion.div
@@ -330,7 +304,7 @@ const Home: React.FC<HomeProps> = () => {
                 role: "Home Chef",
               },
               {
-                text: "The AI-powered recommendations are spot-on!",
+                text: "The recipes are delicious!",
                 author: "Sarah Johnson",
                 role: "Food Blogger",
               },

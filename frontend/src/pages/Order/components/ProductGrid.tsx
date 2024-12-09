@@ -1,19 +1,17 @@
+// ProductGrid Component
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { ShoppingCart } from 'lucide-react';
 import type { Product } from '../types';
 
 interface ProductGridProps {
   selectedCategory: string;
   searchQuery: string;
-  addToCart: (product: Product) => void;
   setSelectedProduct: (product: Product | null) => void;
 }
 
 export const ProductGrid: React.FC<ProductGridProps> = ({
   selectedCategory,
   searchQuery,
-  addToCart,
   setSelectedProduct,
 }) => {
   const { data: products = [], isLoading, error } = useQuery({
@@ -57,10 +55,10 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
           <motion.div
             key={product.id}
             className="bg-gray-800/30 backdrop-blur-sm rounded-xl overflow-hidden 
-                      border border-gray-700/50 flex flex-col cursor-pointer"
+                      border border-gray-700/50 flex flex-col cursor-pointer max-w-sm mx-auto w-full"
             whileHover={{ y: -4 }}
             transition={{ duration: 0.2 }}
-            onClick={() => setSelectedProduct(product)} // Add this line
+            onClick={() => setSelectedProduct(product)}
           >
             {/* Image Container */}
             <div className="relative h-48 bg-white">
@@ -84,34 +82,19 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
                 {product.category}
               </p>
 
-              {/* Buttons */}
-              <div className="mt-auto flex gap-2">
-                <motion.button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    addToCart(product);
-                  }}
-                  className="flex-1 bg-gradient-to-r from-teal-500 to-cyan-400 
-                         text-gray-900 px-3 py-2 rounded-lg font-medium text-sm
-                         hover:from-teal-400 hover:to-cyan-300 
-                         transition-all duration-300 flex items-center justify-center gap-2"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  Add to Cart
-                </motion.button>
+              {/* Amazon Button */}
+              <div className="mt-auto flex justify-center">
                 <motion.a
                   href={product.URL}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
-                  className="px-3 py-2 bg-[#FF9900] text-white rounded-lg text-sm
-                         hover:bg-[#FF9900]/90 transition-colors duration-300"
+                  className="px-6 py-2.5 bg-[#FF9900] text-white rounded-lg text-sm font-medium
+                         hover:bg-[#FF9900]/90 transition-colors duration-300 w-full text-center"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
-                  Amazon
+                  Go to Amazon
                 </motion.a>
               </div>
             </div>
@@ -121,3 +104,4 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
     </div>
   );
 };
+
