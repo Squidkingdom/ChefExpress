@@ -1,3 +1,44 @@
+/***************************************************************************************************
+ * Name of code artifact: CheckoutModal.tsx
+ * Brief description of what the code does:
+ *   This component displays a checkout modal dialog that appears when a user proceeds to the 
+ *   checkout phase of a shopping session. It provides the user with the option to complete their 
+ *   purchase. On completion, it clears the cart, closes the modal, and shows a success message.
+ * Programmer’s name: Brady Holland
+ * Date the code was created: 11/3/24
+ * Dates the code was revised: 11/22/24
+ * Brief description of each revision & author:
+ *   11/22/24 - Brady Holland: Added animations, styling improvements, and integrated a toast message 
+ *   upon successful checkout.
+ * Preconditions:
+ *   - The parent component must control the `showCheckout` state and provide a `setShowCheckout` 
+ *     callback.
+ *   - The parent must also provide `setCart` to clear the cart contents.
+ * Acceptable and unacceptable input values or types:
+ *   - `showCheckout`: boolean (true to show modal, false to hide).
+ *   - `setShowCheckout`: function to toggle the modal visibility.
+ *   - `setCart`: function to clear the cart.
+ *   - All must be valid and provided, or the component will not function as intended.
+ * Postconditions:
+ *   - If the user clicks "Complete Purchase," the cart is cleared, the modal closes, and a success 
+ *     toast appears.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element) that conditionally renders the checkout modal.
+ * Error and exception condition values or types:
+ *   - None known; if the backend or cart state management fails, the modal just closes without action.
+ * Side effects:
+ *   - Clears the cart and shows a toast notification on successful completion.
+ * Invariants:
+ *   - The modal layout and behavior remain consistent.
+ * Any known faults:
+ *   - None currently known.
+ * Comments summarizing major blocks of code:
+ *   - AnimatePresence and Framer Motion for showing/hiding modal with animations.
+ *   - `handleCompletePurchase` triggers cart clearing and shows a success toast.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
+
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ChevronRight } from "lucide-react";

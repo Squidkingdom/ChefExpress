@@ -36,6 +36,45 @@
  * Comments on every line are provided below.
  ***************************************************************************************************/
 
+
+/***************************************************************************************************
+ * Name of code artifact: Home.tsx
+ * Brief description of what the code does:
+ *   This file defines the Home component, serving as a landing page for the ChefExpress application.
+ *   It includes a hero section, mission statement, feature highlights, statistics, testimonials,
+ *   and a newsletter subscription section. Users can scroll through the page to learn about the 
+ *   platform’s capabilities, and smoothly transition to other pages or actions (like viewing features).
+ * Programmer’s name: Darshil
+ * Date the code was created: 11/1/24
+ * Dates the code was revised: 12/8/24
+ * Brief description of each revision & author:
+ *   Date 2 - Programmer 1: Added advanced animations, refined layout and styling, and integrated 
+ *   a newsletter subscription form for user engagement.
+ * Preconditions:
+ *   - React environment set up.
+ *   - Dependencies: react-router-dom for navigation, framer-motion for animations, react-icons for icons.
+ * Acceptable and unacceptable input values or types:
+ *   - This component does not take direct input values. It depends on scroll and user interactions.
+ * Postconditions:
+ *   - Renders a fully interactive and animated homepage.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - No error handling needed as this page mostly displays static data and handles user actions.
+ * Side effects:
+ *   - Scroll event listener to adjust animation based on scroll position.
+ *   - console.log for subscriptions could be extended into a real API call.
+ * Invariants:
+ *   - The layout and structure remain consistent; only user interactions and scroll animate elements.
+ * Any known faults:
+ *   - None currently known.
+ * Comments summarizing major blocks of code:
+ *   - Hero Section: Presents the app name and a "Start Exploring" button.
+ *   - Mission Statement, Features, Stats, Testimonials, Newsletter: Sequential sections each 
+ *     animated into view as the user scrolls.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
 // src/pages/Home.tsx
 
 import React, { useRef, useState, useEffect } from "react";
