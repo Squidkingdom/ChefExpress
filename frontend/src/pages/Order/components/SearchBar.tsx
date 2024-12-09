@@ -4,7 +4,7 @@
  *   This component renders a search bar with a dynamic, blurred background that adjusts its appearance
  *   when the user has scrolled down. As the user types their query, the search input is debounced to 
  *   reduce unnecessary state updates. A clear button allows users to quickly reset the search field.
- * Programmer’s name: Darshil Patel
+ * Programmer’s name: Brady Holland
  * Date the code was created: 11/7/24
  * Dates the code was revised: 11/26/24
  * Brief description of each revision & author:
