@@ -132,15 +132,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ onStartPlanning }) => {
 };
 
 // Types
+interface Ingredient {
+  name: string; // Name of the ingredient
+  quantity: string; // Quantity of the ingredient
+}
 interface Recipe {
-  id: number;
-  title: string;
-  description: string;
-  ingredients: { name: string; quantity: string }[];
-  instructions: string[];
-  prepTime: number;
-  cookTime: number;
-  servings: number;
+  id: number; // Unique identifier for the recipe
+  name: string; // Title of the recipe
+  description: string; // Short description of the recipe
+  ingredients: Ingredient[]; // List of ingredients
+  instructions: string; // Instructions for preparing the recipe
+  image: string | null; // URL of the recipe image, if available
 }
 
 interface Meal {
@@ -161,20 +163,30 @@ interface SavedMealPlan {
 // Fetch functions (adjust endpoints as necessary)
 const fetchSavedRecipes = async () => {
   const token = localStorage.getItem("token"); // Assuming token needed
-  const response = await fetch(`http://localhost:3000/api/savedRecipes?owner_id_ref=${token}`);
+  const response = await fetch(`http://localhost:3000/api/saveRecipe?userId=${token}`);
   if (!response.ok) {
     throw new Error("Failed to fetch saved recipes");
   }
-  return response.json() as Promise<Recipe[]>;
+  const items = await response.json();
+  console.log(items);
+  return items;
 };
 
 const fetchOwnedRecipes = async () => {
   const token = localStorage.getItem("token");
-  const response = await fetch(`http://localhost:3000/api/ownedRecipes?owner_id_ref=${token}`);
+  const response = await fetch(`http://localhost:3000/api/recipe?owner_id_ref=${token}`);
   if (!response.ok) {
     throw new Error("Failed to fetch owned recipes");
   }
-  return response.json() as Promise<Recipe[]>;
+  const items = await response.json();
+  ///rename 'title' to 'name'
+  items.map((item: any) => {
+    item.name = item.title;
+    delete item.title;
+    return item;
+  });
+  console.log(items);
+  return items;
 };
 
 // Main MealPlanner Component
@@ -319,7 +331,7 @@ const MealPlanner: React.FC = () => {
           doc.setFontSize(12);
           doc.text(
             `${mealType.charAt(0).toUpperCase() + mealType.slice(1)}: ${
-              meal.recipe.title
+              meal.recipe.name
             }`,
             30,
             yOffset
@@ -343,49 +355,50 @@ const MealPlanner: React.FC = () => {
   
     mealPlan.meals.forEach((meal) => {
       const { recipe } = meal;
-  
+    
       // Recipe Title
       doc.setFont("helvetica", "bold");
       doc.setFontSize(14);
       doc.setTextColor(40, 116, 166);
-      doc.text(recipe.title, 20, yOffset);
+      doc.text(recipe.name, 20, yOffset);
       doc.setTextColor(0);
       yOffset += 10;
-  
+    
       // Recipe Description
       doc.setFont("helvetica", "normal");
       doc.setFontSize(12);
       doc.text(`Description: ${recipe.description}`, 20, yOffset);
       yOffset += 10;
-  
+    
       // Ingredients Section
       yOffset = addSectionTitle("Ingredients:", yOffset);
       recipe.ingredients.forEach((ingredient) => {
-        doc.setFont("helvetica", "normal");
-        doc.text(`- ${ingredient.quantity} ${ingredient.name}`, 30, yOffset);
-        yOffset += 7;
+      doc.setFont("helvetica", "normal");
+      doc.text(`- ${ingredient.quantity} ${ingredient.name}`, 30, yOffset);
+      yOffset += 7;
       });
-  
+    
       // Instructions Section
       yOffset = addSectionTitle("Instructions:", yOffset);
-      recipe.instructions.forEach((instruction, index) => {
-        doc.setFont("helvetica", "normal");
-        doc.text(`${index + 1}. ${instruction}`, 30, yOffset);
-        yOffset += 7;
-  
-        if (yOffset > 250) {
-          doc.addPage();
-          addPageHeader("Recipes");
-          yOffset = 30;
-        }
-      });
-  
-      yOffset += 10;
-  
+      const instructions = recipe.instructions.split('\n');
+      instructions.forEach((instruction, index) => {
+      doc.setFont("helvetica", "normal");
+      doc.text(`${index + 1}. ${instruction}`, 30, yOffset);
+      yOffset += 7;
+    
       if (yOffset > 250) {
         doc.addPage();
         addPageHeader("Recipes");
         yOffset = 30;
+      }
+      });
+    
+      yOffset += 10;
+    
+      if (yOffset > 250) {
+      doc.addPage();
+      addPageHeader("Recipes");
+      yOffset = 30;
       }
     });
   
@@ -399,7 +412,7 @@ const MealPlanner: React.FC = () => {
   
     const allRecipes = [...savedRecipes, ...ownedRecipes];
     const filteredRecipes = allRecipes.filter(recipe => 
-      recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      recipe.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       recipe.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
   
@@ -448,34 +461,35 @@ const MealPlanner: React.FC = () => {
                 <div className="grid grid-cols-1 gap-4 overflow-y-auto max-h-[calc(70vh-16rem)] pr-2">
                   {filteredRecipes.map((recipe) => (
                     <button
-                      key={recipe.id}
-                      className="w-full p-6 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-200 text-left group border border-gray-700 hover:border-teal-500/50"
-                      onClick={() => handleSelectRecipe(recipe)}
-                    >
-                      <div className="space-y-3">
-                        <h4 className="text-lg font-medium text-white group-hover:text-teal-400 transition-colors break-words">
-                          {recipe.title}
-                        </h4>
-                        <p className="text-sm text-gray-400 break-words line-clamp-2">
-                          {recipe.description}
-                        </p>
-                        
-                        <div className="flex items-center gap-6 text-sm text-gray-400">
-                          <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-gray-500" />
-                            <span>{recipe.prepTime + recipe.cookTime} min</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-gray-500" />
-                            <span>{recipe.servings} servings</span>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Utensils className="w-4 h-4 text-gray-500" />
-                            <span>{recipe.ingredients.length} ingredients</span>
-                          </div>
+                    key={recipe.id}
+                    className="w-full p-4 bg-gray-800 hover:bg-gray-700 rounded-lg transition-all duration-200 text-left group border border-gray-700 hover:border-teal-500/50 flex items-start gap-4"
+                    onClick={() => handleSelectRecipe(recipe)}
+                  >
+                    {/* Image on the left */}
+                    <img
+                      src={recipe.image || "https://via.placeholder.com/150"}
+                      alt={recipe.name}
+                      className="w-24 h-24 object-cover rounded-lg flex-shrink-0"
+                    />
+                  
+                    {/* Content on the right */}
+                    <div className="flex-1">
+                      <h4 className="text-lg font-medium text-white group-hover:text-teal-400 transition-colors break-words">
+                        {recipe.name}
+                      </h4>
+                      <p className="text-sm text-gray-400 break-words line-clamp-2 mt-1">
+                        {recipe.description}
+                      </p>
+                  
+                      <div className="flex items-center gap-6 text-sm text-gray-400 mt-2">
+                        <div className="flex items-center gap-2">
+                          <Utensils className="w-4 h-4 text-gray-500" />
+                          <span>{recipe.ingredients.length} ingredients</span>
                         </div>
                       </div>
-                    </button>
+                    </div>
+                  </button>
+                  
                   ))}
                   
                   {filteredRecipes.length === 0 && (
@@ -728,18 +742,8 @@ const MealPlanner: React.FC = () => {
         <div className="p-4 h-full flex items-center justify-between gap-3">
           <div className="flex-1 min-w-0">
             <h4 className="font-medium text-gray-200 break-words">
-              {meal.recipe.title}
+              {meal.recipe.name}
             </h4>
-            <div className="flex items-center gap-3 mt-1">
-              <span className="text-xs text-gray-400 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {meal.recipe.prepTime + meal.recipe.cookTime}m
-              </span>
-              <span className="text-xs text-gray-400 flex items-center gap-1">
-                <Users className="w-3 h-3" />
-                {meal.recipe.servings}
-              </span>
-            </div>
           </div>
           <button
             className="flex-shrink-0 p-2 text-gray-400 hover:text-red-400 transition-all rounded-lg hover:bg-gray-700/50"

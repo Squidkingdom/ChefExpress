@@ -56,7 +56,7 @@ router.route("/").post(async (req: Request, res: Response): Promise<void> => {
 
       if (!userId) {
         res.status(400).json({ error: "User ID is required." });
-        return 
+        return
       }
 
       // Fetch all saved recipes for the user
@@ -65,23 +65,44 @@ router.route("/").post(async (req: Request, res: Response): Promise<void> => {
           user_id: String(userId),
         },
         include: {
-          Recipe: true, // Fetch associated recipe details
-        },
+          Recipe: {
+            include: {
+              ingrediantinrecipe: {
+                include: {
+                  Ingredient: true
+                }
+              }
+            }
+          },
+        }
       });
 
       // If no saved recipes are found
       if (savedRecipes.length === 0) {
         res.status(404).json({ message: "No saved recipes found for this user." });
-        return 
+        return
       }
 
+
       // Return saved recipes with associated recipe data
-      res.status(200).json(savedRecipes);
+      const newRecipes = savedRecipes.map((savedRecipe) => {
+        return {
+          ...savedRecipe.Recipe,
+          image: savedRecipe.Recipe.image? `data:image/jpeg;base64,${Buffer.from(savedRecipe.Recipe.image).toString('base64')}` : null,
+          ingredients: savedRecipe.Recipe.ingrediantinrecipe.map((ingredient) => {
+            return {
+              name: ingredient.Ingredient.name,
+              quantity: ingredient.quantity,
+            }
+          }),
+        }
+      });
+      res.status(200).json(newRecipes);
       return
     } catch (error) {
       console.error("Error fetching saved recipes:", error);
       res.status(500).json({ error: "An unexpected error occurred." });
-      return 
+      return
     }
   });
 
