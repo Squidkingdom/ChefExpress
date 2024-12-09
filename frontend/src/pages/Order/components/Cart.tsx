@@ -1,3 +1,51 @@
+/***************************************************************************************************
+ * Name of code artifact: Cart.tsx
+ * Brief description of what the code does:
+ *   This file defines a Cart component and a CartItemComponent that work together to display and 
+ *   manage a shopping cart UI. The Cart component shows a modal overlay with a list of cart items, 
+ *   their quantities, total price, and actions to remove items, update quantities, or proceed 
+ *   to checkout. The CartItemComponent is responsible for rendering each individual cart item, 
+ *   displaying its name, price, and quantity controls.
+ * Programmer’s name: Darshil Patel
+ * Date the code was created: 11/5/24
+ * Dates the code was revised: 11/21/24
+ * Brief description of each revision & author:
+ *   11/21/24 - Darshil Patel: Integrated animations (Framer Motion), improved styling, and 
+ *   enhanced UX with hover/tap effects and a modal overlay.
+ * Preconditions:
+ *   - React environment is set up.
+ *   - CartItem type must be defined elsewhere.
+ *   - Functions for updating quantity, removing from cart, closing the cart, and checking out 
+ *     must be provided.
+ * Acceptable and unacceptable input values or types, and their meanings:
+ *   - `cart`: an array of CartItems, where each item contains id, name, price, img, and quantity.
+ *   - `updateQuantity`: function that takes an item’s id and a new quantity number.
+ *   - `removeFromCart`: function that takes an item’s id and removes it from the cart.
+ *   - `calculateTotal`: function that calculates the total cost of the cart items.
+ *   - `onClose` and `onCheckout`: callbacks to handle closing the cart modal and proceeding 
+ *     to checkout, respectively.
+ * Postconditions:
+ *   - The cart modal is displayed over the current view.
+ *   - Users can see and modify the cart content and either close or proceed with checkout.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - None known; errors would mainly be due to missing or incorrect props.
+ * Side effects:
+ *   - Clicking outside the modal closes it (triggering onClose).
+ *   - Interactions with buttons update the cart state or close the modal.
+ * Invariants:
+ *   - The cart modal remains centered and scrollable if there are many items.
+ * Any known faults:
+ *   - If cart data changes unexpectedly, animations might appear abrupt.
+ * Comments summarizing major blocks of code:
+ *   - CartItemComponent: Renders individual item with increment, decrement, and remove actions.
+ *   - Cart component: Renders a modal overlay, cart header, items list, and footer with total 
+ *     and checkout button.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
+
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Minus, Plus, Trash2, ChevronRight, X } from "lucide-react";

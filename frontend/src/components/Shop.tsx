@@ -1,3 +1,51 @@
+/***************************************************************************************************
+ * Name of code artifact: Shop.tsx
+ * Brief description of what the code does:
+ *   The Shop component fetches a list of products from an API endpoint using React Query and 
+ *   displays them in a responsive grid. It supports filtering by category and search query, and 
+ *   allows the user to select a product for viewing detailed information. The component also 
+ *   includes a button to navigate to an external Amazon page for the product.
+ * Programmer’s name: Darshil Patel
+ * Date the code was created: 11/7/24
+ * Dates the code was revised: 11/29/24
+ * Brief description of each revision & author:
+ *   11/29/24 - Brady Holland: Integrated search and category filtering logic, and added product
+ *   selection callback handling.
+ * Preconditions:
+ *   - Must run in a React environment.
+ *   - Backend endpoint (`http://localhost:3000/api/items`) must be accessible and return a list of 
+ *     products in JSON format.
+ * Acceptable and unacceptable input values or types, and their meanings:
+ *   - `selectedCategory`: string indicating which category should be filtered; "All" means no 
+ *     category filter.
+ *   - `searchQuery`: string used to filter products by name.
+ *   - `addToCart`: function to handle adding a product to the cart by ID.
+ *   - `removeFromCart`: function to remove product from cart by ID.
+ *   - `setSelectedProduct`: function to set the currently selected product for detail view.
+ * Unacceptable inputs:
+ *   - Non-string for `selectedCategory` or `searchQuery`.
+ *   - Non-function values for `addToCart`, `removeFromCart`, or `setSelectedProduct` would break the intended functionality.
+ * Postconditions:
+ *   - Renders a grid of filtered products, or a "No products found" message if none match the criteria.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - If the fetch fails, displays an error message.
+ *   - If loading, displays a loading message.
+ * Side effects:
+ *   - Fetches products from the provided API endpoint.
+ * Invariants:
+ *   - The product display layout remains a responsive grid.
+ * Any known faults:
+ *   - If the API endpoint changes or the data schema is altered, the component may not function as intended.
+ * Comments summarizing major blocks of code:
+ *   - useQuery hook: Fetches product data.
+ *   - Filtering logic: Filters products by category and search query.
+ *   - Conditional rendering: Shows loading, error, products grid, or no-results message depending on state.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
+
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
 import { FaShoppingCart } from 'react-icons/fa';

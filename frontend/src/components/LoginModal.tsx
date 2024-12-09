@@ -1,3 +1,47 @@
+/***************************************************************************************************
+ * Name of code artifact: LoginModal.tsx
+ * Brief description of what the code does:
+ *   This component renders a modal window that allows the user to either log in or sign up to 
+ *   the ChefExpress application. It conditionally displays either a LoginForm or a SignUpForm, 
+ *   and includes logic for toggling between these two states. The modal can be closed by clicking 
+ *   the close button or by invoking the provided onClose callback.
+ * Programmer’s name: Darshil Patel
+ * Date the code was created: 11/6/24
+ * Dates the code was revised: 11/15/24
+ * Brief description of each revision & author:
+ *   11/15/24 - Brady Holland: Integrated SignUpForm and toggling feature to switch between Login and 
+ *   SignUp modes.
+ * Preconditions:
+ *   - Must be used within a React environment.
+ *   - LoginForm and SignUpForm must be implemented and imported correctly.
+ *   - `isOpen` determines if the modal should be visible.
+ * Acceptable input values or types:
+ *   - `isOpen`: boolean indicating whether the modal is open.
+ *   - `onClose`: a function to close the modal.
+ * Unacceptable input values or types:
+ *   - Non-boolean for `isOpen`.
+ *   - Non-function for `onClose`.
+ * Postconditions:
+ *   - Renders a modal overlay if `isOpen` is true.
+ *   - Shows either Login or SignUp form based on `isSignUp` state.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element or null if closed).
+ * Error and exception condition values or types:
+ *   - If required components are missing, the modal may fail to render the intended forms.
+ * Side effects:
+ *   - None, aside from DOM updates.
+ * Invariants:
+ *   - The modal's internal state toggles between showing LoginForm and SignUpForm.
+ * Any known faults:
+ *   - If `onSuccess` from forms doesn't handle navigation or modal closure correctly, modal may remain open.
+ * Comments summarizing major blocks of code:
+ *   - State `isSignUp`: toggles between login and sign-up modes.
+ *   - Conditional rendering: if `isSignUp` is true, show SignUpForm; otherwise, LoginForm.
+ *   - Buttons to toggle form state and close the modal.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
+
 // src/components/LoginModal.tsx
 
 import React, { useState } from "react";
