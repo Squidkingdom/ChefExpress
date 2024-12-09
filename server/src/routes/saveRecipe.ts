@@ -42,7 +42,7 @@ router.route("/").post(async (req: Request, res: Response): Promise<void> => {
     logger.info(`Successfully saved recipe with ID: ${savedRecipe.recipe_id} for user: ${savedRecipe.user_id}`);
 
     // Return a success message
-    res.status(201).json({ message: "Recipe saved successfully" });
+    res.status(200).json({ message: "Recipe saved successfully" });
 
   } catch (error) {
     // Log any errors and return a 500 internal server error
