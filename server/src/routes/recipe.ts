@@ -1,3 +1,30 @@
+/**
+ * Name: recipe.ts
+ * Description: This file defines the API routes for handling recipe operations, including fetching, creating recipes, and uploading images.
+ * Programmer's name: Blake, Brady
+ * Date the code was created: 11/24/24
+ * Date the code was revised: 12/7/24
+ * Preconditions: The user must be authenticated and provide valid data in the request body.
+ * Acceptable input values or types:
+ *   - `title` (string): The name of the recipe.
+ *   - `instructions` (string): The preparation instructions for the recipe.
+ *   - `description` (string): A description of the recipe.
+ *   - `owner_id` (string): The UUID of the recipe owner.
+ *   - `ingredients` (array of objects): Each object contains `name` (string) and `quantity` (string).
+ *   - `image` (file): The image to be uploaded (optional).
+ * Postconditions: A new recipe is created, its ingredients are saved, and an image (if provided) is uploaded.
+ * Return values or types:
+ *   - On GET: Returns an array of recipes, each with details and image (if available).
+ *   - On POST: Returns a success message with the created recipe and ingredients, or an error if the creation fails.
+ * Error and exception condition values:
+ *   - Missing or invalid parameters: Returns status 400 with an appropriate error message.
+ *   - Database errors during recipe or ingredient creation: Returns status 500 with the message "Failed to create recipe and ingredients".
+ *   - Image upload errors: Returns status 500 with the message "Internal Server Error".
+ * Side effects: Recipes and ingredients are saved in the database, and images are uploaded if provided.
+ * Invariants: Recipe creation and ingredient linking are ensured, even if the image is not uploaded.
+ * Known faults: None
+ */
+
 import express, { NextFunction, Request, Response } from "express";
 import multer from "multer";
 import log4js from "log4js";
@@ -19,7 +46,7 @@ interface MulterRequest extends Request {
 
 // Handle POST request to /api/recipeImage for image upload
 // (From the first snippet; DO NOT remove or change comments)
- 
+
 /**
  *                                     RECIPE  /api/recipe
  * 

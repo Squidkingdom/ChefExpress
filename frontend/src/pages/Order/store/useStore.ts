@@ -5,11 +5,10 @@
  *   store for managing the cart. It stores cart items, allows adding/removing items, updating 
  *   their quantities, clearing the cart, and calculating the total cost. Toast notifications 
  *   from react-toastify are displayed on certain actions for user feedback.
- * Programmer’s name: Programmer 1
- * Date the code was created: Date 1
- * Dates the code was revised: Date 2
+ * Programmer’s name: Brady, Darshil
+ * Date the code was created: 11/24/24
+ * Dates the code was revised: 12/7/24
  * Brief description of each revision & author:
- *   Date 2 - Programmer 1: Added toast notifications, improved data mutation logic, and ensured
  *   the total cost calculation returns a number.
  * Preconditions:
  *   - Zustand and react-toastify should be installed and configured.
@@ -142,76 +141,3 @@ export const useStore = create<StoreState>((set, get) => ({
     return total; // return as a number
   },
 }));
-
-
-// // src/store/useStore.ts
-// import { create } from 'zustand';
-// import { Product, CartItem } from '../types';
-// import { toast } from 'react-toastify';
-
-// interface StoreState {
-//   cart: CartItem[];
-//   addToCart: (product: Product) => void;
-//   removeFromCart: (id: number) => void;
-//   updateQuantity: (id: number, quantity: number) => void;
-//   clearCart: () => void;
-//   calculateTotal: () => number; // Return a number now
-// }
-
-// export const useStore = create<StoreState>((set, get) => ({
-//   cart: [],
-
-//   addToCart: (product: Product) => {
-//     set((state) => {
-//       const existingItem = state.cart.find((item) => item.id === product.id);
-//       if (existingItem) {
-//         toast.success(`Updated ${product.name} quantity in cart`);
-//         return {
-//           cart: state.cart.map((item) =>
-//             item.id === product.id
-//               ? { ...item, quantity: item.quantity + 1 }
-//               : item
-//           ),
-//         };
-//       }
-//       toast.success(`Added ${product.name} to cart`);
-//       return { cart: [...state.cart, { ...product, quantity: 1 }] };
-//     });
-//   },
-
-//   removeFromCart: (id: number) => {
-//     const item = get().cart.find((item) => item.id === id);
-//     if (item) {
-//       toast.info(`Removed ${item.name} from cart`);
-//     }
-//     set((state) => ({
-//       cart: state.cart.filter((item) => item.id !== id),
-//     }));
-//   },
-
-//   updateQuantity: (id: number, quantity: number) => {
-//     if (quantity < 1) {
-//       get().removeFromCart(id);
-//       return;
-//     }
-//     set((state) => ({
-//       cart: state.cart.map((item) =>
-//         item.id === id ? { ...item, quantity } : item
-//       ),
-//     }));
-//   },
-
-//   clearCart: () => {
-//     toast.success('Cart cleared');
-//     set({ cart: [] });
-//   },
-
-//   calculateTotal: () => {
-//     const state = get();
-//     const total = state.cart.reduce((sum, item) => {
-//       const priceNumber = parseFloat(item.price.replace('$', ''));
-//       return sum + priceNumber * item.quantity;
-//     }, 0);
-//     return total; // return as a number
-//   },
-// }));

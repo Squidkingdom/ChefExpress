@@ -1,16 +1,70 @@
+/**
+ * Name: RecipeCard Component
+ * Description:  
+ * The RecipeCard component displays a styled recipe card with interactive elements such as hover 
+ * animations and a modal trigger. It shows the recipe's title, description, image, cooking time, 
+ * difficulty, servings, and visual cues for "favorite" and "public" statuses. The card opens a modal 
+ * with more details when clicked.
+ * 
+ * Programmer's name: Brady, Darshil
+ * Date the code was created: 11/24/24
+ * Date the code was revised: 12/8/24
+ * 
+ * Preconditions:
+ *   - A valid `recipe` object must be passed to the component as a prop.
+ *   - The `recipe` object must include fields such as `title`, `description`, `image`, `cookTime`, 
+ *     `difficulty`, `servings`, `isPublic`, and `favorite`. Optional fields may be missing.
+ * 
+ * Acceptable input values or types:
+ *   - `recipe`: An object of type `Recipe` (defined elsewhere in the project).
+ *   - `recipe.title`: String, the title of the recipe.
+ *   - `recipe.description`: String, a description of the recipe.
+ *   - `recipe.image`: Optional string URL of the recipe image.
+ *   - `recipe.cookTime`: Optional string representing cooking time.
+ *   - `recipe.difficulty`: Optional string indicating the recipe's difficulty level.
+ *   - `recipe.servings`: Optional number of servings.
+ *   - `recipe.isPublic`: Optional boolean indicating if the recipe is public.
+ *   - `recipe.favorite`: Optional boolean indicating if the recipe is a favorite.
+ * 
+ * Postconditions:
+ *   - When the card is clicked, the `isModalOpen` state is set to `true`, which triggers the modal to open.
+ * 
+ * Return values or types:
+ *   - This component returns JSX for rendering the recipe card, with interactive elements and animations.
+ * 
+ * Error and exception condition values:
+ *   - If the `recipe` object is missing required fields (e.g., `title` or `description`), the component
+ *     may render incomplete or incorrect UI.
+ * 
+ * Side effects:
+ *   - Clicking on the recipe card opens a modal that displays additional details about the recipe.
+ *   - CSS classes and animation libraries are used to create hover effects and transitions.
+ * 
+ * Invariants:
+ *   - The card layout and hover animation should display consistently when valid data is provided.
+ * 
+ * Known faults:
+ *   - No known faults identified at this time.
+ */
+
+
 // src/components/RecipeCard/index.tsx
+
+// Importing necessary dependencies from React, framer-motion, react-toastify, and react-query
 import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "react-toastify";
 import { useQueryClient } from "@tanstack/react-query";
 
 // Types & Interfaces
+// Defining the structure of an ingredient object with optional unit
 export interface Ingredient {
   name: string;
   quantity: string;
   unit?: string;
 }
 
+// Defining the structure of a recipe object, including optional properties for cook time, difficulty, servings, and favorite status
 export interface Recipe {
   id: number;
   title: string;
@@ -26,12 +80,14 @@ export interface Recipe {
 }
 
 // Recipe Meta Item Component
+// This component is used to display individual metadata items (like cook time, difficulty, and servings) in the modal
 interface MetaItemProps {
   icon: React.ReactNode;
   label: string;
   value: string;
 }
 
+// MetaItem displays a small metadata item with an icon, label, and value (used in the RecipeModal)
 const MetaItem: React.FC<MetaItemProps> = ({ icon, label, value }) => (
   <div className="bg-gray-800/50 backdrop-blur-sm rounded-xl p-3 border border-gray-700/50">
     <div className="flex items-center gap-2">
@@ -46,7 +102,8 @@ const MetaItem: React.FC<MetaItemProps> = ({ icon, label, value }) => (
   </div>
 );
 
-// Toggling favorite API call
+// Async function to toggle the favorite status of a recipe
+// If the user is not logged in, it will show an error
 async function toggleFavorite(recipeId: number) {
   const token = localStorage.getItem("token");
   if (!token) {
@@ -54,6 +111,7 @@ async function toggleFavorite(recipeId: number) {
     return;
   }
 
+  // Making a POST request to toggle the favorite status of a recipe on the server
   const response = await fetch(`http://localhost:3000/api/recipe/toggleFavorite?recipe_id=${recipeId}&owner_id_ref=${token}`, {
     method: "POST",
   });
@@ -65,16 +123,19 @@ async function toggleFavorite(recipeId: number) {
   return response.json();
 }
 
-// Updated Modal Component with Horizontal Layout
+// Recipe Modal Component
+// This component displays a modal with detailed information about a recipe, including an option to toggle its favorite status
 const RecipeModal: React.FC<{
-  recipe: Recipe;
-  onClose: () => void;
+  recipe: Recipe; // The recipe to display
+  onClose: () => void; // Function to close the modal
 }> = ({
   recipe,
   onClose,
 }) => {
+  // useQueryClient is used for refetching queries after the favorite state is toggled
   const queryClient = useQueryClient();
 
+  // Handle the toggle favorite action
   const handleToggleFavorite = async () => {
     try {
       await toggleFavorite(recipe.id);
@@ -89,9 +150,10 @@ const RecipeModal: React.FC<{
   };
 
   return (
+    // Modal container with backdrop blur effect
     <div 
       className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4" 
-      onClick={onClose}
+      onClick={onClose} // Close the modal if the backdrop is clicked
     >
       <motion.div 
         initial={{ opacity: 0, scale: 0.95 }}
@@ -99,17 +161,19 @@ const RecipeModal: React.FC<{
         exit={{ opacity: 0, scale: 0.95 }}
         transition={{ type: "spring", duration: 0.5 }}
         className="bg-gray-900/90 backdrop-blur-xl w-full max-w-6xl max-h-[80vh] rounded-2xl overflow-hidden border border-gray-700/50 flex"
-        onClick={e => e.stopPropagation()}
+        onClick={e => e.stopPropagation()} // Prevent closing modal when clicking inside the modal
       >
         {/* Left Side - Image */}
         <div className="w-2/5 relative">
           {recipe.image ? (
+            // Display recipe image if available
             <img
               src={recipe.image}
               alt={recipe.title}
               className="w-full h-full object-cover"
             />
           ) : (
+            // Display a fallback color block if no image is available
             <div className="w-full h-full bg-gray-800" />
           )}
           <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/50" />
@@ -128,12 +192,13 @@ const RecipeModal: React.FC<{
 
           {/* Close Button */}
           <button 
-            onClick={onClose}
-            aria-label="Close"
+            onClick={onClose} // Trigger onClose function when the button is clicked
+            aria-label="Close" // Accessibility label
             className="absolute top-4 right-4 p-2 bg-red-600 rounded-full 
                       text-white hover:bg-red-700 focus:outline-none focus:ring-2 
                       focus:ring-red-500 transition-colors duration-200"
           >
+            {/* Close icon (X) */}
             <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z" />
             </svg>
@@ -215,6 +280,7 @@ const RecipeModal: React.FC<{
 
             {/* Action Buttons */}
             <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-700/50">
+              {/* Button to toggle favorite status */}
               <motion.button
                 onClick={handleToggleFavorite}
                 whileHover={{ scale: 1.05 }}
@@ -249,49 +315,54 @@ const RecipeModal: React.FC<{
 
 // Main RecipeCard Component
 interface RecipeCardProps {
-  recipe: Recipe;
+  recipe: Recipe; // Recipe object passed as a prop
 }
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ 
-  recipe,
+  recipe, // Destructure recipe from props
 }) => {
-  const [isModalOpen, setIsModalOpen] = React.useState(false);
+  const [isModalOpen, setIsModalOpen] = React.useState(false); // State to manage modal visibility
 
   return (
     <>
+      {/* Main card container with hover effects and gradient border */}
       <motion.div
         className="group relative w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 
                   rounded-2xl overflow-hidden cursor-pointer hover:bg-gray-800/70 transition-all duration-300"
-        onClick={() => setIsModalOpen(true)}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        onClick={() => setIsModalOpen(true)} // Open modal on click
+        whileHover={{ scale: 1.02 }} // Hover scale effect
+        whileTap={{ scale: 0.98 }} // Tap scale effect
       >
-        {/* Gradient border effect */}
+        {/* Gradient border effect on hover */}
         <div className="absolute inset-0 p-[1px] rounded-2xl bg-gradient-to-br from-teal-500/30 
                       via-cyan-500/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
         <div className="flex items-stretch h-48">
+          {/* Image display section, shows recipe image if available */}
           {recipe.image && (
             <div className="relative w-48 flex-shrink-0 overflow-hidden">
               <img
-                src={recipe.image}
-                alt={recipe.title}
-                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                src={recipe.image} // Recipe image source
+                alt={recipe.title} // Image alt text
+                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105" // Image styling and hover scale effect
               />
               <div className="absolute inset-0 bg-gradient-to-r from-transparent to-gray-900/20" />
             </div>
           )}
 
+          {/* Recipe details section */}
           <div className="flex-1 p-6 min-w-0">
             <div className="flex items-start justify-between gap-4">
+              {/* Recipe title and description */}
               <div className="min-w-0">
                 <h3 className="text-2xl font-bold bg-gradient-to-r from-teal-400 to-cyan-300 
                              bg-clip-text text-transparent mb-2 truncate">
-                  {recipe.title}
+                  {recipe.title} {/* Display recipe title */}
                 </h3>
-                <p className="text-gray-300 line-clamp-2">{recipe.description}</p>
+                <p className="text-gray-300 line-clamp-2">{recipe.description}</p> {/* Display description with line clamp */}
               </div>
               
+              {/* Section for recipe's status (Public or Favorite) */}
               <div className="flex flex-col gap-2 flex-shrink-0">
                 {recipe.isPublic && (
                   <div className="p-2 bg-teal-500/10 rounded-lg">
@@ -310,7 +381,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
               </div>
             </div>
 
-            {/* Recipe Meta */}
+            {/* Meta information about the recipe (cook time, difficulty, servings) */}
             <div className="flex items-center gap-6 mt-4 text-sm text-gray-400">
               {recipe.cookTime && (
                 <div className="flex items-center gap-2">
@@ -319,7 +390,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                       <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7V7z" />
                     </svg>
                   </div>
-                  <span>{recipe.cookTime}</span>
+                  <span>{recipe.cookTime}</span> {/* Display cook time */}
                 </div>
               )}
               {recipe.difficulty && (
@@ -329,7 +400,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                       <path d="M8.1 13.34l2.83-2.83L3.91 3.5c-1.56 1.56-1.56 4.09 0 5.66l4.19 4.18zm6.78-1.81c1.53.71 3.68.21 5.27-1.38 1.91-1.91 2.28-4.65.81-6.12-1.46-1.46-4.2-1.1-6.12.81-1.59 1.59-2.09 3.74-1.38 5.27L3.7 19.87l1.41 1.41L12 14.41l6.88 6.88 1.41-1.41L13.41 13l1.47-1.47z" />
                     </svg>
                   </div>
-                  <span>{recipe.difficulty}</span>
+                  <span>{recipe.difficulty}</span> {/* Display difficulty level */}
                 </div>
               )}
               {recipe.servings && (
@@ -339,7 +410,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
                       <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z" />
                     </svg>
                   </div>
-                  <span>{recipe.servings} servings</span>
+                  <span>{recipe.servings} servings</span> {/* Display servings */}
                 </div>
               )}
             </div>
@@ -347,11 +418,12 @@ const RecipeCard: React.FC<RecipeCardProps> = ({
         </div>
       </motion.div>
 
+      {/* Modal for recipe details */}
       <AnimatePresence>
         {isModalOpen && (
           <RecipeModal
-            recipe={recipe}
-            onClose={() => setIsModalOpen(false)}
+            recipe={recipe} // Pass recipe to modal
+            onClose={() => setIsModalOpen(false)} // Close modal on close button click
           />
         )}
       </AnimatePresence>
