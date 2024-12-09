@@ -1,3 +1,52 @@
+/***************************************************************************************************
+ * Name of code artifact: Learn.tsx
+ * Brief description of what the code does:
+ *   This file defines a Learn page component for the ChefExpress application. It provides multiple 
+ *   views: a hero section introducing the concept of learning, a category selection screen for 
+ *   educational video topics, and a video browsing view filtered by category and search query. 
+ *   Users can watch tutorial videos on various aspects of cooking, kitchen safety, food science, 
+ *   and more. The page uses React Query for fetching data, Framer Motion for animations, and 
+ *   integrated components like HeroSection, SelectionCards, and VideoCard.
+ * Programmer’s name: Brady, Darshil
+ * Date the code was created: 11/24/24
+ * Dates the code was revised: 12/8/24
+ * Brief description of each revision & author:
+ *   filtering, and enhanced animations and styling for a more dynamic learning experience.
+ * Preconditions:
+ *   - React environment set up.
+ *   - React Query, Framer Motion, and related dependencies must be installed.
+ *   - Backend API endpoint (`http://localhost:3000/api/videos`) must support POST requests 
+ *     with a category field and return an array of videos.
+ * Acceptable and unacceptable input values or types:
+ *   - `ViewType` is a union of 'hero', 'select', or 'view' to determine the current screen.
+ *   - `Video` objects must have an id, title, URL, length, and category.
+ * Postconditions:
+ *   - Displays a hero section, category selection cards, and a video gallery with search filters.
+ *   - Allows watching a selected video in a modal overlay.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - If video fetching fails, displays an error message.
+ *   - If no videos match filters, displays a "no videos" message.
+ * Side effects:
+ *   - Fetches data from an API using React Query.
+ *   - Animations triggered on scroll, hover, and user interactions.
+ * Invariants:
+ *   - The layout remains consistent: hero > category selection > video viewing.
+ * Any known faults:
+ *   - None currently known.
+ * Comments summarizing major blocks of code:
+ *   - Categories data structure: Defines selectable categories.
+ *   - HeroSection: Initial view encouraging users to start learning.
+ *   - SelectionCards: Grid of category cards to pick a learning topic.
+ *   - VideoCard: Renders a video thumbnail and allows selection for viewing.
+ *   - VideoModal: Displays a selected video in a modal (YouTube embed).
+ *   - SearchBar: Allows filtering videos by title search.
+ *   - Main Learn component: Manages state for current view, category, search, and selected video.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
+
 // src/pages/Learn.tsx
 
 import React, { 

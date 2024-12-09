@@ -1,3 +1,47 @@
+/***************************************************************************************************
+ * Name of code artifact: OrderPage.tsx
+ * Brief description of what the code does:
+ *   This file defines the OrderPage component, which showcases a hero section and a product 
+ *   browsing page. Users can transition from the hero section to the shop section, search and 
+ *   filter products, add items to a cart, and proceed to checkout. The component integrates 
+ *   React Query for data fetching, Framer Motion for animations, Toastify for notifications, and 
+ *   Zustand for state management (via useStore).
+ * Programmer’s name: Brady, Darshil
+ * Date the code was created: 11/24/24
+ * Dates the code was revised: 12/8/24
+ * Brief description of each revision & author:
+ *   product filtering, and implemented hero-to-shop transitions.
+ * Preconditions:
+ *   - React environment and related dependencies (React Query, Framer Motion, Toastify, Zustand) installed.
+ *   - Backend API endpoint (http://localhost:3000/api/items) must be available for product data.
+ * Acceptable and unacceptable input values or types, and their meanings:
+ *   - No direct inputs; this page interacts with global state, a backend API, and user interactions.
+ *   - `onStartShopping` callback triggers transitioning from hero to shop.
+ * Postconditions:
+ *   - Displays a hero section initially.
+ *   - Allows switching to a shopping page, searching, filtering, viewing products, adding to cart, and checking out.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - If fetching products fails, shows an error message.
+ *   - User actions triggering invalid states are handled gracefully (e.g., empty cart shows no items).
+ * Side effects:
+ *   - Fetches product data from the backend.
+ *   - Updates global cart state and shows toast notifications on certain actions.
+ * Invariants:
+ *   - The hero section appears first; user must interact to view the shop.
+ * Any known faults:
+ *   - None currently known.
+ * Comments summarizing major blocks of code:
+ *   - QueryClientProvider: Provides React Query context for data fetching.
+ *   - HeroSection: Initial view encouraging user to start shopping.
+ *   - ShopContent: Displays a header, category filters, search bar, and product grid.
+ *   - Cart and CheckoutModal: Overlays for cart management and checkout process.
+ *   - ProductDetailsModal: Shows detailed info about a clicked product.
+ * Comments on every line are provided below.
+ ***************************************************************************************************/
+
+
 import React, { useState, useEffect } from "react";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { motion, AnimatePresence } from "framer-motion";

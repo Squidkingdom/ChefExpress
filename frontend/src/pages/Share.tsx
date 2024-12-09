@@ -1,3 +1,50 @@
+/***************************************************************************************************
+ * Name of code artifact: Share.tsx
+ * Brief description of what the code does:
+ *   This file defines the Share component for the ChefExpress application. It provides a hero section 
+ *   and a selection menu where users can either share their own recipes with the community or explore 
+ *   community recipes. Users can create a new recipe by adding ingredients, instructions, and an image, 
+ *   and then submit it to be saved to the backend. It also integrates a recipes explorer where users 
+ *   can browse community recipes. Framer Motion animations, toast notifications, and transitions 
+ *   enhance the user experience.
+ * Programmer’s name: Brady, Darshil
+ * Date the code was created: 11/14/24
+ * Dates the code was revised: 12/8/24
+ * Brief description of each revision & author:
+ *   Date 2 - Programmer 1: Integrated recipe creation, community recipe exploration, and improved 
+ *   UI/UX with animations and toasts.
+ * Preconditions:
+ *   - React environment set up.
+ *   - Backend endpoints for creating recipes (`http://localhost:3000/api/recipe`) and fetching recipes.
+ *   - Framer Motion, React Query, react-toastify, and required dependencies installed.
+ * Acceptable and unacceptable input values or types:
+ *   - User must provide a recipe name, description, at least one ingredient, instructions, and an image to share a recipe.
+ *   - For exploring recipes, no specific input is required, just browsing.
+ * Postconditions:
+ *   - Users can successfully submit a new recipe, which is saved to the backend.
+ *   - Users can also navigate to explore community recipes.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - If recipe creation fails, a toast error is shown.
+ *   - If no recipes are found, descriptive messages are displayed.
+ * Side effects:
+ *   - Mutating the backend by creating a new recipe.
+ *   - Invalidating React Query cache to refresh recipe lists.
+ * Invariants:
+ *   - The navigation between hero, selection, share form, and explore is consistent.
+ * Any known faults:
+ *   - None currently known.
+ * Comments summarizing major blocks of code:
+ *   - ShareHeroSection: Initial hero section encouraging user to start contributing recipes.
+ *   - SelectionView: Menu where users can choose to share a recipe or explore existing ones.
+ *   - ShareForm: Form to create and submit a new recipe, including ingredient management and image upload.
+ *   - Explore: Displays the community recipes using the Recipes component.
+ *   - Main Share component: Manages view state and integrates all parts together.
+ * Comments on every line are provided inline below.
+ ***************************************************************************************************/
+
+
 import React, { useState, ChangeEvent, KeyboardEvent, useRef } from "react";
 import {
   FaPlus,

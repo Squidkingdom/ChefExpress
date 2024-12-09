@@ -1,3 +1,49 @@
+/***************************************************************************************************
+ * Name of code artifact: MealPlanner.tsx
+ * Brief description of what the code does:
+ *   This file defines a MealPlanner component that provides a hero section to start planning meals, 
+ *   and a comprehensive weekly meal planning interface. Users can select recipes (from saved or owned) 
+ *   to assign to breakfast, lunch, and dinner slots for each day of the week. They can also export 
+ *   their meal plan to PDF, save/load meal plans, and navigate between different weeks. The planner 
+ *   includes animated transitions, modals for selecting recipes and saving plans, and integrates 
+ *   data fetching with React Query.
+ * Programmer’s name: Brady
+ * Date the code was created: 11/24/24
+ * Dates the code was revised: 12/7/24
+ * Brief description of each revision & author:
+ *   implemented saving/loading meal plans, and enhanced the overall UI/UX.
+ * Preconditions:
+ *   - React environment set up.
+ *   - React Query, Framer Motion, date-fns, jsPDF, and other dependencies installed.
+ *   - Backend endpoints:
+ *     - `http://localhost:3000/api/saveRecipe` for fetching saved recipes
+ *     - `http://localhost:3000/api/recipe` for fetching owned recipes
+ * Postconditions:
+ *   - Users can view a hero section and transition to a meal planner screen.
+ *   - The meal planner allows setting meals for each day, saving/loading plans, exporting to PDF.
+ * Return values or types:
+ *   - Returns a React Functional Component (JSX.Element).
+ * Error and exception condition values or types:
+ *   - If fetching recipes fails, an error is thrown and displayed in console.
+ *   - If no recipes or no meal plans exist, displays appropriate messages.
+ * Side effects:
+ *   - Fetches data from the backend, reads/writes from localStorage (token).
+ * Invariants:
+ *   - The UI layout: hero screen first, then planner with a weekly calendar view.
+ * Any known faults:
+ *   - None currently known.
+ * Comments summarizing major blocks of code:
+ *   - HeroSection: Initial landing view encouraging user to start meal planning.
+ *   - MealPlanner component: The main planner UI with weekly calendar, meal slots, modals.
+ *   - fetchSavedRecipes & fetchOwnedRecipes: Data fetching functions via React Query.
+ *   - PDF generation logic using jsPDF to export current week’s meal plan and recipes.
+ *   - RecipeModal: Modal for selecting a recipe from saved/owned lists with search functionality.
+ *   - SaveModal: Modal for naming and saving the current meal plan.
+ *   - SavedPlans: Displays previously saved meal plans, allowing load/delete actions.
+ * Comments on every line are provided inline below.
+ ***************************************************************************************************/
+
+
 import React, { useState, useCallback, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { 

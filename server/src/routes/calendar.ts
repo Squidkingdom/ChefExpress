@@ -1,3 +1,50 @@
+/**
+ * Name: calendar.ts
+ * Description:  
+ * This module defines the API routes for managing calendar-related data, including fetching, 
+ * creating, updating, and deleting calendar entries. It integrates with a Prisma database 
+ * to perform operations on the 'calendar' table and logs activities using log4js.
+ * 
+ * Programmer's name: Blake, Brady
+ * Date the code was created: 11/24/24
+ * Date the code was revised: 12/8/24
+ * 
+ * Preconditions:
+ *   - The `prisma` client must be correctly configured to connect to the database.
+ *   - log4js must be properly initialized for logging.
+ *   - Express server setup should include this router at the desired endpoint (e.g., `/api/calendar`).
+ * 
+ * Acceptable input values or types:
+ *   - `GET /api/calendar`: Requires `owner_id` as a query parameter.
+ *   - `POST /api/calendar`: Requires JSON body containing `owner_id`, `date_saved`, and `meal` (and optionally `recipe_id`).
+ *   - `DELETE /api/calendar/:owner_id/:date_saved/:meal`: Expects `owner_id`, `date_saved`, and `meal` as route parameters.
+ * 
+ * Postconditions:
+ *   - For `GET`: Returns a JSON array of calendar entries with associated recipe details.
+ *   - For `POST`: Creates or updates a calendar entry and returns the new or updated entry.
+ *   - For `DELETE`: Deletes a specified calendar entry and returns a success message.
+ * 
+ * Return values or types:
+ *   - Successful requests return `200`, `201`, or appropriate JSON responses.
+ *   - Error responses return `400` (bad request) or `500` (server error) with an error message.
+ * 
+ * Error and exception condition values:
+ *   - Invalid or missing input values (e.g., `owner_id` missing in `POST`) result in a `400` response.
+ *   - Database errors or unexpected exceptions result in a `500` response.
+ * 
+ * Side effects:
+ *   - Modifies the 'calendar' table in the database through `POST` and `DELETE` requests.
+ *   - Logs all activity and errors for auditing and debugging purposes.
+ * 
+ * Invariants:
+ *   - Logging occurs for every request to the `/api/calendar` endpoint.
+ *   - `meal_date_saved_owner_id` composite key must uniquely identify calendar entries in the database.
+ * 
+ * Known faults:
+ *   - Error handling might not capture all edge cases for database errors.
+ */
+
+
 import express, { NextFunction, Request, Response } from "express";
 import log4js from "log4js";
 import { prisma } from "../db/client";

@@ -1,57 +1,107 @@
+/**
+ * Name: App.css
+ * Description:  
+ * This stylesheet defines the base styles, root color variables, custom utility classes, and global styling 
+ * for the application. It imports Tailwind CSS base, components, and utilities, and customizes elements such as 
+ * fonts, colors, and utility classes for consistent and reusable design patterns.
+ * 
+ * Programmer's name: Brady, Darshil
+ * Date the code was created: 11/24/24
+ * Date the code was revised: 12/8/24
+ * 
+ * Preconditions:
+ *   - Tailwind CSS is integrated into the project.
+ *   - The `Roboto` font from Google Fonts is available for use.
+ * 
+ * Acceptable input values or types:
+ *   - No specific inputs required as this file is a CSS stylesheet.
+ * 
+ * Postconditions:
+ *   - The application’s visual appearance is governed by these global styles and utility classes.
+ * 
+ * Return values or types:
+ *   - No return values, as this file defines styles and does not include executable code.
+ * 
+ * Error and exception condition values:
+ *   - Missing Tailwind CSS integration or broken font link may result in missing styles.
+ * 
+ * Side effects:
+ *   - The global styles, including fonts, colors, and utility classes, will apply across the entire application.
+ * 
+ * Invariants:
+ *   - The root colors and font-family will remain consistent unless overwritten elsewhere in the application.
+ * 
+ * Known faults:
+ *   - No known faults identified at this time.
+ */
+
+/* Tailwind CSS Imports */
+/* These imports bring in the base styles, components, and utilities from Tailwind CSS */
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
 
 /* Font Import */
+/* This imports the Roboto font family from Google Fonts to be used throughout the application */
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap');
 
 /* Root color variables */
+/* Defining color variables for primary and secondary colors, and background color for easy reference */
 :root {
-    --primary-color: #333333;
-    --secondary-color: #777777;
-    --background-color: #f9f9f9;
+    --primary-color: #333333;  /* Dark primary color used for text */
+    --secondary-color: #777777; /* Lighter secondary color used for less emphasized text */
+    --background-color: #f9f9f9; /* Light background color for the page */
 }
 
 /* Base Body Styles */
+/* Defining base body styles including font family, text color, and background color */
 body {
-    font-family: 'Roboto', sans-serif;
-    color: var(--primary-color);
-    background-color: var(--background-color);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    font-family: 'Roboto', sans-serif;  /* Apply the Roboto font to the entire body */
+    color: var(--primary-color);  /* Set the text color to the primary color */
+    background-color: var(--background-color); /* Set the background color to a light color */
+    -webkit-font-smoothing: antialiased; /* Smooth fonts for webkit browsers */
+    -moz-osx-font-smoothing: grayscale; /* Smooth fonts for Firefox on macOS */
 }
 
 /* Custom Utility Classes */
-/* These add consistency and keep classes lightweight without extra custom CSS */
+/* These utility classes provide reusable styling that can be applied to elements */
 
+/* Flex-center utility for centering content */
 .flex-center {
-    @apply flex items-center justify-center;
+    @apply flex items-center justify-center; /* Uses Tailwind's flex utility to center items horizontally and vertically */
 }
 
+/* Primary text color utility */
 .text-primary {
-    color: var(--primary-color);
+    color: var(--primary-color); /* Applies the primary color defined in the :root variables */
 }
 
+/* Secondary text color utility */
 .text-secondary {
-    color: var(--secondary-color);
+    color: var(--secondary-color); /* Applies the secondary color defined in the :root variables */
 }
 
+/* Primary background color utility */
 .bg-primary {
-    background-color: var(--primary-color);
-    color: #ffffff;
+    background-color: var(--primary-color); /* Applies the primary color as a background */
+    color: #ffffff; /* White text color for contrast */
 }
 
-/* Card Component (if custom styling is needed beyond Tailwind) */
+/* Card Component Styling */
+/* Card style for content sections, with rounded corners and shadows */
 .card {
-    @apply bg-white rounded-lg shadow-lg p-6 mb-4;
+    @apply bg-white rounded-lg shadow-lg p-6 mb-4; /* Tailwind utility for white background, rounded corners, shadow, padding, and margin */
 }
 
+/* Button Primary Style */
+/* Custom primary button with hover effects */
 .btn-primary {
-    @apply bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90 transition duration-200;
+    @apply bg-primary text-white py-2 px-4 rounded hover:bg-opacity-90 transition duration-200; /* Button with primary background, white text, padding, rounded corners, and hover effect */
 }
 
-
+/* Global Image Styles */
+/* Ensures that images scale responsively without exceeding container width */
 img {
-    max-width: 100%;
-    height: auto;
+    max-width: 100%; /* Prevents images from overflowing their containers */
+    height: auto; /* Maintains aspect ratio */
 }
