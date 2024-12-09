@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
 import { 
   Plus, X, Download, Save, ChevronLeft, ChevronRight,
@@ -9,6 +9,7 @@ import { jsPDF } from "jspdf";
 import { useQuery } from "@tanstack/react-query";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
+import { toast } from "react-toastify";
 
 interface HeroSectionProps {
   onStartPlanning: () => void;
@@ -146,8 +147,8 @@ interface Recipe {
 }
 
 interface Meal {
-  id: number;
-  date: string;
+  owner_id: string;
+  date_saved: string; //yyyy-MM-DD
   type: 'breakfast' | 'lunch' | 'dinner';
   recipe: Recipe;
 }
@@ -201,6 +202,22 @@ const MealPlanner: React.FC = () => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [planName, setPlanName] = useState("");
 
+
+    // Load user's meals on mount
+  useEffect(() => {
+      const loadMeals = async () => {
+        try {
+          const userMeals = await fetchMeals();
+          setMealPlan({ meals: userMeals });
+        } catch (error) {
+          console.error("Error loading meals:", error);
+          toast.error("Failed to load meals. Please try again.");
+        }
+      };
+  
+      loadMeals();
+    }, []);
+    
   // Queries for recipes
   const { data: savedRecipes = [] } = useQuery<Recipe[], Error>({
     queryKey: ["savedRecipes"],
@@ -221,7 +238,7 @@ const MealPlanner: React.FC = () => {
 
   const getMealForDate = useCallback((date: Date, type: "breakfast" | "lunch" | "dinner"): Meal | null => {
     return mealPlan.meals.find(
-      meal => meal.date === formatDate(date) && meal.type === type
+      meal => meal.date_saved === formatDate(date) && meal.type === type
     ) || null;
   }, [mealPlan.meals]);
 
@@ -236,16 +253,18 @@ const MealPlanner: React.FC = () => {
     setMealPlan(prev => ({
       ...prev,
       meals: prev.meals.filter(
-        meal => !(meal.date === formatDate(date) && meal.type === type)
+        meal => !(meal.date_saved === formatDate(date) && meal.type === type)
       ),
     }));
   };
+  
 
   const handleSelectRecipe = (recipe: Recipe) => {
     if (selectedDate && selectedMealType) {
       const newMeal: Meal = {
-        id: Date.now(),
-        date: formatDate(selectedDate),
+        //get token from cookies
+        owner_id: localStorage.getItem("token") || "",
+        date_saved: formatDate(selectedDate),
         type: selectedMealType,
         recipe,
       };
@@ -253,7 +272,7 @@ const MealPlanner: React.FC = () => {
       setMealPlan(prev => ({
         ...prev,
         meals: [...prev.meals.filter(
-          meal => !(meal.date === newMeal.date && meal.type === newMeal.type)
+          meal => !(meal.date_saved === newMeal.date_saved && meal.type === newMeal.type)
         ), newMeal],
       }));
 
@@ -263,28 +282,64 @@ const MealPlanner: React.FC = () => {
     }
   };
 
+  async function postMeals(meals: Meal[]): Promise<void> {
+    const endpoint = 'http://localhost:3000/api/calendar';
+  
+    // Transform meals into the required format
+    const formattedMeals = meals.map((meal) => ({
+      owner_id: meal.owner_id,
+      date_saved: meal.date_saved,
+      type: meal.type,
+      recipe_id: meal.recipe.id,
+    }));
+    console.log(formattedMeals);
+    // Post each meal to the endpoint
+    try {
+      const postRequests = formattedMeals.map(async (meal) =>
+        fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(meal),
+        })
+      );
+      await Promise.all(postRequests);
+      console.log('All meals posted successfully.');
+    } catch (error) {
+      console.error('Error posting meals:', error);
+    }
+  }
+
   const handleSavePlan = () => {
-    if (!planName.trim()) return;
-
-    const newPlan: SavedMealPlan = {
-      id: Date.now().toString(),
-      name: planName,
-      startDate: formatDate(currentWeek),
-      meals: mealPlan.meals,
-      createdAt: new Date().toISOString()
-    };
-
-    setSavedMealPlans(prev => [newPlan, ...prev]);
-    setPlanName("");
-    setShowSaveModal(false);
+    console.log(mealPlan.meals)
+    postMeals(mealPlan.meals);
+    toast.success('Meal plan saved successfully!');
   };
 
   const handleDeletePlan = (planId: string) => {
     setSavedMealPlans(prev => prev.filter(plan => plan.id !== planId));
   };
 
+  const fetchMeals = async (): Promise<Meal[]> => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("User not authenticated");
+      return [];
+    }
+
+    const response = await fetch(`http://localhost:3000/api/calendar?owner_id=${token}`);
+    if (!response.ok) {
+      throw new Error("Failed to fetch saved meal plans");
+    }
+    const meals: Meal[] = await response.json();
+    return meals;
+  };
+
   const handleLoadPlan = (plan: SavedMealPlan) => {
-    setMealPlan({ meals: plan.meals });
+    fetchMeals().then((meals) => {
+      setMealPlan({ meals });
+    });
     setCurrentWeek(parseISO(plan.startDate));
   };
 
@@ -320,7 +375,7 @@ const MealPlanner: React.FC = () => {
     // Weekly Schedule Section
     weekDays.forEach((date) => {
       const dateStr = formatDate(date);
-      const dayMeals = mealPlan.meals.filter((meal) => meal.date === dateStr);
+      const dayMeals = mealPlan.meals.filter((meal) => meal.date_saved === dateStr);
   
       // Day Header
       yOffset = addSectionTitle(format(date, "EEEE, MMMM d"), yOffset);
@@ -594,7 +649,7 @@ const MealPlanner: React.FC = () => {
                 Export PDF
               </button>
               <button 
-                onClick={() => setShowSaveModal(true)}
+                onClick={() => handleSavePlan()}
                 className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r 
                          from-teal-500 to-cyan-400 text-gray-900 rounded-lg 
                          hover:opacity-90 transition-opacity flex items-center 
@@ -785,3 +840,5 @@ const MealPlanner: React.FC = () => {
 };
 
 export default MealPlanner;
+
+
